@@ -1,0 +1,5 @@
+enum: ReflexTier
+values:
+  - greenMastered
+  - yellowDeveloping
+  - redNeedsWork

@@ -1,0 +1,5 @@
+class: CohortSummary
+fields:
+  mastery: List<TopicMastery>
+  questions: List<QuestionInsight>
+  students: List<StudentProgress>

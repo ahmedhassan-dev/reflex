@@ -1,0 +1,6 @@
+class: OptionExplanationView
+fields:
+  optionId: int
+  text: String
+  isCorrect: bool
+  explanation: String?

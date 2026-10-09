@@ -1,0 +1,11 @@
+class: QuestionOption
+table: question_option
+fields:
+  questionId: int
+  position: int
+  text: String
+  isCorrect: bool
+  explanation: String?
+indexes:
+  question_option_qid_idx:
+    fields: questionId

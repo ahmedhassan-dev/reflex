@@ -1,0 +1,7 @@
+class: StudentProgress
+fields:
+  learnerId: int
+  displayName: String
+  solvedCount: int
+  cleanFirstTryCount: int
+  avgResponseMs: double

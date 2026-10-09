@@ -1,0 +1,8 @@
+class: AcceptedAnswer
+table: accepted_answer
+fields:
+  questionId: int
+  normalizedText: String
+indexes:
+  accepted_answer_qid_idx:
+    fields: questionId

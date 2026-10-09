@@ -1,0 +1,10 @@
+class: Learner
+table: learner
+fields:
+  authUserId: UuidValue
+  displayName: String
+  role: Role
+indexes:
+  learner_auth_idx:
+    fields: authUserId
+    unique: true

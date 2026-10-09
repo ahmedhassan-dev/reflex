@@ -1,0 +1,4 @@
+class: DemoClock
+table: demo_clock
+fields:
+  offsetDays: int

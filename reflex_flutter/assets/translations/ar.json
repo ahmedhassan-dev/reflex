@@ -1,0 +1,29 @@
+{
+  "app_title": "ريفلكس",
+  "connected": "أنت متصل الآن",
+  "sign_out": "تسجيل الخروج",
+  "sign_in": "تسجيل الدخول",
+  "enter_name": "أدخل اسمك",
+  "no_response_yet": "لا يوجد رد من الخادم حتى الآن.",
+  "error_occurred": "حدث خطأ",
+  "retry": "إعادة المحاولة",
+  "loading": "جارٍ التحميل...",
+  "practice": {
+    "title": "التدريب",
+    "submit": "إرسال الإجابة",
+    "continue_button": "متابعة",
+    "hint": "تلميح",
+    "points": "نقاط",
+    "note_gate_title": "ملاحظة الموضوع",
+    "note_gate_acknowledge": "قرأت هذه الملاحظة وفهمتها",
+    "mastered": "متقن (ريفلكس سريع وبدون مساعدة)",
+    "developing": "في طور التطوير (صحيح، تابع التدريب)",
+    "needs_work": "يحتاج مراجعة (غير صحيح)"
+  },
+  "dashboard": {
+    "title": "لوحة تحكم المعلم",
+    "cohort_mastery": "إتقان الفصل الدراسي",
+    "questions": "تحليلات الأسئلة",
+    "students": "تقدم الطلاب"
+  }
+}

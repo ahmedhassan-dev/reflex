@@ -1,0 +1,10 @@
+class: QuestionView
+fields:
+  id: int
+  prompt: String
+  topic: String
+  questionType: QuestionType
+  options: List<QuestionOptionView>?
+  points: int
+  expectedSeconds: int
+  hasHelpHint: bool

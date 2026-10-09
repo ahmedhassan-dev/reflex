@@ -1,0 +1,21 @@
+class: Question
+table: question
+fields:
+  courseId: int
+  position: int
+  prompt: String
+  topic: String
+  questionType: QuestionType
+  points: int
+  expectedSeconds: int
+  topicNote: String?
+  helpHint: String?
+  attemptCount: int
+  attemptedStudentCount: int
+  solvedStudentCount: int
+  firstTrySolveCount: int
+  underTimeSolveCount: int
+  cleanSolveCount: int
+indexes:
+  question_course_idx:
+    fields: courseId

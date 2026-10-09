@@ -1,0 +1,15 @@
+class: ReviewState
+table: review_state
+fields:
+  learnerId: int
+  questionId: int
+  dueAt: DateTime
+  intervalDays: int
+  lapses: int
+  helpUsed: bool
+  lastServedAt: DateTime?
+  lastResult: AttemptStatus?
+indexes:
+  review_state_learner_q_idx:
+    fields: learnerId, questionId
+    unique: true

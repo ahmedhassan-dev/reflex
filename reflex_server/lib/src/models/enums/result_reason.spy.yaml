@@ -1,0 +1,6 @@
+enum: ResultReason
+values:
+  - correctClean
+  - correctSlow
+  - correctWithHelp
+  - wrong

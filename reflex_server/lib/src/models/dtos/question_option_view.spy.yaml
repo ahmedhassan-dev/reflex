@@ -1,0 +1,4 @@
+class: QuestionOptionView
+fields:
+  id: int
+  text: String

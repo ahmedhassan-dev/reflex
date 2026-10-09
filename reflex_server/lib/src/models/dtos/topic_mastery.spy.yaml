@@ -1,0 +1,4 @@
+class: TopicMastery
+fields:
+  topic: String
+  masteryRate: double

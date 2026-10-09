@@ -1,0 +1,36 @@
+# Seed configuration running on non-conflicting auxiliary ports
+apiServer:
+  port: 8085
+  publicHost: localhost
+  publicPort: 8085
+  publicScheme: http
+
+insightsServer:
+  port: 8086
+  publicHost: localhost
+  publicPort: 8086
+  publicScheme: http
+
+webServer:
+  port: 8087
+  publicHost: localhost
+  publicPort: 8087
+  publicScheme: http
+
+database:
+  host: localhost
+  port: 8090
+  name: reflex
+  user: postgres
+  dataPath: .serverpod/development/pgdata
+
+redis:
+  enabled: false
+  host: localhost
+  port: 8091
+
+maxRequestSize: 524288
+
+sessionLogs:
+  persistentEnabled: false
+  consoleEnabled: false

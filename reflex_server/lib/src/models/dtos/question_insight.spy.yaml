@@ -1,0 +1,14 @@
+class: QuestionInsight
+fields:
+  questionId: int
+  prompt: String
+  topic: String
+  questionType: QuestionType
+  attemptCount: int
+  solvedStudentCount: int
+  firstTrySolveCount: int
+  underTimeSolveCount: int
+  cleanSolveCount: int
+  firstTryRate: double
+  cleanRate: double
+  avgResponseMs: double

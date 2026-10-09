@@ -1,0 +1,29 @@
+{
+  "app_title": "Reflex",
+  "connected": "You are connected",
+  "sign_out": "Sign out",
+  "sign_in": "Sign in",
+  "enter_name": "Enter your name",
+  "no_response_yet": "No server response yet.",
+  "error_occurred": "An error occurred",
+  "retry": "Retry",
+  "loading": "Loading...",
+  "practice": {
+    "title": "Practice",
+    "submit": "Submit Answer",
+    "continue_button": "Continue",
+    "hint": "Hint",
+    "points": "points",
+    "note_gate_title": "Topic Note",
+    "note_gate_acknowledge": "I have read and understood this note",
+    "mastered": "Mastered (Reflex Fast & Clean)",
+    "developing": "Developing (Correct, Keep Practicing)",
+    "needs_work": "Needs Work (Review Needed)"
+  },
+  "dashboard": {
+    "title": "Teacher Dashboard",
+    "cohort_mastery": "Cohort Mastery",
+    "questions": "Question Insights",
+    "students": "Student Progress"
+  }
+}

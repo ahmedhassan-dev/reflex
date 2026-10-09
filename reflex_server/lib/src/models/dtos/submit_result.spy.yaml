@@ -1,0 +1,11 @@
+class: SubmitResult
+fields:
+  verdict: AttemptStatus
+  reason: ResultReason
+  reflexTier: ReflexTier
+  points: int
+  responseMs: int
+  nextDueAt: DateTime
+  topicNote: String?
+  selectedOptionExplanation: String?
+  optionExplanations: List<OptionExplanationView>?

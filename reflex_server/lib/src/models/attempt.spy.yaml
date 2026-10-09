@@ -1,0 +1,20 @@
+class: Attempt
+table: attempt
+fields:
+  learnerId: int
+  questionId: int
+  selectedOptionId: int?
+  answerText: String?
+  status: AttemptStatus
+  responseMs: int
+  usedHelp: bool
+  isFirstAttempt: bool
+  underExpectedTime: bool
+  isClean: bool
+  reflexTier: ReflexTier
+  createdAt: DateTime
+indexes:
+  attempt_learner_idx:
+    fields: learnerId
+  attempt_question_idx:
+    fields: questionId

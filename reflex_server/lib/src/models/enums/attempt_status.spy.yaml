@@ -1,0 +1,4 @@
+enum: AttemptStatus
+values:
+  - valid
+  - wrong

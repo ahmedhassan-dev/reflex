@@ -1,0 +1,4 @@
+class: PracticeItem
+fields:
+  question: QuestionView
+  kind: CardKind

@@ -1,0 +1,28 @@
+analytics:
+  - getCohortSummary:
+  - getMyProgress:
+emailIdp:
+  - login:
+  - startRegistration:
+  - verifyRegistrationCode:
+  - finishRegistration:
+  - startPasswordReset:
+  - verifyPasswordResetCode:
+  - finishPasswordReset:
+  - hasAccount:
+jwtRefresh:
+  - refreshAccessToken:
+demoClock:
+  - getOffsetDays:
+  - setOffsetDays:
+  - advanceDays:
+  - resetClock:
+greeting:
+  - hello:
+practice:
+  - serveNextCard:
+  - requestHelp:
+  - submitAnswer:
+questionAdmin:
+  - updateTopicNoteAndHint:
+  - listQuestions:

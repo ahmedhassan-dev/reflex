@@ -1,0 +1,235 @@
+import 'package:reflex_server/src/features/practice/domain/attempt_outcome.dart';
+import 'package:reflex_server/src/features/practice/domain/card_selector.dart';
+import 'package:reflex_server/src/core/clock/clock.dart';
+import 'package:reflex_server/src/core/errors/exceptions.dart';
+import 'package:reflex_server/src/features/practice/domain/grader.dart';
+import 'package:reflex_server/src/generated/protocol.dart';
+import 'package:reflex_server/src/data/repositories/interfaces.dart';
+
+/// Core practice orchestrator for student flashcard sessions.
+///
+/// Handles card selection, timing tracking, help hints, grading,
+/// spaced repetition updates, atomic counter deltas, and idempotency.
+class PracticeService {
+  final IQuestionRepository questionRepo;
+  final IQuestionOptionRepository optionRepo;
+  final IAcceptedAnswerRepository acceptedAnswerRepo;
+  final IAttemptRepository attemptRepo;
+  final IReviewStateRepository reviewStateRepo;
+  final Clock clock;
+  final CardSelector cardSelector;
+
+  PracticeService({
+    required this.questionRepo,
+    required this.optionRepo,
+    required this.acceptedAnswerRepo,
+    required this.attemptRepo,
+    required this.reviewStateRepo,
+    required this.clock,
+    CardSelector? cardSelector,
+  }) : cardSelector = cardSelector ??
+            CardSelector(
+              questionRepository: questionRepo,
+              reviewStateRepository: reviewStateRepo,
+            );
+
+  /// Serves the next card due for review or unattempted in the course deck.
+  /// Stamps `lastServedAt` and clears `helpUsed` on the card's [ReviewState].
+  Future<PracticeItem?> serveNextCard({
+    required int learnerId,
+    required int courseId,
+  }) async {
+    final now = clock.now();
+
+    final selection = await cardSelector.selectNextCard(
+      learnerId: learnerId,
+      courseId: courseId,
+      now: now,
+    );
+
+    if (selection == null) return null;
+
+    final question = selection.question;
+
+    // Stamp ReviewState as served now
+    final existingReview = await reviewStateRepo.get(learnerId, question.id!);
+    final stateToSave = (existingReview ??
+            ReviewState(
+              learnerId: learnerId,
+              questionId: question.id!,
+              dueAt: now,
+              intervalDays: 0,
+              lapses: 0,
+              helpUsed: false,
+            ))
+        .copyWith(
+      lastServedAt: now,
+      helpUsed: false,
+    );
+    await reviewStateRepo.upsert(stateToSave);
+
+    // Fetch options for multiple choice
+    List<QuestionOptionView>? optionViews;
+    if (question.questionType == QuestionType.multipleChoice) {
+      final options = await optionRepo.getOptionsForQuestion(question.id!);
+      optionViews = options
+          .map((o) => QuestionOptionView(
+                id: o.id!,
+                text: o.text,
+              ))
+          .toList();
+    }
+
+    // Build QuestionView without secret answers or topicNote
+    final questionView = QuestionView(
+      id: question.id!,
+      prompt: question.prompt,
+      topic: question.topic,
+      questionType: question.questionType,
+      options: optionViews,
+      points: question.points,
+      expectedSeconds: question.expectedSeconds,
+      hasHelpHint: question.helpHint != null && question.helpHint!.trim().isNotEmpty,
+    );
+
+    return PracticeItem(
+      question: questionView,
+      kind: selection.kind,
+    );
+  }
+
+  /// Requests a help hint for the currently served card.
+  /// Flags the card as having used help.
+  Future<HelpResult> requestHelp({
+    required int learnerId,
+    required int questionId,
+  }) async {
+    final state = await reviewStateRepo.get(learnerId, questionId);
+    if (state == null || state.lastServedAt == null) {
+      throw NoActiveCardException();
+    }
+
+    // Mark helpUsed
+    await reviewStateRepo.upsert(state.copyWith(helpUsed: true));
+
+    final question = await questionRepo.findById(questionId);
+    if (question == null) {
+      throw QuestionNotFoundException(questionId);
+    }
+
+    return HelpResult(
+      helpHint: question.helpHint ?? 'Think carefully about the core concept.',
+    );
+  }
+
+  /// Submits an answer (MCQ option ID or text).
+  ///
+  /// Enforces idempotency via `lastServedAt` verification, calculates latency,
+  /// grades, updates spaced repetition interval, applies atomic counter SQL,
+  /// and returns [SubmitResult] with explanations and teacher topic note.
+  Future<SubmitResult> submitAnswer({
+    required int learnerId,
+    required int questionId,
+    String? textAnswer,
+    int? optionId,
+  }) async {
+    final state = await reviewStateRepo.get(learnerId, questionId);
+    if (state == null || state.lastServedAt == null) {
+      throw CardAlreadyAnsweredException();
+    }
+
+    final now = clock.now();
+    final responseMs = now.difference(state.lastServedAt!).inMilliseconds;
+
+    final question = await questionRepo.findById(questionId);
+    if (question == null) {
+      throw QuestionNotFoundException(questionId);
+    }
+
+    // Grade answer
+    late final AttemptStatus status;
+    List<OptionExplanationView>? optionExplanations;
+    String? selectedOptionExplanation;
+
+    if (optionId != null) {
+      final options = await optionRepo.getOptionsForQuestion(questionId);
+      status = Grader.gradeOptionById(optionId, options);
+
+      final selectedOpt = options.where((o) => o.id == optionId).firstOrNull;
+      selectedOptionExplanation = selectedOpt?.explanation;
+
+      optionExplanations = options
+          .map((o) => OptionExplanationView(
+                optionId: o.id!,
+                text: o.text,
+                isCorrect: o.isCorrect,
+                explanation: o.explanation,
+              ))
+          .toList();
+    } else {
+      final accepted = await acceptedAnswerRepo.getByQuestionId(questionId);
+      status = Grader.grade(
+        studentAnswer: textAnswer ?? '',
+        acceptedAnswers: accepted.map((a) => a.normalizedText).toList(),
+      );
+    }
+
+    // Determine prior learner history on this question
+    final hasPriorAttempt = await attemptRepo.hasPriorAttempt(learnerId, questionId);
+    final hasLearnerSolvedBefore = await attemptRepo.hasLearnerSolvedQuestion(learnerId, questionId);
+
+    // Calculate outcome metrics and counter deltas
+    final outcome = AttemptOutcomeCalculator.calculate(
+      status: status,
+      usedHelp: state.helpUsed,
+      responseMs: responseMs,
+      expectedSeconds: question.expectedSeconds,
+      isFirstAttempt: !hasPriorAttempt,
+      isFirstSolveByStudent: !hasLearnerSolvedBefore,
+    );
+
+    // Persist attempt
+    final attempt = Attempt(
+      learnerId: learnerId,
+      questionId: questionId,
+      selectedOptionId: optionId,
+      answerText: textAnswer,
+      status: outcome.status,
+      responseMs: responseMs,
+      usedHelp: state.helpUsed,
+      isFirstAttempt: !hasPriorAttempt,
+      underExpectedTime: outcome.underExpectedTime,
+      isClean: outcome.isClean,
+      reflexTier: outcome.reflexTier,
+      createdAt: now,
+    );
+    await attemptRepo.insert(attempt);
+
+    // Clear lastServedAt to enforce idempotency and schedule next review
+    final nextDueAt = now.add(Duration(days: outcome.intervalDays));
+    final updatedState = state.copyWith(
+      dueAt: nextDueAt,
+      intervalDays: outcome.intervalDays,
+      lapses: state.lapses + outcome.lapsesDelta,
+      lastServedAt: null,
+      lastResult: outcome.status,
+      helpUsed: false,
+    );
+    await reviewStateRepo.upsert(updatedState);
+
+    // Atomically increment question counters
+    await questionRepo.applyCounterDeltas(questionId, outcome.counterDeltas);
+
+    return SubmitResult(
+      verdict: outcome.status,
+      reason: outcome.reason,
+      reflexTier: outcome.reflexTier,
+      points: question.points,
+      responseMs: responseMs,
+      nextDueAt: nextDueAt,
+      topicNote: question.topicNote,
+      selectedOptionExplanation: selectedOptionExplanation,
+      optionExplanations: optionExplanations,
+    );
+  }
+}
