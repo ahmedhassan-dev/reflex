@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Flutter as Reflex Flutter App
+    participant Server as Serverpod Server
+    participant Handler as DiagnosticEventHandler
+    participant Sentry as Sentry Cloud
+
+    User->>Flutter: Triggers action / encounters unexpected error
+    alt Server Exception
+        Server->>Server: Unhandled Exception in Serverpod execution
+        Server->>Handler: DiagnosticEvent.submit(ExceptionEvent)
+        Handler->>Handler: Filter out DomainException (expected 4xx business flows)
+        Handler->>Handler: Scrub credentials & student answer text
+        Handler->>Sentry: Capture Exception with Serverpod StackTrace
+    else Flutter Exception
+        Flutter->>Flutter: FlutterError / uncaught Dart error
+        Flutter->>Flutter: beforeSend callback scrubs student inputs & passwords
+        Flutter->>Sentry: SentryFlutter.captureException()
+    end
+    note over Sentry: Error visible in Sentry Dashboard with breadcrumbs

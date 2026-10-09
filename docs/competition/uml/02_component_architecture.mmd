@@ -1,0 +1,71 @@
+flowchart TB
+    subgraph CLIENT["Reflex Client (Flutter - MVVM + easy_localization)"]
+        VIEW["Views (PracticeView with Chromatic Aura, DashboardView)"]
+        VM["ViewModels (PracticeViewModel, DashboardViewModel)"]
+        REPO["Repositories (PracticeRepo, DashboardRepo, QuestionRepo)"]
+        API["API Services (Generated Serverpod Client)"]
+        VIEW --> VM --> REPO --> API
+    end
+
+    subgraph SERVER["Reflex Server (Serverpod - Controller / Service / Repository)"]
+        subgraph CTRL["Endpoints (Thin Controllers, Scoped)"]
+            PE["PracticeEndpoint (Student)"]
+            PGE["ProgressEndpoint (Student)"]
+            QE["QuestionEndpoint (Teacher)"]
+            DE["DashboardEndpoint (Teacher)"]
+            CE["DemoClockEndpoint (Admin/Demo)"]
+        end
+        subgraph SVC["Domain Services (Pure Dart, TDD Unit-Tested)"]
+            PS["PracticeService"]
+            SEL["CardSelector"]
+            GR["Grader (Text & MCQ Option Evaluator)"]
+            OC["AttemptOutcomeCalculator (Reflex Tier Classifier)"]
+            POL["SchedulingPolicy (Legacy Fixed Interval)"]
+            STAT["CohortStatsService"]
+            QAS["QuestionAdminService (Notes & Options)"]
+            CLK["Clock (SystemClock / FakeClock)"]
+        end
+        subgraph REPOS["Repositories (Data Access & Atomic SQL)"]
+            QR["QuestionRepository"]
+            OPTR["QuestionOptionRepository"]
+            AR["AttemptRepository"]
+            RR["ReviewStateRepository"]
+            LR["LearnerRepository"]
+        end
+        AUTH["Serverpod Auth (JWT + Scopes: teacher, student)"]
+        ERR["ErrorReporter (Serverpod Diagnostic Handler)"]
+    end
+
+    DB[("PostgreSQL Database")]
+    SENTRY["Sentry Error Tracking"]
+
+    API -->|"Typed WebSocket/RPC"| CTRL
+    PE --> PS
+    PGE --> STAT
+    QE --> QAS
+    DE --> STAT
+    CE --> CLK
+    PS --> SEL
+    PS --> GR
+    PS --> OC
+    PS --> POL
+    PS --> CLK
+    SEL --> RR
+    SEL --> QR
+    PS --> AR
+    PS --> QR
+    PS --> OPTR
+    PS --> RR
+    STAT --> AR
+    STAT --> QR
+    QAS --> QR
+    QAS --> OPTR
+    QR --> DB
+    OPTR --> DB
+    AR --> DB
+    RR --> DB
+    LR --> DB
+    CTRL -.-> AUTH
+    SERVER --> ERR
+    ERR --> SENTRY
+    CLIENT -->|"sentry_flutter"| SENTRY

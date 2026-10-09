@@ -1,0 +1,20 @@
+sequenceDiagram
+    autonumber
+    actor Teacher
+    participant Flutter as Teacher Dashboard
+    participant VM as DashboardViewModel
+    participant Endpoint as DashboardEndpoint
+    participant Stats as CohortStatsService
+    participant DB as PostgreSQL
+
+    Teacher->>Flutter: Open Teacher Analytics
+    Flutter->>VM: loadCommand.execute()
+    VM->>Endpoint: cohortSummary(courseId)
+    Endpoint->>Stats: getCohortSummary(courseId)
+    Stats->>DB: Query Questions (counters: attempt, solved, firstTry, clean)
+    Stats->>DB: Query Attempts (group by learner: cleanFirstTryCount, avgLatency)
+    Stats->>DB: Query Attempts by reflex_tier (Green / Yellow / Red distribution)
+    Stats-->>Endpoint: CohortSummary (TopicMastery, QuestionInsights, StudentProgress)
+    Endpoint-->>VM: CohortSummary
+    VM->>Flutter: Render Dashboard View
+    Flutter-->>Teacher: Display Topic Mastery Bars, Question Insights Table (6 counters), and Student Clean-First-Try Solves

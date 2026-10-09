@@ -1,0 +1,29 @@
+sequenceDiagram
+    autonumber
+    actor Student
+    participant Flutter as Flutter PracticeView
+    participant VM as PracticeViewModel
+    participant Endpoint as PracticeEndpoint
+    participant Service as PracticeService
+    participant Selector as CardSelector
+    participant DB as PostgreSQL
+
+    Student->>Flutter: Open Practice Screen
+    Flutter->>VM: loadNextCommand.execute()
+    VM->>Endpoint: nextCard(courseId)
+    Endpoint->>Service: serveNextCard(learnerId, courseId)
+    Service->>Selector: selectNextCard(learnerId, courseId)
+    Selector->>DB: Query overdue review cards (dueAt <= now ASC)
+    alt Review card due
+        DB-->>Selector: Return overdue Question
+    else No reviews due
+        Selector->>DB: Query unattempted card (position ASC)
+        DB-->>Selector: Return new Question
+    end
+    Selector-->>Service: Selected Question
+    Service->>DB: Update ReviewState (lastServedAt = now, helpUsed = false)
+    Service->>DB: If MCQ, fetch QuestionOptions (id, text only)
+    Service-->>Endpoint: PracticeItem (QuestionView without answers or notes)
+    Endpoint-->>VM: PracticeItem
+    VM->>Flutter: Update PracticeUiState.QuestionShown
+    Flutter-->>Student: Display prompt, timer, and choice buttons (or input box)

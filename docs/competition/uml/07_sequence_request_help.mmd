@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    actor Student
+    participant Flutter as Flutter PracticeView
+    participant VM as PracticeViewModel
+    participant Endpoint as PracticeEndpoint
+    participant Service as PracticeService
+    participant DB as PostgreSQL
+
+    Student->>Flutter: Tap "Need Help 💡"
+    Flutter->>VM: requestHelpCommand.execute()
+    VM->>Endpoint: requestHelp(questionId)
+    Endpoint->>Service: requestHelp(learnerId, questionId)
+    Service->>DB: Get ReviewState for learner & question
+    alt Card not actively served
+        Service-->>Endpoint: Throw NoActiveCardException
+        Endpoint-->>VM: Error result
+    else Active card confirmed
+        Service->>DB: UPDATE review_state SET help_used = true
+        Service->>DB: Get question.help_hint
+        Service-->>Endpoint: HelpResult(helpHint)
+        Endpoint-->>VM: HelpResult
+        VM->>Flutter: Reveal HelpBottomSheet with hint
+        Flutter-->>Student: Display hint & note that card interval will be capped
+    end

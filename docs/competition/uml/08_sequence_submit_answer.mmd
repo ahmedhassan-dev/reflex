@@ -1,0 +1,40 @@
+sequenceDiagram
+    autonumber
+    actor Student
+    participant Flutter as Flutter PracticeView
+    participant VM as PracticeViewModel
+    participant Endpoint as PracticeEndpoint
+    participant Service as PracticeService
+    participant Grader as Grader
+    participant Calc as OutcomeCalculator
+    participant DB as PostgreSQL
+
+    Student->>Flutter: Select Option B (or type answer) & Tap Submit
+    Flutter->>VM: submitCommand.execute(optionId: 2)
+    VM->>Endpoint: submitAnswer(questionId, optionId: 2)
+    Endpoint->>Service: submitAnswer(learnerId, questionId, optionId: 2)
+    Service->>DB: Check ReviewState (must have lastServedAt != null)
+    Service->>Service: responseMs = now - lastServedAt
+    alt Question is Multiple Choice
+        Service->>DB: Fetch QuestionOption(id=2)
+        Service->>Grader: gradeOption(option) -> valid or wrong
+    else Question is Text Input
+        Service->>DB: Fetch AcceptedAnswers
+        Service->>Grader: gradeText(text, acceptedAnswers) -> valid or wrong
+    end
+    Service->>Calc: calculate(status, helpUsed, responseMs, expectedSeconds)
+    Calc-->>Service: Verdict, Reason, ReflexTier (Green/Yellow/Red), Interval (+1d, +2d, +30d)
+    
+    rect rgb(240, 248, 255)
+    note right of Service: Atomic Database Transaction
+    Service->>DB: INSERT into attempt (..., reflex_tier, response_ms)
+    Service->>DB: UPDATE review_state (due_at, interval, lapses, lastServedAt = null)
+    Service->>DB: Atomic UPDATE question counters (+1 attempt, clean, underTime...)
+    end
+
+    Service->>DB: Fetch option explanations and topicNote
+    Service-->>Endpoint: SubmitResult (ReflexTier, optionExplanations, topicNote)
+    Endpoint-->>VM: SubmitResult
+    VM->>Flutter: Emit ResultShown with ReflexTier
+    Flutter-->>Student: Display Chromatic Feedback (Green/Yellow/Red background)
+    Flutter-->>Student: Render "Why choice was right/wrong" explanation & Topic Note Gate

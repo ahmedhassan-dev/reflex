@@ -1,0 +1,33 @@
+flowchart TD
+    Start([Submit Received]) --> ActiveCard{Card currently served?<br/>lastServedAt != null}
+    ActiveCard -- No --> Reject([Reject: CardAlreadyAnsweredException])
+    ActiveCard -- Yes --> MeasureLatency[responseMs = now - lastServedAt]
+    
+    MeasureLatency --> QType{Question Type?}
+    QType -- Multiple Choice --> CheckOption{selectedOption.isCorrect?}
+    QType -- Text Input --> CheckText{Normalised answer in accepted keys?}
+
+    CheckOption -- No --> SetWrong["verdict = wrong<br/>reason = wrong<br/>reflexTier = Red (Needs Work)<br/>interval = +1 day, lapses + 1"]
+    CheckText -- No --> SetWrong
+
+    CheckOption -- Yes --> CheckHelp{helpUsed == true?}
+    CheckText -- Yes --> CheckHelp
+
+    CheckHelp -- Yes --> SetHelped["verdict = valid<br/>reason = correctWithHelp<br/>reflexTier = Yellow (Developing)<br/>interval = +1 day"]
+
+    CheckHelp -- No --> CheckSpeed{responseMs > expectedSeconds * 1000?}
+    CheckSpeed -- Yes --> SetSlow["verdict = valid<br/>reason = correctSlow<br/>reflexTier = Yellow (Developing)<br/>interval = +2 days"]
+    CheckSpeed -- No --> SetClean["verdict = valid<br/>reason = correctClean<br/>reflexTier = Green (Mastered)<br/>interval = +30 days"]
+
+    SetWrong --> Flags
+    SetHelped --> Flags
+    SetSlow --> Flags
+    SetClean --> Flags
+
+    Flags[Compute Flags:<br/>isFirstAttempt = no prior attempts<br/>underExpectedTime = responseMs <= expected<br/>isClean = valid AND first AND no help AND fast]
+
+    Flags --> CounterDeltas[Compute Counter Deltas:<br/>attemptCount + 1<br/>attemptedStudentCount + 1 if first attempt<br/>solvedStudentCount + 1 if valid and never solved before<br/>firstTrySolveCount + 1 if valid and first attempt<br/>underTimeSolveCount + 1 if valid and under time<br/>cleanSolveCount + 1 if clean]
+
+    CounterDeltas --> Tx[(Atomic DB Transaction:<br/>Insert Attempt<br/>Update ReviewState<br/>Atomic SQL UPDATE Question counters)]
+
+    Tx --> Finish([Return SubmitResult with<br/>ReflexTier, Option Explanations, Topic Note])

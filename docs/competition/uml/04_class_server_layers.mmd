@@ -1,0 +1,82 @@
+classDiagram
+    direction TB
+
+    class PracticeEndpoint {
+        <<Controller>>
+        +nextCard(int courseId) PracticeItem
+        +requestHelp(int questionId) HelpResult
+        +submitAnswer(int questionId, String? text, int? optionId) SubmitResult
+    }
+    class QuestionEndpoint {
+        <<Controller>>
+        +updateTopicNote(int id, String note) void
+        +updateHelpHint(int id, String hint) void
+        +updateOptionExplanation(int optionId, String explanation) void
+        +listQuestions(int courseId) List~Question~
+    }
+    class DashboardEndpoint {
+        <<Controller>>
+        +cohortSummary(int courseId) CohortSummary
+    }
+
+    class PracticeService {
+        <<Service>>
+        +serveNextCard(int learnerId, int courseId) PracticeItem
+        +requestHelp(int learnerId, int questionId) HelpResult
+        +submitAnswer(int learnerId, int questionId, String? text, int? optionId) SubmitResult
+    }
+    class Grader {
+        <<Service>>
+        +gradeText(String answer, List~String~ accepted) AttemptStatus
+        +gradeOption(QuestionOption option) AttemptStatus
+    }
+    class AttemptOutcomeCalculator {
+        <<Service>>
+        +calculate(AttemptStatus status, bool usedHelp, int responseMs, int expectedSeconds, bool isFirstAttempt) OutcomeResult
+    }
+    class CardSelector {
+        <<Service>>
+        +selectNextCard(int learnerId, int courseId) Question
+    }
+    class CohortStatsService {
+        <<Service>>
+        +getCohortSummary(int courseId) CohortSummary
+        +getStudentProgress(int learnerId) StudentProgress
+    }
+
+    class QuestionRepository {
+        <<Repository>>
+        +getById(int id) Question
+        +applyCounterDeltas(int id, CounterDeltas deltas) void
+    }
+    class QuestionOptionRepository {
+        <<Repository>>
+        +getOptionsForQuestion(int questionId) List~QuestionOption~
+        +getById(int optionId) QuestionOption
+    }
+    class AttemptRepository {
+        <<Repository>>
+        +insert(Attempt attempt) Attempt
+        +hasPriorAttempt(int learnerId, int questionId) bool
+    }
+    class ReviewStateRepository {
+        <<Repository>>
+        +get(int learnerId, int questionId) ReviewState
+        +upsert(ReviewState state) ReviewState
+    }
+
+    PracticeEndpoint --> PracticeService
+    QuestionEndpoint --> QuestionRepository
+    QuestionEndpoint --> QuestionOptionRepository
+    DashboardEndpoint --> CohortStatsService
+
+    PracticeService --> CardSelector
+    PracticeService --> Grader
+    PracticeService --> AttemptOutcomeCalculator
+    PracticeService --> QuestionRepository
+    PracticeService --> QuestionOptionRepository
+    PracticeService --> AttemptRepository
+    PracticeService --> ReviewStateRepository
+
+    CohortStatsService --> AttemptRepository
+    CohortStatsService --> QuestionRepository

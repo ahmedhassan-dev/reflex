@@ -1,0 +1,19 @@
+stateDiagram-v2
+    [*] --> Unseen: Seeded in Course
+
+    Unseen --> Active: Served as New Card (lastServedAt stamped)
+    
+    state Active {
+        [*] --> Answering
+        Answering --> Helped: Student taps "Need Help" (helpUsed = true)
+    }
+
+    Active --> Red_NeedsWork: Wrong Answer (lapses + 1, due in +1 day)
+    Active --> Yellow_Developing: Correct with Help OR Slow (> expected) (due in +1 or +2 days)
+    Active --> Green_Mastered: Correct + Fast (<= expected) + First Try (due in +30 days)
+
+    Red_NeedsWork --> DueReview: Demo Clock / Real Time passes +1 day
+    Yellow_Developing --> DueReview: Time passes (+1 or +2 days)
+    Green_Mastered --> DueReview: Time passes (+30 days)
+
+    DueReview --> Active: Served as Overdue Review Card

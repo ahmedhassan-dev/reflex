@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    actor Student
+    participant View as PracticeView
+    participant Gate as TopicNoteGateWidget
+    participant VM as PracticeViewModel
+    participant Repo as PracticeRepository
+
+    Student->>View: Taps Submit on Selected Option B
+    View->>VM: submitCommand.execute()
+    VM->>Repo: submit(questionId, optionId: 2)
+    Repo-->>VM: SubmitResult (ReflexTier, optionExplanations, topicNote)
+    VM->>View: PracticeUiState.ResultShown (noteAcknowledged = false)
+    
+    View->>View: Apply Chromatic Background (Green / Yellow / Red)
+    View->>View: Render Option Explanation ("Why Choice B was correct / incorrect")
+    View->>Gate: Render Topic Note & Locked "Continue" Button
+    
+    note over Student,View: Student reads explanation and note
+    Student->>Gate: Taps "✓ I have read the explanation and note"
+    Gate->>VM: acknowledgeNote()
+    VM->>View: Update noteAcknowledged = true
+    View->>View: Unlock "Continue to Next Card" button
+    Student->>View: Taps "Continue to Next Card"
+    View->>VM: loadNextCommand.execute()

@@ -1,0 +1,85 @@
+classDiagram
+    direction TB
+
+    class ReflexTier {
+        <<enumeration>>
+        greenMastered
+        yellowDeveloping
+        redNeedsWork
+    }
+
+    class PracticeUiState {
+        <<sealed>>
+    }
+    class Loading {
+        <<state>>
+    }
+    class QuestionShown {
+        <<state>>
+        +QuestionView question
+        +int selectedOptionId
+    }
+    class ResultShown {
+        <<state>>
+        +SubmitResult result
+        +ReflexTier reflexTier
+        +bool noteAcknowledged
+    }
+    class DeckComplete {
+        <<state>>
+    }
+    class Failure {
+        <<state>>
+        +String errorMessage
+    }
+
+    PracticeUiState <|-- Loading
+    PracticeUiState <|-- QuestionShown
+    PracticeUiState <|-- ResultShown
+    PracticeUiState <|-- DeckComplete
+    PracticeUiState <|-- Failure
+
+    class PracticeViewModel {
+        +PracticeUiState state
+        +Command loadNextCommand
+        +Command requestHelpCommand
+        +Command submitCommand
+        +selectOption(int optionId) void
+        +acknowledgeNote() void
+    }
+
+    class PracticeView {
+        <<Widget>>
+        +build(BuildContext) Widget
+        +applyChromaticAura(ReflexTier tier) Color
+    }
+    class MultipleChoiceWidget {
+        <<Widget>>
+        +buildOptions(List~QuestionOptionView~)
+    }
+    class OptionExplanationWidget {
+        <<Widget>>
+        +buildExplanations(List~OptionExplanationView~)
+    }
+    class TopicNoteGateWidget {
+        <<Widget>>
+        +buildNoteGate(String note, bool acknowledged)
+    }
+
+    class PracticeRepository {
+        <<interface>>
+        +nextCard(int courseId) Result~PracticeItem~
+        +requestHelp(int questionId) Result~HelpResult~
+        +submit(int questionId, String? text, int? optionId) Result~SubmitResult~
+    }
+    class ApiService {
+        +Client serverpodClient
+    }
+
+    PracticeView --> PracticeViewModel
+    PracticeView --> MultipleChoiceWidget
+    PracticeView --> OptionExplanationWidget
+    PracticeView --> TopicNoteGateWidget
+    PracticeViewModel --> PracticeUiState
+    PracticeViewModel --> PracticeRepository
+    PracticeRepository --> ApiService

@@ -1,0 +1,208 @@
+classDiagram
+    direction LR
+
+    class Role {
+        <<enumeration>>
+        student
+        teacher
+    }
+    class AttemptStatus {
+        <<enumeration>>
+        valid
+        wrong
+    }
+    class ResultReason {
+        <<enumeration>>
+        correctClean
+        correctSlow
+        correctWithHelp
+        wrong
+    }
+    class ReflexTier {
+        <<enumeration>>
+        greenMastered
+        yellowDeveloping
+        redNeedsWork
+    }
+    class QuestionType {
+        <<enumeration>>
+        textInput
+        multipleChoice
+    }
+    class CardKind {
+        <<enumeration>>
+        review
+        newCard
+    }
+
+    class Learner {
+        +int id
+        +UuidValue authUserId
+        +String displayName
+        +Role role
+    }
+    class Course {
+        +int id
+        +String title
+        +String subject
+    }
+    class Question {
+        +int id
+        +int courseId
+        +int position
+        +String prompt
+        +String topic
+        +QuestionType questionType
+        +int points
+        +int expectedSeconds
+        +String topicNote
+        +String helpHint
+        +int attemptCount
+        +int attemptedStudentCount
+        +int solvedStudentCount
+        +int firstTrySolveCount
+        +int underTimeSolveCount
+        +int cleanSolveCount
+    }
+    class QuestionOption {
+        +int id
+        +int questionId
+        +int position
+        +String text
+        +bool isCorrect
+        +String explanation
+    }
+    class AcceptedAnswer {
+        +int id
+        +int questionId
+        +String normalizedText
+    }
+    class Attempt {
+        +int id
+        +int learnerId
+        +int questionId
+        +int selectedOptionId
+        +String answerText
+        +AttemptStatus status
+        +int responseMs
+        +bool usedHelp
+        +bool isFirstAttempt
+        +bool underExpectedTime
+        +bool isClean
+        +ReflexTier reflexTier
+        +DateTime createdAt
+    }
+    class ReviewState {
+        +int id
+        +int learnerId
+        +int questionId
+        +DateTime dueAt
+        +int intervalDays
+        +int lapses
+        +bool helpUsed
+        +DateTime lastServedAt
+        +AttemptStatus lastResult
+    }
+    class DemoClock {
+        +int id
+        +int offsetDays
+    }
+
+    class QuestionOptionView {
+        <<DTO>>
+        +int id
+        +String text
+    }
+    class OptionExplanationView {
+        <<DTO>>
+        +int optionId
+        +String text
+        +bool isCorrect
+        +String explanation
+    }
+    class QuestionView {
+        <<DTO>>
+        +int id
+        +String prompt
+        +String topic
+        +QuestionType questionType
+        +List~QuestionOptionView~ options
+        +int points
+        +int expectedSeconds
+        +bool hasHelpHint
+    }
+    class PracticeItem {
+        <<DTO>>
+        +QuestionView question
+        +CardKind kind
+    }
+    class HelpResult {
+        <<DTO>>
+        +String helpHint
+    }
+    class SubmitResult {
+        <<DTO>>
+        +AttemptStatus verdict
+        +ResultReason reason
+        +ReflexTier reflexTier
+        +int points
+        +int responseMs
+        +DateTime nextDueAt
+        +String topicNote
+        +String selectedOptionExplanation
+        +List~OptionExplanationView~ optionExplanations
+    }
+    class QuestionInsight {
+        <<DTO>>
+        +int questionId
+        +String prompt
+        +String topic
+        +QuestionType questionType
+        +int attemptCount
+        +int solvedStudentCount
+        +int firstTrySolveCount
+        +int underTimeSolveCount
+        +int cleanSolveCount
+        +double firstTryRate
+        +double cleanRate
+        +double avgResponseMs
+    }
+    class StudentProgress {
+        <<DTO>>
+        +int learnerId
+        +String displayName
+        +int solvedCount
+        +int cleanFirstTryCount
+        +double avgResponseMs
+    }
+    class TopicMastery {
+        <<DTO>>
+        +String topic
+        +double masteryRate
+    }
+    class CohortSummary {
+        <<DTO>>
+        +List~TopicMastery~ mastery
+        +List~QuestionInsight~ questions
+        +List~StudentProgress~ students
+    }
+
+    Course "1" --> "*" Question : contains
+    Question "1" --> "*" QuestionOption : provides choices
+    Question "1" --> "*" AcceptedAnswer : text answer key
+    Question "1" --> "*" Attempt : answered in
+    Learner "1" --> "*" Attempt : makes
+    Learner "1" --> "*" ReviewState : owns
+    Question "1" --> "*" ReviewState : scheduled as
+
+    PracticeItem --> QuestionView
+    PracticeItem --> CardKind
+    QuestionView --> QuestionOptionView
+    QuestionView --> QuestionType
+    SubmitResult --> AttemptStatus
+    SubmitResult --> ResultReason
+    SubmitResult --> ReflexTier
+    SubmitResult --> OptionExplanationView
+    CohortSummary --> TopicMastery
+    CohortSummary --> QuestionInsight
+    CohortSummary --> StudentProgress

@@ -1,0 +1,88 @@
+erDiagram
+    COURSE ||--|{ QUESTION : contains
+    QUESTION ||--o{ QUESTION_OPTION : "has options"
+    QUESTION ||--o{ ACCEPTED_ANSWER : "has text keys"
+    QUESTION ||--o{ ATTEMPT : "attempted in"
+    QUESTION ||--o{ REVIEW_STATE : "scheduled in"
+    LEARNER ||--o{ ATTEMPT : submits
+    LEARNER ||--o{ REVIEW_STATE : maintains
+
+    COURSE {
+        int id PK
+        text title
+        text subject
+    }
+
+    QUESTION {
+        int id PK
+        int course_id FK
+        int position
+        text prompt
+        text topic
+        text question_type "textInput | multipleChoice"
+        int points
+        int expected_seconds
+        text topic_note "optional teacher explanation"
+        text help_hint "optional hint"
+        int attempt_count "aggregate"
+        int attempted_student_count "distinct learners"
+        int solved_student_count "distinct solvers"
+        int first_try_solve_count "first attempt correct"
+        int under_time_solve_count "fast solves"
+        int clean_solve_count "first + fast + valid + no help"
+    }
+
+    QUESTION_OPTION {
+        int id PK
+        int question_id FK
+        int position
+        text text
+        bool is_correct
+        text explanation "why choice is right or wrong"
+    }
+
+    ACCEPTED_ANSWER {
+        int id PK
+        int question_id FK
+        text normalized_text
+    }
+
+    LEARNER {
+        int id PK
+        uuid auth_user_id UK
+        text display_name
+        text role "student | teacher"
+    }
+
+    ATTEMPT {
+        int id PK
+        int learner_id FK
+        int question_id FK
+        int selected_option_id FK "nullable for text"
+        text answer_text "nullable for MCQ"
+        text status "valid | wrong"
+        int response_ms
+        bool used_help
+        bool is_first_attempt
+        bool under_expected_time
+        bool is_clean
+        text reflex_tier "greenMastered | yellowDeveloping | redNeedsWork"
+        timestamp created_at
+    }
+
+    REVIEW_STATE {
+        int id PK
+        int learner_id FK
+        int question_id FK
+        timestamp due_at
+        int interval_days
+        int lapses
+        bool help_used
+        timestamp last_served_at "null when answered"
+        text last_result
+    }
+
+    DEMO_CLOCK {
+        int id PK
+        int offset_days
+    }

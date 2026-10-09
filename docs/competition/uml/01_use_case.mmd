@@ -1,0 +1,35 @@
+flowchart LR
+    student([Student])
+    teacher([Teacher])
+    subgraph SYS["Reflex System - Serverpod & Flutter Core Flow"]
+        direction TB
+        UC1(("Sign in"))
+        UC2(("Get next card (MCQ or Text)"))
+        UC3(("Request help hint"))
+        UC4(("Submit answer (Select Option or Type)"))
+        UC5(("See Chromatic Reflex Feedback<br/>(Green / Yellow / Red)"))
+        UC6(("Review Option Explanations & Topic Note"))
+        UC7(("Acknowledge note to continue"))
+        UC8(("Auto-reschedule card interval"))
+        UC9(("Update atomic question counters"))
+        UC10(("View clean-first-try progress"))
+        UC11(("Author Question Options, Explanations & Notes"))
+        UC12(("View cohort mastery & question insights"))
+        UC13(("Seed demo course (MCQ & Text)"))
+        UC14(("Advance demo clock"))
+    end
+    student --- UC1
+    student --- UC2
+    student --- UC3
+    student --- UC4
+    student --- UC10
+    teacher --- UC1
+    teacher --- UC11
+    teacher --- UC12
+    teacher --- UC13
+    teacher --- UC14
+    UC4 -. include .-> UC5
+    UC5 -. include .-> UC6
+    UC6 -. include .-> UC7
+    UC4 -. include .-> UC8
+    UC4 -. include .-> UC9
