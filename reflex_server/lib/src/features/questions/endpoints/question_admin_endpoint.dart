@@ -22,11 +22,13 @@ class QuestionAdminEndpoint extends Endpoint {
     Session session, {
     required String title,
     required String subject,
+    List<String>? topics,
   }) async {
     final container = AppContainer(session);
     return container.questionAdminService.createCourse(
       title: title,
       subject: subject,
+      topics: topics,
     );
   }
 

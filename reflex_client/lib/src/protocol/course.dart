@@ -10,6 +10,7 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:reflex_client/src/protocol/protocol.dart' as _i733dxuy;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
 abstract class Course
@@ -18,12 +19,14 @@ abstract class Course
     this.id,
     required this.title,
     required this.subject,
+    this.topics,
   });
 
   factory Course({
     int? id,
     required String title,
     required String subject,
+    List<String>? topics,
   }) = _CourseImpl;
 
   factory Course.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -31,6 +34,11 @@ abstract class Course
       id: jsonSerialization['id'] as int?,
       title: jsonSerialization['title'] as String,
       subject: jsonSerialization['subject'] as String,
+      topics: jsonSerialization['topics'] == null
+          ? null
+          : _i733dxuy.Protocol().deserialize<List<String>>(
+              jsonSerialization['topics'],
+            ),
     );
   }
 
@@ -43,6 +51,8 @@ abstract class Course
 
   String subject;
 
+  List<String>? topics;
+
   /// Returns a shallow copy of this [Course]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -50,6 +60,7 @@ abstract class Course
     int? id,
     String? title,
     String? subject,
+    List<String>? topics,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -58,6 +69,7 @@ abstract class Course
       if (id != null) 'id': id,
       'title': title,
       'subject': subject,
+      if (topics != null) 'topics': topics?.toJson(),
     };
   }
 
@@ -68,6 +80,7 @@ abstract class Course
       if (id != null) 'id': id,
       'title': title,
       'subject': subject,
+      if (topics != null) 'topics': topics?.toJson(),
     };
   }
 
@@ -84,10 +97,12 @@ class _CourseImpl extends Course {
     int? id,
     required String title,
     required String subject,
+    List<String>? topics,
   }) : super._(
          id: id,
          title: title,
          subject: subject,
+         topics: topics,
        );
 
   /// Returns a shallow copy of this [Course]
@@ -98,11 +113,15 @@ class _CourseImpl extends Course {
     Object? id = _Undefined,
     String? title,
     String? subject,
+    Object? topics = _Undefined,
   }) {
     return Course(
       id: id is int? ? id : this.id,
       title: title ?? this.title,
       subject: subject ?? this.subject,
+      topics: topics is List<String>?
+          ? topics
+          : this.topics?.map((e0) => e0).toList(),
     );
   }
 }

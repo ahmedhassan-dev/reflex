@@ -1081,6 +1081,7 @@ class _QuestionAdminEndpoint {
     _ist.TestSessionBuilder sessionBuilder, {
     required String title,
     required String subject,
+    List<String>? topics,
   }) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1096,6 +1097,7 @@ class _QuestionAdminEndpoint {
           parameters: _ist.testObjectToJson({
             'title': title,
             'subject': subject,
+            'topics': topics,
           }),
           serializationManager: _serializationManager,
         );

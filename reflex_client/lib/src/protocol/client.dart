@@ -464,12 +464,14 @@ class EndpointQuestionAdmin extends _isc.EndpointRef {
   _ida.Future<_irm1rqva.Course> createCourse({
     required String title,
     required String subject,
+    List<String>? topics,
   }) => caller.callServerEndpoint<_irm1rqva.Course>(
     'questionAdmin',
     'createCourse',
     {
       'title': title,
       'subject': subject,
+      'topics': topics,
     },
   );
 

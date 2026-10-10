@@ -24,79 +24,159 @@ class _QuestionAdminScreenState extends QuestionAdminController {
   void _openCreateCourseDialog() {
     final titleCtrl = TextEditingController();
     final subjectCtrl = TextEditingController();
+    final topicCtrl = TextEditingController();
+    final List<String> topics = [];
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.school_rounded, color: ReflexColors.primary),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(LocaleKeys.questions_admin_new_course_dialog_title.tr()),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              LocaleKeys.questions_admin_course_title_label.tr(),
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            ),
-            const SizedBox(height: 4),
-            TextField(
-              key: const Key('input_new_course_title'),
-              controller: titleCtrl,
-              decoration: InputDecoration(
-                hintText: LocaleKeys.questions_admin_course_title_hint.tr(),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.school_rounded, color: ReflexColors.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(LocaleKeys.questions_admin_new_course_dialog_title.tr()),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              LocaleKeys.questions_admin_course_subject_label.tr(),
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            ),
-            const SizedBox(height: 4),
-            TextField(
-              key: const Key('input_new_course_subject'),
-              controller: subjectCtrl,
-              decoration: InputDecoration(
-                hintText: LocaleKeys.questions_admin_course_subject_hint.tr(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(LocaleKeys.questions_admin_cancel.tr()),
+            ],
           ),
-          ElevatedButton(
-            key: const Key('btn_confirm_create_course'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ReflexColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () async {
-              final t = titleCtrl.text.trim();
-              final s = subjectCtrl.text.trim();
-              if (t.isEmpty || s.isEmpty) return;
-              Navigator.of(ctx).pop();
-              final ok = await createNewCourse(title: t, subject: s);
-              if (ok && mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(LocaleKeys.questions_admin_course_created_success.tr()),
-                    backgroundColor: ReflexColors.chromaticGreen,
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  LocaleKeys.questions_admin_course_title_label.tr(),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                const SizedBox(height: 4),
+                TextField(
+                  key: const Key('input_new_course_title'),
+                  controller: titleCtrl,
+                  decoration: InputDecoration(
+                    hintText: LocaleKeys.questions_admin_course_title_hint.tr(),
                   ),
-                );
-              }
-            },
-            child: Text(LocaleKeys.questions_admin_create_course_action.tr()),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  LocaleKeys.questions_admin_course_subject_label.tr(),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                const SizedBox(height: 4),
+                TextField(
+                  key: const Key('input_new_course_subject'),
+                  controller: subjectCtrl,
+                  decoration: InputDecoration(
+                    hintText: LocaleKeys.questions_admin_course_subject_hint.tr(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  LocaleKeys.questions_admin_course_topics_label.tr(),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        key: const Key('input_new_course_topic'),
+                        controller: topicCtrl,
+                        decoration: InputDecoration(
+                          hintText: LocaleKeys.questions_admin_course_topics_hint.tr(),
+                        ),
+                        onSubmitted: (val) {
+                          final trimmed = val.trim();
+                          if (trimmed.isNotEmpty && !topics.contains(trimmed)) {
+                            setDialogState(() {
+                              topics.add(trimmed);
+                              topicCtrl.clear();
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    IconButton(
+                      key: const Key('btn_add_topic_to_course'),
+                      icon: const Icon(Icons.add_circle_outline_rounded, color: ReflexColors.primary),
+                      tooltip: LocaleKeys.questions_admin_add_topic_tooltip.tr(),
+                      onPressed: () {
+                        final trimmed = topicCtrl.text.trim();
+                        if (trimmed.isNotEmpty && !topics.contains(trimmed)) {
+                          setDialogState(() {
+                            topics.add(trimmed);
+                            topicCtrl.clear();
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                if (topics.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      for (int i = 0; i < topics.length; i++)
+                        Chip(
+                          key: Key('chip_dialog_topic_${topics[i]}'),
+                          label: Text(topics[i], style: const TextStyle(fontSize: 12)),
+                          deleteIcon: const Icon(Icons.close, size: 14),
+                          onDeleted: () {
+                            setDialogState(() {
+                              topics.removeAt(i);
+                            });
+                          },
+                          backgroundColor: ReflexColors.primary.withValues(alpha: 0.1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(color: ReflexColors.primary.withValues(alpha: 0.3)),
+                          ),
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                        ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(LocaleKeys.questions_admin_cancel.tr()),
+            ),
+            ElevatedButton(
+              key: const Key('btn_confirm_create_course'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ReflexColors.primary,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () async {
+                final t = titleCtrl.text.trim();
+                final s = subjectCtrl.text.trim();
+                if (t.isEmpty || s.isEmpty) return;
+                Navigator.of(ctx).pop();
+                final ok = await createNewCourse(
+                  title: t,
+                  subject: s,
+                  topics: topics.isNotEmpty ? topics : null,
+                );
+                if (ok && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(LocaleKeys.questions_admin_course_created_success.tr()),
+                      backgroundColor: ReflexColors.chromaticGreen,
+                    ),
+                  );
+                }
+              },
+              child: Text(LocaleKeys.questions_admin_create_course_action.tr()),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -535,6 +615,28 @@ class _QuestionAdminScreenState extends QuestionAdminController {
                             ),
                           ],
                         ),
+                        if (selectedCourse?.topics != null && selectedCourse!.topics!.isNotEmpty) ...[
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: selectedCourse!.topics!
+                                .map(
+                                  (topic) => Chip(
+                                    key: Key('chip_course_topic_$topic'),
+                                    avatar: const Icon(Icons.tag_rounded, size: 14, color: ReflexColors.primary),
+                                    label: Text(topic, style: const TextStyle(fontSize: 12)),
+                                    backgroundColor: ReflexColors.primary.withValues(alpha: 0.08),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      side: BorderSide(color: ReflexColors.primary.withValues(alpha: 0.2)),
+                                    ),
+                                    visualDensity: VisualDensity.compact,
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
                       ],
                     ),
                   ),

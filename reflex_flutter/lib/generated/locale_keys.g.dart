@@ -102,6 +102,10 @@ abstract class  LocaleKeys {
   static const questions_admin_question_created_success = 'questions_admin.question_created_success';
   static const questions_admin_cancel = 'questions_admin.cancel';
   static const questions_admin_validation_fill_required = 'questions_admin.validation_fill_required';
+  static const questions_admin_course_topics_label = 'questions_admin.course_topics_label';
+  static const questions_admin_course_topics_hint = 'questions_admin.course_topics_hint';
+  static const questions_admin_add_topic_tooltip = 'questions_admin.add_topic_tooltip';
+  static const questions_admin_no_course_topics = 'questions_admin.no_course_topics';
   static const questions_admin = 'questions_admin';
   static const demo_clock_title = 'demo_clock.title';
   static const demo_clock_simulated_date = 'demo_clock.simulated_date';

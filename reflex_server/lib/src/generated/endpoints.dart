@@ -605,6 +605,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<String>(),
               nullable: false,
             ),
+            'topics': _is.ParameterDescription(
+              name: 'topics',
+              type: _is.getType<List<String>?>(),
+              nullable: true,
+            ),
           },
           call:
               (
@@ -617,6 +622,7 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         title: params['title'],
                         subject: params['subject'],
+                        topics: params['topics'],
                       ),
         ),
         'createQuestion': _is.MethodConnector(

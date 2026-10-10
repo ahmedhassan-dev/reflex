@@ -10,6 +10,7 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:reflex_server/src/generated/protocol.dart' as _immqfr35;
 import 'package:serverpod/serverpod.dart' as _is;
 
 abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
@@ -17,12 +18,14 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
     this.id,
     required this.title,
     required this.subject,
+    this.topics,
   });
 
   factory Course({
     int? id,
     required String title,
     required String subject,
+    List<String>? topics,
   }) = _CourseImpl;
 
   factory Course.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -30,6 +33,11 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
       id: jsonSerialization['id'] as int?,
       title: jsonSerialization['title'] as String,
       subject: jsonSerialization['subject'] as String,
+      topics: jsonSerialization['topics'] == null
+          ? null
+          : _immqfr35.Protocol().deserialize<List<String>>(
+              jsonSerialization['topics'],
+            ),
     );
   }
 
@@ -44,6 +52,8 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
 
   String subject;
 
+  List<String>? topics;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -54,6 +64,7 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
     int? id,
     String? title,
     String? subject,
+    List<String>? topics,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -62,6 +73,7 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
       if (id != null) 'id': id,
       'title': title,
       'subject': subject,
+      if (topics != null) 'topics': topics?.toJson(),
     };
   }
 
@@ -72,6 +84,7 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
       if (id != null) 'id': id,
       'title': title,
       'subject': subject,
+      if (topics != null) 'topics': topics?.toJson(),
     };
   }
 
@@ -110,10 +123,12 @@ class _CourseImpl extends Course {
     int? id,
     required String title,
     required String subject,
+    List<String>? topics,
   }) : super._(
          id: id,
          title: title,
          subject: subject,
+         topics: topics,
        );
 
   /// Returns a shallow copy of this [Course]
@@ -124,11 +139,15 @@ class _CourseImpl extends Course {
     Object? id = _Undefined,
     String? title,
     String? subject,
+    Object? topics = _Undefined,
   }) {
     return Course(
       id: id is int? ? id : this.id,
       title: title ?? this.title,
       subject: subject ?? this.subject,
+      topics: topics is List<String>?
+          ? topics
+          : this.topics?.map((e0) => e0).toList(),
     );
   }
 }
@@ -145,6 +164,12 @@ class CourseUpdateTable extends _is.UpdateTable<CourseTable> {
     table.subject,
     value,
   );
+
+  _is.ColumnValue<List<String>, List<String>> topics(List<String>? value) =>
+      _is.ColumnValue(
+        table.topics,
+        value,
+      );
 }
 
 class CourseTable extends _is.Table<int?> {
@@ -158,6 +183,10 @@ class CourseTable extends _is.Table<int?> {
       'subject',
       this,
     );
+    topics = _is.ColumnSerializable<List<String>>(
+      'topics',
+      this,
+    );
   }
 
   late final CourseUpdateTable updateTable;
@@ -166,11 +195,14 @@ class CourseTable extends _is.Table<int?> {
 
   late final _is.ColumnString subject;
 
+  late final _is.ColumnSerializable<List<String>> topics;
+
   @override
   List<_is.Column> get columns => [
     id,
     title,
     subject,
+    topics,
   ];
 }
 

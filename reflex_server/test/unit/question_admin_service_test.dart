@@ -110,10 +110,12 @@ void main() {
       final course = await service.createCourse(
         title: '   Math 101   ',
         subject: '   Mathematics   ',
+        topics: ['Algebra', 'Calculus', ' '],
       );
 
       expect(course.title, equals('Math 101'));
       expect(course.subject, equals('Mathematics'));
+      expect(course.topics, equals(['Algebra', 'Calculus']));
       expect(course.id, isNotNull);
 
       final list = await service.listCourses();

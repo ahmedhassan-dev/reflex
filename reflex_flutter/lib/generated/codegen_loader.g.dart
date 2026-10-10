@@ -117,7 +117,11 @@ class CodegenLoader extends AssetLoader{
     "create_question_action": "Create Question",
     "question_created_success": "Question created successfully!",
     "cancel": "Cancel",
-    "validation_fill_required": "Please fill in all required fields."
+    "validation_fill_required": "Please fill in all required fields.",
+    "course_topics_label": "Course Topics",
+    "course_topics_hint": "Type topic and tap + (e.g. Algebra, Kinematics)",
+    "add_topic_tooltip": "Add Topic",
+    "no_course_topics": "No topics assigned"
   },
   "demo_clock": {
     "title": "Time Machine (Demo Clock)",
@@ -277,7 +281,11 @@ static const Map<String,dynamic> _ar = {
     "create_question_action": "إنشاء السؤال",
     "question_created_success": "تم إنشاء السؤال بنجاح!",
     "cancel": "إلغاء",
-    "validation_fill_required": "يرجى تعبئة جميع الحقول المطلوبة."
+    "validation_fill_required": "يرجى تعبئة جميع الحقول المطلوبة.",
+    "course_topics_label": "موضوعات الدورة",
+    "course_topics_hint": "اكتب الموضوع واضغط + (مثال: الجبر، الحركة)",
+    "add_topic_tooltip": "إضافة موضوع",
+    "no_course_topics": "لا توجد موضوعات مخصصة"
   },
   "demo_clock": {
     "title": "آلة الزمن (ساعة العرض التجريبي)",

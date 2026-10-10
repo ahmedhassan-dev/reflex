@@ -119,10 +119,12 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
   Future<bool> createNewCourse({
     required String title,
     required String subject,
+    List<String>? topics,
   }) async {
     final res = await questionRepo.createCourse(
       title: title,
       subject: subject,
+      topics: topics,
     );
     if (!mounted) return false;
 

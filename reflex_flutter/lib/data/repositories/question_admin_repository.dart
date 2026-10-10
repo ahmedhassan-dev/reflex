@@ -7,6 +7,7 @@ abstract interface class IQuestionAdminRepository {
   Future<Result<Course>> createCourse({
     required String title,
     required String subject,
+    List<String>? topics,
   });
   Future<Result<List<Question>>> listQuestions(int courseId);
   Future<Result<Question>> createQuestion(CreateQuestionInput input);
@@ -37,11 +38,13 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
   Future<Result<Course>> createCourse({
     required String title,
     required String subject,
+    List<String>? topics,
   }) async {
     try {
       final course = await _client.questionAdmin.createCourse(
         title: title,
         subject: subject,
+        topics: topics,
       );
       return Result.success(course);
     } catch (e) {

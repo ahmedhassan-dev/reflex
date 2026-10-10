@@ -26,6 +26,7 @@ class QuestionAdminService {
   Future<Course> createCourse({
     required String title,
     required String subject,
+    List<String>? topics,
   }) async {
     final trimmedTitle = title.trim();
     final trimmedSubject = subject.trim();
@@ -39,9 +40,15 @@ class QuestionAdminService {
       throw const ValidationException('Course repository is not configured.');
     }
 
+    final cleanedTopics = topics
+        ?.map((t) => t.trim())
+        .where((t) => t.isNotEmpty)
+        .toList();
+
     final newCourse = Course(
       title: trimmedTitle,
       subject: trimmedSubject,
+      topics: cleanedTopics == null || cleanedTopics.isEmpty ? null : cleanedTopics,
     );
     return courseRepo!.save(newCourse);
   }

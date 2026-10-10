@@ -3,3 +3,4 @@ table: course
 fields:
   title: String
   subject: String
+  topics: List<String>?

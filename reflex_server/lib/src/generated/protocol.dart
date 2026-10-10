@@ -268,6 +268,12 @@ class Protocol extends _is.DatabaseSerializationManager {
           isNullable: false,
           dartType: 'String',
         ),
+        _isp.ColumnDefinition(
+          name: 'topics',
+          columnType: _isp.ColumnType.json,
+          isNullable: true,
+          dartType: 'List<String>?',
+        ),
       ],
       foreignKeys: [],
       indexes: [],
@@ -823,6 +829,15 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_iiyeai10.ReviewState?>()) {
       return (data != null ? _iiyeai10.ReviewState.fromJson(data) : null) as T;
     }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == _is.getType<List<String>?>()) {
+      return (data != null
+              ? (data as List).map((e) => deserialize<String>(e)).toList()
+              : null)
+          as T;
+    }
     if (t == List<_ioklc517.TopicMastery>) {
       return (data as List)
               .map((e) => deserialize<_ioklc517.TopicMastery>(e))
@@ -839,15 +854,6 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data as List)
               .map((e) => deserialize<_iv5t7noe.StudentProgress>(e))
               .toList()
-          as T;
-    }
-    if (t == List<String>) {
-      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
-    }
-    if (t == _is.getType<List<String>?>()) {
-      return (data != null
-              ? (data as List).map((e) => deserialize<String>(e)).toList()
-              : null)
           as T;
     }
     if (t == List<_i12skj47.CreateOptionInput>) {
@@ -896,6 +902,15 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data as List)
               .map((e) => deserialize<_ik7qkox3.Course>(e))
               .toList()
+          as T;
+    }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == _is.getType<List<String>?>()) {
+      return (data != null
+              ? (data as List).map((e) => deserialize<String>(e)).toList()
+              : null)
           as T;
     }
     if (t == List<_igqv87t7.Question>) {

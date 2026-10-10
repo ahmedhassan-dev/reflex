@@ -114,14 +114,15 @@ void main() {
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
     });
 
-    testWidgets('teacher can open dialog and create a new course', (tester) async {
+    testWidgets('teacher can open dialog and create a new course with topics', (tester) async {
       when(() => mockRepo.listQuestions(any()))
           .thenAnswer((_) async => Result.success([]));
       when(() => mockRepo.createCourse(
             title: any(named: 'title'),
             subject: any(named: 'subject'),
+            topics: any(named: 'topics'),
           )).thenAnswer((_) async => Result.success(
-            Course(id: 2, title: 'Calculus Advanced', subject: 'Math'),
+            Course(id: 2, title: 'Calculus Advanced', subject: 'Math', topics: ['Algebra']),
           ));
 
       await tester.pumpWidget(
@@ -139,9 +140,14 @@ void main() {
       await tester.tap(addCourseBtn);
       await tester.pumpAndSettle();
 
-      // Enter Title and Subject
+      // Enter Title, Subject, and Tag
       await tester.enterText(find.byKey(const Key('input_new_course_title')), 'Calculus Advanced');
       await tester.enterText(find.byKey(const Key('input_new_course_subject')), 'Math');
+      await tester.enterText(find.byKey(const Key('input_new_course_topic')), 'Algebra');
+      await tester.tap(find.byKey(const Key('btn_add_topic_to_course')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('chip_dialog_topic_Algebra')), findsOneWidget);
 
       // Tap Confirm Create
       await tester.tap(find.byKey(const Key('btn_confirm_create_course')));
@@ -150,7 +156,30 @@ void main() {
       verify(() => mockRepo.createCourse(
             title: 'Calculus Advanced',
             subject: 'Math',
+            topics: ['Algebra'],
           )).called(1);
+    });
+
+    testWidgets('course topics are rendered as chips for selected course', (tester) async {
+      when(() => mockRepo.listCourses()).thenAnswer(
+        (_) async => Result.success([
+          Course(id: 1, title: 'STEM Math', subject: 'Math', topics: ['Geometry', 'Vectors']),
+        ]),
+      );
+      when(() => mockRepo.listQuestions(any()))
+          .thenAnswer((_) async => Result.success([]));
+
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: QuestionAdminScreen(
+            repositoryOverride: mockRepo,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('chip_course_topic_Geometry')), findsOneWidget);
+      expect(find.byKey(const Key('chip_course_topic_Vectors')), findsOneWidget);
     });
 
     testWidgets('teacher can open bottom sheet and create a new question', (tester) async {
