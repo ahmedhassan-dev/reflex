@@ -7,11 +7,29 @@ import '../fakes/fake_repositories.dart';
 void main() {
   group('T-021: QuestionAdminService (Teacher Topic Notes & Hints)', () {
     late FakeQuestionRepository questionRepo;
+    late FakeCourseRepository courseRepo;
+    late FakeQuestionOptionRepository optionRepo;
+    late FakeAcceptedAnswerRepository acceptedAnswerRepo;
     late QuestionAdminService service;
 
     setUp(() async {
       questionRepo = FakeQuestionRepository();
-      service = QuestionAdminService(questionRepo: questionRepo);
+      courseRepo = FakeCourseRepository();
+      optionRepo = FakeQuestionOptionRepository();
+      acceptedAnswerRepo = FakeAcceptedAnswerRepository();
+
+      service = QuestionAdminService(
+        questionRepo: questionRepo,
+        courseRepo: courseRepo,
+        optionRepo: optionRepo,
+        acceptedAnswerRepo: acceptedAnswerRepo,
+      );
+
+      await courseRepo.save(Course(
+        id: 1,
+        title: 'Flutter Mastery',
+        subject: 'Mobile Development',
+      ));
 
       await questionRepo.save(Question(
         id: 1,
@@ -86,6 +104,78 @@ void main() {
         () => service.updateTopicNoteAndHint(questionId: 999, topicNote: 'Valid note'),
         throwsA(isA<QuestionNotFoundException>()),
       );
+    });
+
+    test('createCourse creates course with trimmed title and subject', () async {
+      final course = await service.createCourse(
+        title: '   Math 101   ',
+        subject: '   Mathematics   ',
+      );
+
+      expect(course.title, equals('Math 101'));
+      expect(course.subject, equals('Mathematics'));
+      expect(course.id, isNotNull);
+
+      final list = await service.listCourses();
+      expect(list.length, equals(2));
+    });
+
+    test('createCourse rejects empty title or subject', () async {
+      expect(
+        () => service.createCourse(title: '  ', subject: 'Math'),
+        throwsA(isA<ValidationException>()),
+      );
+      expect(
+        () => service.createCourse(title: 'Math', subject: '  '),
+        throwsA(isA<ValidationException>()),
+      );
+    });
+
+    test('createQuestion adds multiple choice question with options', () async {
+      final input = CreateQuestionInput(
+        courseId: 1,
+        prompt: 'What is 2 + 2?',
+        topic: 'Arithmetic',
+        questionType: QuestionType.multipleChoice,
+        points: 10,
+        expectedSeconds: 10,
+        topicNote: 'Basic addition.',
+        helpHint: 'Count fingers.',
+        options: [
+          CreateOptionInput(text: '4', isCorrect: true, explanation: 'Correct answer'),
+          CreateOptionInput(text: '5', isCorrect: false, explanation: 'Incorrect'),
+        ],
+      );
+
+      final created = await service.createQuestion(input);
+      expect(created.id, isNotNull);
+      expect(created.prompt, equals('What is 2 + 2?'));
+      expect(created.position, equals(2)); // Position 1 already exists
+
+      final opts = await optionRepo.getOptionsForQuestion(created.id!);
+      expect(opts.length, equals(2));
+      expect(opts.first.text, equals('4'));
+      expect(opts.first.isCorrect, isTrue);
+    });
+
+    test('createQuestion adds text input question with accepted answers', () async {
+      final input = CreateQuestionInput(
+        courseId: 1,
+        prompt: 'Capital of France?',
+        topic: 'Geography',
+        questionType: QuestionType.textInput,
+        points: 15,
+        expectedSeconds: 12,
+        acceptedAnswers: ['paris', 'Paris '],
+      );
+
+      final created = await service.createQuestion(input);
+      expect(created.id, isNotNull);
+      expect(created.questionType, equals(QuestionType.textInput));
+
+      final answers = await acceptedAnswerRepo.getByQuestionId(created.id!);
+      expect(answers.length, equals(2));
+      expect(answers.first.normalizedText, equals('paris'));
     });
   });
 }

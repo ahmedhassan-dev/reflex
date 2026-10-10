@@ -43,6 +43,7 @@ class FakeCourseRepository implements ICourseRepository {
   @override
   Future<Course> save(Course course) async {
     final id = course.id ?? _nextId++;
+    if (id >= _nextId) _nextId = id + 1;
     final saved = course.copyWith(id: id);
     _storage[id] = saved;
     return saved;
@@ -66,6 +67,7 @@ class FakeQuestionRepository implements IQuestionRepository {
   @override
   Future<Question> save(Question question) async {
     final id = question.id ?? _nextId++;
+    if (id >= _nextId) _nextId = id + 1;
     final saved = question.copyWith(id: id);
     _storage[id] = saved;
     return saved;

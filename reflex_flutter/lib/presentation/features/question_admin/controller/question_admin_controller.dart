@@ -9,6 +9,9 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
 
   // ── State variables ────────────────────────────────────────────────────────
   int courseId = 1;
+  List<Course> courses = [];
+  Course? selectedCourse;
+
   List<Question> questions = [];
   Question? selectedQuestion;
   bool isLoading = false;
@@ -26,7 +29,7 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
   void initState() {
     super.initState();
     questionRepo = widget.repositoryOverride ?? QuestionAdminRepositoryImpl();
-    loadQuestions();
+    loadCoursesAndQuestions();
   }
 
   @override
@@ -37,6 +40,42 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
   }
 
   // ── Actions ────────────────────────────────────────────────────────────────
+  Future<void> loadCoursesAndQuestions() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    final coursesRes = await questionRepo.listCourses();
+    if (!mounted) return;
+
+    if (coursesRes.isSuccess && (coursesRes.data?.isNotEmpty ?? false)) {
+      courses = coursesRes.data!;
+      // Find course matching current courseId or pick first
+      selectedCourse = courses.firstWhere(
+        (c) => c.id == courseId,
+        orElse: () => courses.first,
+      );
+      courseId = selectedCourse!.id!;
+    }
+
+    await loadQuestions();
+  }
+
+  Future<void> onCourseSelected(Course course) async {
+    if (course.id == null || course.id == courseId) return;
+    setState(() {
+      selectedCourse = course;
+      courseId = course.id!;
+      selectedQuestion = null;
+      topicNoteController.clear();
+      helpHintController.clear();
+      successMessage = null;
+      errorMessage = null;
+    });
+    await loadQuestions();
+  }
+
   Future<void> loadQuestions() async {
     setState(() {
       isLoading = true;
@@ -51,8 +90,12 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
       setState(() {
         isLoading = false;
         questions = list;
-        if (list.isNotEmpty && selectedQuestion == null) {
+        if (list.isNotEmpty) {
           selectQuestion(list.first);
+        } else {
+          selectedQuestion = null;
+          topicNoteController.clear();
+          helpHintController.clear();
         }
       });
     } else {
@@ -71,6 +114,57 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
       successMessage = null;
       errorMessage = null;
     });
+  }
+
+  Future<bool> createNewCourse({
+    required String title,
+    required String subject,
+  }) async {
+    final res = await questionRepo.createCourse(
+      title: title,
+      subject: subject,
+    );
+    if (!mounted) return false;
+
+    if (res.isSuccess) {
+      final newCourse = res.data!;
+      setState(() {
+        courses.add(newCourse);
+        selectedCourse = newCourse;
+        courseId = newCourse.id!;
+        questions = [];
+        selectedQuestion = null;
+        topicNoteController.clear();
+        helpHintController.clear();
+        successMessage = 'course_created';
+      });
+      return true;
+    } else {
+      setState(() {
+        errorMessage = res.error;
+      });
+      return false;
+    }
+  }
+
+  Future<bool> createNewQuestion(CreateQuestionInput input) async {
+    final res = await questionRepo.createQuestion(input);
+    if (!mounted) return false;
+
+    if (res.isSuccess) {
+      final created = res.data!;
+      setState(() {
+        questions.add(created);
+        selectQuestion(created);
+        successMessage = 'question_created';
+      });
+      return true;
+    } else {
+      setState(() {
+        errorMessage = res.error;
+      });
+      return false;
+    }
   }
 
   Future<void> saveChanges() async {

@@ -52,6 +52,9 @@ class AppContainer {
 
   QuestionAdminService get questionAdminService => QuestionAdminService(
         questionRepo: questionRepo,
+        courseRepo: courseRepo,
+        optionRepo: optionRepo,
+        acceptedAnswerRepo: acceptedAnswerRepo,
       );
 
   AuthProvisioningService get authProvisioningService => AuthProvisioningService(

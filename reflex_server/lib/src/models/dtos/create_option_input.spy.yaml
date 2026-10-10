@@ -1,0 +1,5 @@
+class: CreateOptionInput
+fields:
+  text: String
+  isCorrect: bool
+  explanation: String?

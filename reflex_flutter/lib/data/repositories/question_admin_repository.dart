@@ -3,7 +3,13 @@ import '../../core/result.dart';
 import '../../client.dart';
 
 abstract interface class IQuestionAdminRepository {
+  Future<Result<List<Course>>> listCourses();
+  Future<Result<Course>> createCourse({
+    required String title,
+    required String subject,
+  });
   Future<Result<List<Question>>> listQuestions(int courseId);
+  Future<Result<Question>> createQuestion(CreateQuestionInput input);
   Future<Result<Question>> updateTopicNoteAndHint(
     int questionId, {
     String? topicNote,
@@ -18,10 +24,46 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
       : _client = clientInstance ?? client;
 
   @override
+  Future<Result<List<Course>>> listCourses() async {
+    try {
+      final list = await _client.questionAdmin.listCourses();
+      return Result.success(list);
+    } catch (e) {
+      return Result.failure(e.toString());
+    }
+  }
+
+  @override
+  Future<Result<Course>> createCourse({
+    required String title,
+    required String subject,
+  }) async {
+    try {
+      final course = await _client.questionAdmin.createCourse(
+        title: title,
+        subject: subject,
+      );
+      return Result.success(course);
+    } catch (e) {
+      return Result.failure(e.toString());
+    }
+  }
+
+  @override
   Future<Result<List<Question>>> listQuestions(int courseId) async {
     try {
       final list = await _client.questionAdmin.listQuestions(courseId);
       return Result.success(list);
+    } catch (e) {
+      return Result.failure(e.toString());
+    }
+  }
+
+  @override
+  Future<Result<Question>> createQuestion(CreateQuestionInput input) async {
+    try {
+      final question = await _client.questionAdmin.createQuestion(input);
+      return Result.success(question);
     } catch (e) {
       return Result.failure(e.toString());
     }

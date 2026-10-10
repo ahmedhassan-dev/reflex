@@ -24,9 +24,13 @@ demoClock:
 greeting:
   - hello:
 practice:
+  - listCourses:
   - serveNextCard:
   - requestHelp:
   - submitAnswer:
 questionAdmin:
+  - listCourses:
+  - createCourse:
+  - createQuestion:
   - updateTopicNoteAndHint:
   - listQuestions:

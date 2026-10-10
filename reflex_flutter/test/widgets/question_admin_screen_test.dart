@@ -9,8 +9,11 @@ import '../test_helpers.dart';
 
 class MockQuestionAdminRepository extends Mock implements IQuestionAdminRepository {}
 
+class FakeCreateQuestionInput extends Fake implements CreateQuestionInput {}
+
 void main() {
   setUpAll(() async {
+    registerFallbackValue(FakeCreateQuestionInput());
     await initTestLocalization();
   });
 
@@ -18,6 +21,11 @@ void main() {
 
   setUp(() {
     mockRepo = MockQuestionAdminRepository();
+    when(() => mockRepo.listCourses()).thenAnswer(
+      (_) async => Result.success([
+        Course(id: 1, title: 'STEM Math', subject: 'Math'),
+      ]),
+    );
   });
 
   group('QuestionAdminScreen widget tests', () {
@@ -104,6 +112,94 @@ void main() {
 
       // Verify success feedback is shown
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+    });
+
+    testWidgets('teacher can open dialog and create a new course', (tester) async {
+      when(() => mockRepo.listQuestions(any()))
+          .thenAnswer((_) async => Result.success([]));
+      when(() => mockRepo.createCourse(
+            title: any(named: 'title'),
+            subject: any(named: 'subject'),
+          )).thenAnswer((_) async => Result.success(
+            Course(id: 2, title: 'Calculus Advanced', subject: 'Math'),
+          ));
+
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: QuestionAdminScreen(
+            repositoryOverride: mockRepo,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap "New Course" button
+      final addCourseBtn = find.byKey(const Key('btn_add_course'));
+      expect(addCourseBtn, findsOneWidget);
+      await tester.tap(addCourseBtn);
+      await tester.pumpAndSettle();
+
+      // Enter Title and Subject
+      await tester.enterText(find.byKey(const Key('input_new_course_title')), 'Calculus Advanced');
+      await tester.enterText(find.byKey(const Key('input_new_course_subject')), 'Math');
+
+      // Tap Confirm Create
+      await tester.tap(find.byKey(const Key('btn_confirm_create_course')));
+      await tester.pumpAndSettle();
+
+      verify(() => mockRepo.createCourse(
+            title: 'Calculus Advanced',
+            subject: 'Math',
+          )).called(1);
+    });
+
+    testWidgets('teacher can open bottom sheet and create a new question', (tester) async {
+      when(() => mockRepo.listQuestions(any()))
+          .thenAnswer((_) async => Result.success([]));
+      when(() => mockRepo.createQuestion(any()))
+          .thenAnswer((_) async => Result.success(Question(
+                id: 15,
+                courseId: 1,
+                position: 1,
+                prompt: 'What is Newton second law?',
+                topic: 'Physics',
+                questionType: QuestionType.multipleChoice,
+                points: 10,
+                expectedSeconds: 15,
+                attemptCount: 0,
+                attemptedStudentCount: 0,
+                solvedStudentCount: 0,
+                firstTrySolveCount: 0,
+                underTimeSolveCount: 0,
+                cleanSolveCount: 0,
+              )));
+
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: QuestionAdminScreen(
+            repositoryOverride: mockRepo,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap "New Question" button
+      final addQBtn = find.byKey(const Key('btn_add_question'));
+      expect(addQBtn, findsOneWidget);
+      await tester.tap(addQBtn);
+      await tester.pumpAndSettle();
+
+      // Enter Prompt and Topic
+      await tester.enterText(find.byKey(const Key('input_question_prompt')), 'What is Newton second law?');
+      await tester.enterText(find.byKey(const Key('input_question_topic')), 'Physics');
+
+      // Tap Confirm Create
+      final confirmBtn = find.byKey(const Key('btn_confirm_create_question'));
+      await tester.ensureVisible(confirmBtn);
+      await tester.tap(confirmBtn);
+      await tester.pumpAndSettle();
+
+      verify(() => mockRepo.createQuestion(any())).called(1);
     });
   });
 }

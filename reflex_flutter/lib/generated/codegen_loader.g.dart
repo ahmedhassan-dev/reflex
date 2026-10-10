@@ -10,7 +10,7 @@ class CodegenLoader extends AssetLoader{
   const CodegenLoader();
 
   @override
-  Future<Map<String, dynamic>> load(String path, Locale locale) {
+  Future<Map<String, dynamic>?> load(String path, Locale locale) {
     return Future.value(mapLocales[locale.toString()]);
   }
 
@@ -44,13 +44,13 @@ class CodegenLoader extends AssetLoader{
     "note_gate_title": "Teacher's Concept Explanation",
     "note_gate_acknowledge": "I have read and understood this concept",
     "must_acknowledge_note": "Please acknowledge the concept note above to continue.",
-    "mastered": "Mastered \u26a1 (Clean first-try under target time)",
-    "developing": "Developing \u26a0\ufe0f (Correct, but slow or hint used)",
-    "needs_work": "Needs Work \u274c (Review scheduled for tomorrow)",
+    "mastered": "Mastered ⚡ (Clean first-try under target time)",
+    "developing": "Developing ⚠️ (Correct, but slow or hint used)",
+    "needs_work": "Needs Work ❌ (Review scheduled for tomorrow)",
     "option_explanation": "Option Explanation",
     "why_right": "Why this option is correct:",
     "why_wrong": "Why this option is incorrect:",
-    "deck_complete_title": "Review Session Complete! \ud83c\udf89",
+    "deck_complete_title": "Review Session Complete! 🎉",
     "deck_complete_subtitle": "You have completed all review cards due for today. Great work building your reflexes!",
     "target_time": "Target Time: {}s",
     "peer_stats": "{} of {} students solved this",
@@ -86,7 +86,38 @@ class CodegenLoader extends AssetLoader{
     "help_hint_label": "Guided Help Hint",
     "help_hint_hint": "Enter a guiding hint shown when students tap Need Hint...",
     "save_changes": "Save Changes",
-    "saved_successfully": "Topic note and hint updated successfully!"
+    "saved_successfully": "Topic note and hint updated successfully!",
+    "course_label": "Course",
+    "select_course": "Select Course",
+    "add_course_button": "New Course",
+    "add_question_button": "New Question",
+    "new_course_dialog_title": "Create New Course",
+    "course_title_label": "Course Title",
+    "course_title_hint": "e.g. Mechanics & Kinematics",
+    "course_subject_label": "Subject",
+    "course_subject_hint": "e.g. Physics",
+    "create_course_action": "Create Course",
+    "course_created_success": "Course created successfully!",
+    "new_question_dialog_title": "Add New Question",
+    "prompt_label": "Question Prompt",
+    "prompt_hint": "Enter question text...",
+    "topic_label": "Topic",
+    "topic_hint": "e.g. Velocity, Vectors",
+    "question_type_label": "Question Type",
+    "type_multiple_choice": "Multiple Choice",
+    "type_text_input": "Text Input",
+    "points_label": "Points",
+    "expected_seconds_label": "Expected Time (seconds)",
+    "options_label": "Answer Options",
+    "add_option_button": "Add Option",
+    "option_text_hint": "Option text",
+    "option_explanation_hint": "Why this option is correct/incorrect (optional)",
+    "accepted_answers_label": "Accepted Answers (comma-separated)",
+    "accepted_answers_hint": "e.g. 28, twenty eight, 28.0",
+    "create_question_action": "Create Question",
+    "question_created_success": "Question created successfully!",
+    "cancel": "Cancel",
+    "validation_fill_required": "Please fill in all required fields."
   },
   "demo_clock": {
     "title": "Time Machine (Demo Clock)",
@@ -135,7 +166,7 @@ class CodegenLoader extends AssetLoader{
     "name_label": "Full Name",
     "name_hint": "Enter your full name",
     "email_hint": "name@example.com",
-    "password_hint": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+    "password_hint": "••••••••",
     "create_account": "Create Account",
     "sign_in_with_google": "Sign in with Google",
     "sign_in_with_apple": "Sign in with Apple",
@@ -143,7 +174,7 @@ class CodegenLoader extends AssetLoader{
     "demo_hint": "Fast-track access to pre-seeded hackathon teacher & student environments."
   }
 };
-  static const Map<String,dynamic> _ar = {
+static const Map<String,dynamic> _ar = {
   "app_title": "ريفلكس",
   "connected": "أنت متصل الآن",
   "sign_out": "تسجيل الخروج",
@@ -215,7 +246,38 @@ class CodegenLoader extends AssetLoader{
     "help_hint_label": "تلميح المساعدة الموجه",
     "help_hint_hint": "اكتب تلميحاً يوجه الطالب دون كشف الإجابة...",
     "save_changes": "حفظ التعديلات",
-    "saved_successfully": "تم تحديث الملاحظة والتلميح بنجاح!"
+    "saved_successfully": "تم تحديث الملاحظة والتلميح بنجاح!",
+    "course_label": "الدورة التدريبية",
+    "select_course": "اختر الدورة",
+    "add_course_button": "دورة جديدة",
+    "add_question_button": "سؤال جديد",
+    "new_course_dialog_title": "إنشاء دورة تدريبية جديدة",
+    "course_title_label": "عنوان الدورة",
+    "course_title_hint": "مثال: الميكانيكا وعلم الحركة",
+    "course_subject_label": "المادة",
+    "course_subject_hint": "مثال: الفيزياء",
+    "create_course_action": "إنشاء الدورة",
+    "course_created_success": "تم إنشاء الدورة بنجاح!",
+    "new_question_dialog_title": "إضافة سؤال جديد",
+    "prompt_label": "نص السؤال",
+    "prompt_hint": "اكتب نص السؤال هنا...",
+    "topic_label": "الموضوع",
+    "topic_hint": "مثال: السرعة، المتجهات",
+    "question_type_label": "نوع السؤال",
+    "type_multiple_choice": "اختيار من متعدد",
+    "type_text_input": "إدخال نصي",
+    "points_label": "النقاط",
+    "expected_seconds_label": "الوقت المتوقع (ثوانٍ)",
+    "options_label": "خيارات الإجابة",
+    "add_option_button": "إضافة خيار",
+    "option_text_hint": "نص الخيار",
+    "option_explanation_hint": "سبب صحة أو خطأ هذا الخيار (اختياري)",
+    "accepted_answers_label": "الإجابات المقبولة (مفصولة بفواصل)",
+    "accepted_answers_hint": "مثال: 28، ثمانية وعشرون، ٢٨",
+    "create_question_action": "إنشاء السؤال",
+    "question_created_success": "تم إنشاء السؤال بنجاح!",
+    "cancel": "إلغاء",
+    "validation_fill_required": "يرجى تعبئة جميع الحقول المطلوبة."
   },
   "demo_clock": {
     "title": "آلة الزمن (ساعة العرض التجريبي)",
@@ -272,5 +334,5 @@ class CodegenLoader extends AssetLoader{
     "demo_hint": "دخول فوري بملفات المعلم والطلاب الجاهزة للعرض السريع."
   }
 };
-  static const Map<String, Map<String,dynamic>> mapLocales = {"en": _en, "ar": _ar};
+static const Map<String, Map<String,dynamic>> mapLocales = {"en": _en, "ar": _ar};
 }

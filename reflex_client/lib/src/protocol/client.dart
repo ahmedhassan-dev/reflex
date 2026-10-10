@@ -12,8 +12,11 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
 import 'package:http/http.dart' as _i85jenna;
+import 'package:reflex_client/src/protocol/course.dart' as _irm1rqva;
 import 'package:reflex_client/src/protocol/dtos/cohort_summary.dart'
     as _ipp2lvvc;
+import 'package:reflex_client/src/protocol/dtos/create_question_input.dart'
+    as _igxwd1ae;
 import 'package:reflex_client/src/protocol/dtos/help_result.dart' as _i38zaplx;
 import 'package:reflex_client/src/protocol/dtos/practice_item.dart'
     as _izdle0db;
@@ -401,6 +404,14 @@ class EndpointPractice extends _isc.EndpointRef {
   @override
   String get name => 'practice';
 
+  /// Lists all courses available for practice.
+  _ida.Future<List<_irm1rqva.Course>> listCourses() =>
+      caller.callServerEndpoint<List<_irm1rqva.Course>>(
+        'practice',
+        'listCourses',
+        {},
+      );
+
   /// Serves the next card due for spaced repetition review or the next unattempted card.
   _ida.Future<_izdle0db.PracticeItem?> serveNextCard(int courseId) =>
       caller.callServerEndpoint<_izdle0db.PracticeItem?>(
@@ -433,13 +444,43 @@ class EndpointPractice extends _isc.EndpointRef {
   );
 }
 
-/// Endpoint allowing teachers to inspect questions, update topic notes, and manage hints.
+/// Endpoint allowing teachers to inspect questions, create courses/questions, update topic notes, and manage hints.
 /// {@category Endpoint}
 class EndpointQuestionAdmin extends _isc.EndpointRef {
   EndpointQuestionAdmin(_isc.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'questionAdmin';
+
+  /// Lists all courses.
+  _ida.Future<List<_irm1rqva.Course>> listCourses() =>
+      caller.callServerEndpoint<List<_irm1rqva.Course>>(
+        'questionAdmin',
+        'listCourses',
+        {},
+      );
+
+  /// Creates a new course.
+  _ida.Future<_irm1rqva.Course> createCourse({
+    required String title,
+    required String subject,
+  }) => caller.callServerEndpoint<_irm1rqva.Course>(
+    'questionAdmin',
+    'createCourse',
+    {
+      'title': title,
+      'subject': subject,
+    },
+  );
+
+  /// Creates a new question with options or accepted answers.
+  _ida.Future<_idjaghnf.Question> createQuestion(
+    _igxwd1ae.CreateQuestionInput input,
+  ) => caller.callServerEndpoint<_idjaghnf.Question>(
+    'questionAdmin',
+    'createQuestion',
+    {'input': input},
+  );
 
   /// Updates teacher topic explanation note and help hint for a question.
   _ida.Future<_idjaghnf.Question> updateTopicNoteAndHint(

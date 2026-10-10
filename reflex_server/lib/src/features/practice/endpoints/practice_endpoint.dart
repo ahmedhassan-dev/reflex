@@ -4,6 +4,12 @@ import 'package:reflex_server/src/generated/protocol.dart';
 
 /// Endpoint managing active flashcard practice, hints, and answer submissions.
 class PracticeEndpoint extends Endpoint {
+  /// Lists all courses available for practice.
+  Future<List<Course>> listCourses(Session session) async {
+    final container = AppContainer(session);
+    return container.courseRepo.listAll();
+  }
+
   /// Serves the next card due for spaced repetition review or the next unattempted card.
   Future<PracticeItem?> serveNextCard(Session session, int courseId) async {
     final container = AppContainer(session);

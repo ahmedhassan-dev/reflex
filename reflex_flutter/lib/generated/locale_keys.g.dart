@@ -13,12 +13,11 @@ abstract class  LocaleKeys {
   static const retry = 'retry';
   static const loading = 'loading';
   static const switch_language = 'switch_language';
-  static const nav = 'nav';
   static const nav_practice = 'nav.practice';
   static const nav_dashboard = 'nav.dashboard';
   static const nav_questions = 'nav.questions';
   static const nav_profile = 'nav.profile';
-  static const practice = 'practice';
+  static const nav = 'nav';
   static const practice_title = 'practice.title';
   static const practice_submit = 'practice.submit';
   static const practice_continue_button = 'practice.continue_button';
@@ -43,7 +42,7 @@ abstract class  LocaleKeys {
   static const practice_peer_stats = 'practice.peer_stats';
   static const practice_first_try_stat = 'practice.first_try_stat';
   static const practice_latency = 'practice.latency';
-  static const dashboard = 'dashboard';
+  static const practice = 'practice';
   static const dashboard_title = 'dashboard.title';
   static const dashboard_refresh = 'dashboard.refresh';
   static const dashboard_cohort_mastery = 'dashboard.cohort_mastery';
@@ -63,7 +62,7 @@ abstract class  LocaleKeys {
   static const dashboard_clean_first_try = 'dashboard.clean_first_try';
   static const dashboard_avg_latency = 'dashboard.avg_latency';
   static const dashboard_no_cohort_data = 'dashboard.no_cohort_data';
-  static const questions_admin = 'questions_admin';
+  static const dashboard = 'dashboard';
   static const questions_admin_title = 'questions_admin.title';
   static const questions_admin_select_question = 'questions_admin.select_question';
   static const questions_admin_topic_note_label = 'questions_admin.topic_note_label';
@@ -72,7 +71,38 @@ abstract class  LocaleKeys {
   static const questions_admin_help_hint_hint = 'questions_admin.help_hint_hint';
   static const questions_admin_save_changes = 'questions_admin.save_changes';
   static const questions_admin_saved_successfully = 'questions_admin.saved_successfully';
-  static const demo_clock = 'demo_clock';
+  static const questions_admin_course_label = 'questions_admin.course_label';
+  static const questions_admin_select_course = 'questions_admin.select_course';
+  static const questions_admin_add_course_button = 'questions_admin.add_course_button';
+  static const questions_admin_add_question_button = 'questions_admin.add_question_button';
+  static const questions_admin_new_course_dialog_title = 'questions_admin.new_course_dialog_title';
+  static const questions_admin_course_title_label = 'questions_admin.course_title_label';
+  static const questions_admin_course_title_hint = 'questions_admin.course_title_hint';
+  static const questions_admin_course_subject_label = 'questions_admin.course_subject_label';
+  static const questions_admin_course_subject_hint = 'questions_admin.course_subject_hint';
+  static const questions_admin_create_course_action = 'questions_admin.create_course_action';
+  static const questions_admin_course_created_success = 'questions_admin.course_created_success';
+  static const questions_admin_new_question_dialog_title = 'questions_admin.new_question_dialog_title';
+  static const questions_admin_prompt_label = 'questions_admin.prompt_label';
+  static const questions_admin_prompt_hint = 'questions_admin.prompt_hint';
+  static const questions_admin_topic_label = 'questions_admin.topic_label';
+  static const questions_admin_topic_hint = 'questions_admin.topic_hint';
+  static const questions_admin_question_type_label = 'questions_admin.question_type_label';
+  static const questions_admin_type_multiple_choice = 'questions_admin.type_multiple_choice';
+  static const questions_admin_type_text_input = 'questions_admin.type_text_input';
+  static const questions_admin_points_label = 'questions_admin.points_label';
+  static const questions_admin_expected_seconds_label = 'questions_admin.expected_seconds_label';
+  static const questions_admin_options_label = 'questions_admin.options_label';
+  static const questions_admin_add_option_button = 'questions_admin.add_option_button';
+  static const questions_admin_option_text_hint = 'questions_admin.option_text_hint';
+  static const questions_admin_option_explanation_hint = 'questions_admin.option_explanation_hint';
+  static const questions_admin_accepted_answers_label = 'questions_admin.accepted_answers_label';
+  static const questions_admin_accepted_answers_hint = 'questions_admin.accepted_answers_hint';
+  static const questions_admin_create_question_action = 'questions_admin.create_question_action';
+  static const questions_admin_question_created_success = 'questions_admin.question_created_success';
+  static const questions_admin_cancel = 'questions_admin.cancel';
+  static const questions_admin_validation_fill_required = 'questions_admin.validation_fill_required';
+  static const questions_admin = 'questions_admin';
   static const demo_clock_title = 'demo_clock.title';
   static const demo_clock_simulated_date = 'demo_clock.simulated_date';
   static const demo_clock_advance_1d = 'demo_clock.advance_1d';
@@ -81,7 +111,7 @@ abstract class  LocaleKeys {
   static const demo_clock_reset = 'demo_clock.reset';
   static const demo_clock_clock_advanced = 'demo_clock.clock_advanced';
   static const demo_clock_clock_reset = 'demo_clock.clock_reset';
-  static const profile = 'profile';
+  static const demo_clock = 'demo_clock';
   static const profile_title = 'profile.title';
   static const profile_clean_first_try = 'profile.clean_first_try';
   static const profile_cards_mastered = 'profile.cards_mastered';
@@ -91,7 +121,7 @@ abstract class  LocaleKeys {
   static const profile_total_attempts = 'profile.total_attempts';
   static const profile_summary_title = 'profile.summary_title';
   static const profile_summary_subtitle = 'profile.summary_subtitle';
-  static const auth = 'auth';
+  static const profile = 'profile';
   static const auth_welcome_title = 'auth.welcome_title';
   static const auth_welcome_subtitle = 'auth.welcome_subtitle';
   static const auth_choose_role_prompt = 'auth.choose_role_prompt';
@@ -123,5 +153,6 @@ abstract class  LocaleKeys {
   static const auth_sign_in_with_apple = 'auth.sign_in_with_apple';
   static const auth_or_divider = 'auth.or_divider';
   static const auth_demo_hint = 'auth.demo_hint';
+  static const auth = 'auth';
 
 }

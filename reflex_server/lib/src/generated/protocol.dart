@@ -11,6 +11,7 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:reflex_server/src/generated/course.dart' as _ik7qkox3;
 import 'package:reflex_server/src/generated/question.dart' as _igqv87t7;
 import 'package:serverpod/protocol.dart' as _isp;
 import 'package:serverpod/serverpod.dart' as _is;
@@ -23,6 +24,8 @@ import 'attempt.dart' as _iyzrlzh2;
 import 'course.dart' as _ink5e3of;
 import 'demo_clock.dart' as _itaqwut4;
 import 'dtos/cohort_summary.dart' as _il7knc0r;
+import 'dtos/create_option_input.dart' as _i12skj47;
+import 'dtos/create_question_input.dart' as _i83lwmh8;
 import 'dtos/help_result.dart' as _ila2pk6h;
 import 'dtos/option_explanation_view.dart' as _ihmvr8it;
 import 'dtos/practice_item.dart' as _ijawaj3m;
@@ -48,6 +51,8 @@ export 'attempt.dart';
 export 'course.dart';
 export 'demo_clock.dart';
 export 'dtos/cohort_summary.dart';
+export 'dtos/create_option_input.dart';
+export 'dtos/create_question_input.dart';
 export 'dtos/help_result.dart';
 export 'dtos/option_explanation_view.dart';
 export 'dtos/practice_item.dart';
@@ -657,6 +662,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _il7knc0r.CohortSummary) {
       return _il7knc0r.CohortSummary.fromJson(data) as T;
     }
+    if (t == _i12skj47.CreateOptionInput) {
+      return _i12skj47.CreateOptionInput.fromJson(data) as T;
+    }
+    if (t == _i83lwmh8.CreateQuestionInput) {
+      return _i83lwmh8.CreateQuestionInput.fromJson(data) as T;
+    }
     if (t == _ila2pk6h.HelpResult) {
       return _ila2pk6h.HelpResult.fromJson(data) as T;
     }
@@ -732,6 +743,16 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_il7knc0r.CohortSummary?>()) {
       return (data != null ? _il7knc0r.CohortSummary.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i12skj47.CreateOptionInput?>()) {
+      return (data != null ? _i12skj47.CreateOptionInput.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i83lwmh8.CreateQuestionInput?>()) {
+      return (data != null
+              ? _i83lwmh8.CreateQuestionInput.fromJson(data)
+              : null)
           as T;
     }
     if (t == _is.getType<_ila2pk6h.HelpResult?>()) {
@@ -820,6 +841,29 @@ class Protocol extends _is.DatabaseSerializationManager {
               .toList()
           as T;
     }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == _is.getType<List<String>?>()) {
+      return (data != null
+              ? (data as List).map((e) => deserialize<String>(e)).toList()
+              : null)
+          as T;
+    }
+    if (t == List<_i12skj47.CreateOptionInput>) {
+      return (data as List)
+              .map((e) => deserialize<_i12skj47.CreateOptionInput>(e))
+              .toList()
+          as T;
+    }
+    if (t == _is.getType<List<_i12skj47.CreateOptionInput>?>()) {
+      return (data != null
+              ? (data as List)
+                    .map((e) => deserialize<_i12skj47.CreateOptionInput>(e))
+                    .toList()
+              : null)
+          as T;
+    }
     if (t == List<_i7imv6rp.QuestionOptionView>) {
       return (data as List)
               .map((e) => deserialize<_i7imv6rp.QuestionOptionView>(e))
@@ -848,6 +892,12 @@ class Protocol extends _is.DatabaseSerializationManager {
               : null)
           as T;
     }
+    if (t == List<_ik7qkox3.Course>) {
+      return (data as List)
+              .map((e) => deserialize<_ik7qkox3.Course>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_igqv87t7.Question>) {
       return (data as List)
               .map((e) => deserialize<_igqv87t7.Question>(e))
@@ -873,6 +923,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ink5e3of.Course => 'Course',
       _itaqwut4.DemoClock => 'DemoClock',
       _il7knc0r.CohortSummary => 'CohortSummary',
+      _i12skj47.CreateOptionInput => 'CreateOptionInput',
+      _i83lwmh8.CreateQuestionInput => 'CreateQuestionInput',
       _ila2pk6h.HelpResult => 'HelpResult',
       _ihmvr8it.OptionExplanationView => 'OptionExplanationView',
       _ijawaj3m.PracticeItem => 'PracticeItem',
@@ -917,6 +969,10 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'DemoClock';
       case _il7knc0r.CohortSummary():
         return 'CohortSummary';
+      case _i12skj47.CreateOptionInput():
+        return 'CreateOptionInput';
+      case _i83lwmh8.CreateQuestionInput():
+        return 'CreateQuestionInput';
       case _ila2pk6h.HelpResult():
         return 'HelpResult';
       case _ihmvr8it.OptionExplanationView():
@@ -997,6 +1053,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'CohortSummary') {
       return deserialize<_il7knc0r.CohortSummary>(data['data']);
+    }
+    if (dataClassName == 'CreateOptionInput') {
+      return deserialize<_i12skj47.CreateOptionInput>(data['data']);
+    }
+    if (dataClassName == 'CreateQuestionInput') {
+      return deserialize<_i83lwmh8.CreateQuestionInput>(data['data']);
     }
     if (dataClassName == 'HelpResult') {
       return deserialize<_ila2pk6h.HelpResult>(data['data']);

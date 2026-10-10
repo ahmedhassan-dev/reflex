@@ -10,6 +10,8 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:reflex_server/src/generated/dtos/create_question_input.dart'
+    as _i27r3xjl;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -493,6 +495,16 @@ class Endpoints extends _is.EndpointDispatch {
       name: 'practice',
       endpoint: endpoints['practice']!,
       methodConnectors: {
+        'listCourses': _is.MethodConnector(
+          name: 'listCourses',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['practice'] as _izjuq0o1.PracticeEndpoint)
+                  .listCourses(session),
+        ),
         'serveNextCard': _is.MethodConnector(
           name: 'serveNextCard',
           params: {
@@ -568,6 +580,66 @@ class Endpoints extends _is.EndpointDispatch {
       name: 'questionAdmin',
       endpoint: endpoints['questionAdmin']!,
       methodConnectors: {
+        'listCourses': _is.MethodConnector(
+          name: 'listCourses',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['questionAdmin']
+                          as _i28c2dxt.QuestionAdminEndpoint)
+                      .listCourses(session),
+        ),
+        'createCourse': _is.MethodConnector(
+          name: 'createCourse',
+          params: {
+            'title': _is.ParameterDescription(
+              name: 'title',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'subject': _is.ParameterDescription(
+              name: 'subject',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['questionAdmin']
+                          as _i28c2dxt.QuestionAdminEndpoint)
+                      .createCourse(
+                        session,
+                        title: params['title'],
+                        subject: params['subject'],
+                      ),
+        ),
+        'createQuestion': _is.MethodConnector(
+          name: 'createQuestion',
+          params: {
+            'input': _is.ParameterDescription(
+              name: 'input',
+              type: _is.getType<_i27r3xjl.CreateQuestionInput>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['questionAdmin']
+                          as _i28c2dxt.QuestionAdminEndpoint)
+                      .createQuestion(
+                        session,
+                        params['input'],
+                      ),
+        ),
         'updateTopicNoteAndHint': _is.MethodConnector(
           name: 'updateTopicNoteAndHint',
           params: {

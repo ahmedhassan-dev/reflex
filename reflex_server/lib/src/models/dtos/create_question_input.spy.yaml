@@ -1,0 +1,12 @@
+class: CreateQuestionInput
+fields:
+  courseId: int
+  prompt: String
+  topic: String
+  questionType: QuestionType
+  points: int
+  expectedSeconds: int
+  topicNote: String?
+  helpHint: String?
+  acceptedAnswers: List<String>?
+  options: List<CreateOptionInput>?
