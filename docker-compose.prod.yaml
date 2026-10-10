@@ -1,0 +1,66 @@
+# ==========================================
+# Reflex Production Docker Compose Stack (T-060)
+# ==========================================
+services:
+  postgres:
+    image: ghcr.io/serverpod/postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: \${SERVERPOD_DATABASE_USER:-postgres}
+      POSTGRES_DB: \${SERVERPOD_DATABASE_NAME:-reflex}
+      POSTGRES_PASSWORD: \${SERVERPOD_DATABASE_PASSWORD:-YPMVf_v_oijIRvvFDpat6nFOF3tcQ0iw}
+    ports:
+      - "\${SERVERPOD_DATABASE_PORT:-5432}:5432"
+    volumes:
+      - reflex_prod_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \${SERVERPOD_DATABASE_USER:-postgres} -d \${SERVERPOD_DATABASE_NAME:-reflex}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:6.2.6
+    restart: always
+    command: redis-server --requirepass \${SERVERPOD_REDIS_PASSWORD:-WPhLDMQn35YFhtk9UlQcU0lHYuAry-9O}
+    ports:
+      - "\${SERVERPOD_REDIS_PORT:-6379}:6379"
+    volumes:
+      - reflex_prod_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "\${SERVERPOD_REDIS_PASSWORD:-WPhLDMQn35YFhtk9UlQcU0lHYuAry-9O}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: reflex_server/Dockerfile
+    restart: always
+    env_file:
+      - .env
+    environment:
+      runmode: production
+      SERVERPOD_DATABASE_HOST: postgres
+      SERVERPOD_DATABASE_PORT: 5432
+      SERVERPOD_DATABASE_USER: \${SERVERPOD_DATABASE_USER:-postgres}
+      SERVERPOD_DATABASE_NAME: \${SERVERPOD_DATABASE_NAME:-reflex}
+      SERVERPOD_DATABASE_PASSWORD: \${SERVERPOD_DATABASE_PASSWORD:-YPMVf_v_oijIRvvFDpat6nFOF3tcQ0iw}
+      SERVERPOD_REDIS_HOST: redis
+      SERVERPOD_REDIS_PORT: 6379
+      SERVERPOD_REDIS_PASSWORD: \${SERVERPOD_REDIS_PASSWORD:-WPhLDMQn35YFhtk9UlQcU0lHYuAry-9O}
+      SERVERPOD_SERVICE_SECRET: \${SERVERPOD_SERVICE_SECRET:-YVs7P9kZjtXq06zYML1YddFYh4rgFuXH}
+    ports:
+      - "8080:8080" # API Server
+      - "8081:8081" # Insights Server
+      - "8082:8082" # Web Server
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  reflex_prod_db:
+  reflex_prod_redis:

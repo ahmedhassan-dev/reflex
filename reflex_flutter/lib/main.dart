@@ -6,7 +6,7 @@ import 'client.dart';
 import 'generated/codegen_loader.g.dart';
 import 'generated/locale_keys.g.dart';
 import 'presentation/core/theme/app_theme.dart';
-import 'presentation/features/greetings/greetings_screen.dart';
+import 'presentation/features/auth/auth_screen.dart';
 
 Future<void> main() async {
   await SentryFlutter.init(
@@ -35,8 +35,6 @@ Future<void> main() async {
   );
 }
 
-
-
 class ReflexApp extends StatelessWidget {
   const ReflexApp({super.key});
 
@@ -50,34 +48,7 @@ class ReflexApp extends StatelessWidget {
       theme: ReflexTheme.light,
       darkTheme: ReflexTheme.dark,
       themeMode: ThemeMode.system,
-      home: const ReflexHomeScreen(),
-    );
-  }
-}
-
-class ReflexHomeScreen extends StatelessWidget {
-  const ReflexHomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(LocaleKeys.app_title.tr()),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.language),
-            tooltip: 'Switch Language',
-            onPressed: () {
-              if (context.locale.languageCode == 'en') {
-                context.setLocale(const Locale('ar'));
-              } else {
-                context.setLocale(const Locale('en'));
-              }
-            },
-          ),
-        ],
-      ),
-      body: const GreetingsScreen(),
+      home: const AuthScreen(),
     );
   }
 }

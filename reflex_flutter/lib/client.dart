@@ -1,8 +1,9 @@
-import 'dart:async';
+import "dart:async";
 
-import 'package:reflex_client/reflex_client.dart';
-import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
-import 'package:serverpod_flutter/serverpod_flutter.dart';
+import "package:flutter/foundation.dart";
+import "package:reflex_client/reflex_client.dart";
+import "package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart";
+import "package:serverpod_flutter/serverpod_flutter.dart";
 
 // When you are running the app on a physical device, you need to set the
 // server URL to the IP address of your computer. You can find the IP
@@ -29,4 +30,22 @@ Future<void> initializeClient() async {
     ..connectivityMonitor = FlutterConnectivityMonitor()
     ..authSessionManager = FlutterAuthSessionManager();
   unawaited(client.auth.initialize());
+
+  const googleClientId = String.fromEnvironment("GOOGLE_CLIENT_ID", defaultValue: "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com");
+  if (googleClientId.isNotEmpty) {
+    try {
+      if (kIsWeb) {
+        await client.auth.initializeGoogleSignIn(
+          clientId: googleClientId,
+          redirectUri: Uri.base.resolve("auth.html").toString(),
+        );
+      } else {
+        await client.auth.initializeGoogleSignIn(
+          clientId: googleClientId,
+        );
+      }
+    } catch (e) {
+      debugPrint("[Auth] Note: Google Sign In pre-initialization skipped: \$e");
+    }
+  }
 }

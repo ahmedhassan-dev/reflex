@@ -21,3 +21,10 @@ pubspec_overrides.yaml
 
 # Serverpod Cloud CLI
 .scloud/
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+config/passwords.yaml
+**/config/passwords.yaml

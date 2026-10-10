@@ -6,7 +6,9 @@
       "type": "dart",
       "request": "launch",
       "program": "bin/main.dart",
-      "args": ["--apply-migrations"],
+      "args": [
+        "--apply-migrations"
+      ],
       "cwd": "${workspaceFolder}/reflex_server",
       "preLaunchTask": "docker_up",
       "env": {
@@ -18,7 +20,13 @@
       "type": "dart",
       "request": "launch",
       "program": "lib/main.dart",
-      "cwd": "${workspaceFolder}/reflex_flutter"
+      "cwd": "${workspaceFolder}/reflex_flutter",
+      "args": [
+        "-d",
+        "chrome",
+        "--web-port=8085",
+        "--dart-define-from-file=${workspaceFolder}/.env"
+      ]
     },
     {
       "name": "reflex_flutter (attach to CLI)",
