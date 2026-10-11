@@ -12,6 +12,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:reflex_client/src/protocol/course.dart' as _irm1rqva;
+import 'package:reflex_client/src/protocol/dtos/course_subscription_view.dart'
+    as _ienigelz;
 import 'package:reflex_client/src/protocol/question.dart' as _idjaghnf;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -21,8 +23,10 @@ import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'accepted_answer.dart' as _im0rixu4;
 import 'attempt.dart' as _iyzrlzh2;
 import 'course.dart' as _ink5e3of;
+import 'course_subscription.dart' as _iuhc77t0;
 import 'demo_clock.dart' as _itaqwut4;
 import 'dtos/cohort_summary.dart' as _il7knc0r;
+import 'dtos/course_subscription_view.dart' as _iugqjajm;
 import 'dtos/create_option_input.dart' as _i12skj47;
 import 'dtos/create_question_input.dart' as _i83lwmh8;
 import 'dtos/help_result.dart' as _ila2pk6h;
@@ -40,6 +44,7 @@ import 'enums/question_type.dart' as _in2t4eqa;
 import 'enums/reflex_tier.dart' as _i8m78wq8;
 import 'enums/result_reason.dart' as _i3yqrgm0;
 import 'enums/role.dart' as _iu4tij3a;
+import 'enums/subscription_status.dart' as _i5d9goyo;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'learner.dart' as _iia065xp;
 import 'question.dart' as _in6mynjk;
@@ -48,8 +53,10 @@ import 'review_state.dart' as _iiyeai10;
 export 'accepted_answer.dart';
 export 'attempt.dart';
 export 'course.dart';
+export 'course_subscription.dart';
 export 'demo_clock.dart';
 export 'dtos/cohort_summary.dart';
+export 'dtos/course_subscription_view.dart';
 export 'dtos/create_option_input.dart';
 export 'dtos/create_question_input.dart';
 export 'dtos/help_result.dart';
@@ -67,6 +74,7 @@ export 'enums/question_type.dart';
 export 'enums/reflex_tier.dart';
 export 'enums/result_reason.dart';
 export 'enums/role.dart';
+export 'enums/subscription_status.dart';
 export 'greetings/greeting.dart';
 export 'learner.dart';
 export 'question.dart';
@@ -117,11 +125,17 @@ class Protocol extends _isc.SerializationManager {
     if (t == _ink5e3of.Course) {
       return _ink5e3of.Course.fromJson(data) as T;
     }
+    if (t == _iuhc77t0.CourseSubscription) {
+      return _iuhc77t0.CourseSubscription.fromJson(data) as T;
+    }
     if (t == _itaqwut4.DemoClock) {
       return _itaqwut4.DemoClock.fromJson(data) as T;
     }
     if (t == _il7knc0r.CohortSummary) {
       return _il7knc0r.CohortSummary.fromJson(data) as T;
+    }
+    if (t == _iugqjajm.CourseSubscriptionView) {
+      return _iugqjajm.CourseSubscriptionView.fromJson(data) as T;
     }
     if (t == _i12skj47.CreateOptionInput) {
       return _i12skj47.CreateOptionInput.fromJson(data) as T;
@@ -174,6 +188,9 @@ class Protocol extends _isc.SerializationManager {
     if (t == _iu4tij3a.Role) {
       return _iu4tij3a.Role.fromJson(data) as T;
     }
+    if (t == _i5d9goyo.SubscriptionStatus) {
+      return _i5d9goyo.SubscriptionStatus.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
@@ -199,11 +216,21 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_ink5e3of.Course?>()) {
       return (data != null ? _ink5e3of.Course.fromJson(data) : null) as T;
     }
+    if (t == _isc.getType<_iuhc77t0.CourseSubscription?>()) {
+      return (data != null ? _iuhc77t0.CourseSubscription.fromJson(data) : null)
+          as T;
+    }
     if (t == _isc.getType<_itaqwut4.DemoClock?>()) {
       return (data != null ? _itaqwut4.DemoClock.fromJson(data) : null) as T;
     }
     if (t == _isc.getType<_il7knc0r.CohortSummary?>()) {
       return (data != null ? _il7knc0r.CohortSummary.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_iugqjajm.CourseSubscriptionView?>()) {
+      return (data != null
+              ? _iugqjajm.CourseSubscriptionView.fromJson(data)
+              : null)
           as T;
     }
     if (t == _isc.getType<_i12skj47.CreateOptionInput?>()) {
@@ -267,6 +294,10 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_iu4tij3a.Role?>()) {
       return (data != null ? _iu4tij3a.Role.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_i5d9goyo.SubscriptionStatus?>()) {
+      return (data != null ? _i5d9goyo.SubscriptionStatus.fromJson(data) : null)
+          as T;
     }
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
@@ -368,6 +399,12 @@ class Protocol extends _isc.SerializationManager {
               : null)
           as T;
     }
+    if (t == List<_ienigelz.CourseSubscriptionView>) {
+      return (data as List)
+              .map((e) => deserialize<_ienigelz.CourseSubscriptionView>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_idjaghnf.Question>) {
       return (data as List)
               .map((e) => deserialize<_idjaghnf.Question>(e))
@@ -388,8 +425,10 @@ class Protocol extends _isc.SerializationManager {
       _im0rixu4.AcceptedAnswer => 'AcceptedAnswer',
       _iyzrlzh2.Attempt => 'Attempt',
       _ink5e3of.Course => 'Course',
+      _iuhc77t0.CourseSubscription => 'CourseSubscription',
       _itaqwut4.DemoClock => 'DemoClock',
       _il7knc0r.CohortSummary => 'CohortSummary',
+      _iugqjajm.CourseSubscriptionView => 'CourseSubscriptionView',
       _i12skj47.CreateOptionInput => 'CreateOptionInput',
       _i83lwmh8.CreateQuestionInput => 'CreateQuestionInput',
       _ila2pk6h.HelpResult => 'HelpResult',
@@ -407,6 +446,7 @@ class Protocol extends _isc.SerializationManager {
       _i8m78wq8.ReflexTier => 'ReflexTier',
       _i3yqrgm0.ResultReason => 'ResultReason',
       _iu4tij3a.Role => 'Role',
+      _i5d9goyo.SubscriptionStatus => 'SubscriptionStatus',
       _izw8z7ou.Greeting => 'Greeting',
       _iia065xp.Learner => 'Learner',
       _in6mynjk.Question => 'Question',
@@ -432,10 +472,14 @@ class Protocol extends _isc.SerializationManager {
         return 'Attempt';
       case _ink5e3of.Course():
         return 'Course';
+      case _iuhc77t0.CourseSubscription():
+        return 'CourseSubscription';
       case _itaqwut4.DemoClock():
         return 'DemoClock';
       case _il7knc0r.CohortSummary():
         return 'CohortSummary';
+      case _iugqjajm.CourseSubscriptionView():
+        return 'CourseSubscriptionView';
       case _i12skj47.CreateOptionInput():
         return 'CreateOptionInput';
       case _i83lwmh8.CreateQuestionInput():
@@ -470,6 +514,8 @@ class Protocol extends _isc.SerializationManager {
         return 'ResultReason';
       case _iu4tij3a.Role():
         return 'Role';
+      case _i5d9goyo.SubscriptionStatus():
+        return 'SubscriptionStatus';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _iia065xp.Learner():
@@ -511,11 +557,17 @@ class Protocol extends _isc.SerializationManager {
     if (dataClassName == 'Course') {
       return deserialize<_ink5e3of.Course>(data['data']);
     }
+    if (dataClassName == 'CourseSubscription') {
+      return deserialize<_iuhc77t0.CourseSubscription>(data['data']);
+    }
     if (dataClassName == 'DemoClock') {
       return deserialize<_itaqwut4.DemoClock>(data['data']);
     }
     if (dataClassName == 'CohortSummary') {
       return deserialize<_il7knc0r.CohortSummary>(data['data']);
+    }
+    if (dataClassName == 'CourseSubscriptionView') {
+      return deserialize<_iugqjajm.CourseSubscriptionView>(data['data']);
     }
     if (dataClassName == 'CreateOptionInput') {
       return deserialize<_i12skj47.CreateOptionInput>(data['data']);
@@ -567,6 +619,9 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'Role') {
       return deserialize<_iu4tij3a.Role>(data['data']);
+    }
+    if (dataClassName == 'SubscriptionStatus') {
+      return deserialize<_i5d9goyo.SubscriptionStatus>(data['data']);
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);

@@ -56,11 +56,70 @@ class ServerpodCourseRepository implements ICourseRepository {
   }
 
   @override
+  Future<List<Course>> listByTeacher(int teacherId) async {
+    return Course.db.find(
+      session,
+      where: (t) => t.teacherId.equals(teacherId),
+      transaction: transaction,
+    );
+  }
+
+  @override
   Future<Course> save(Course course) async {
     if (course.id != null) {
       return Course.db.updateRow(session, course, transaction: transaction);
     }
     return Course.db.insertRow(session, course, transaction: transaction);
+  }
+}
+
+/// Serverpod ORM implementation of [ICourseSubscriptionRepository].
+class ServerpodCourseSubscriptionRepository implements ICourseSubscriptionRepository {
+  final Session session;
+  final Transaction? transaction;
+
+  const ServerpodCourseSubscriptionRepository(this.session, [this.transaction]);
+
+  @override
+  Future<CourseSubscription?> findByCourseAndStudent(int courseId, int studentId) async {
+    return CourseSubscription.db.findFirstRow(
+      session,
+      where: (t) => t.courseId.equals(courseId) & t.studentId.equals(studentId),
+      transaction: transaction,
+    );
+  }
+
+  @override
+  Future<List<CourseSubscription>> listByCourse(int courseId) async {
+    return CourseSubscription.db.find(
+      session,
+      where: (t) => t.courseId.equals(courseId),
+      orderBy: (t) => t.requestedAt,
+      transaction: transaction,
+    );
+  }
+
+  @override
+  Future<List<CourseSubscription>> listByStudent(int studentId) async {
+    return CourseSubscription.db.find(
+      session,
+      where: (t) => t.studentId.equals(studentId),
+      orderBy: (t) => t.requestedAt,
+      transaction: transaction,
+    );
+  }
+
+  @override
+  Future<CourseSubscription?> findById(int id) async {
+    return CourseSubscription.db.findById(session, id, transaction: transaction);
+  }
+
+  @override
+  Future<CourseSubscription> save(CourseSubscription subscription) async {
+    if (subscription.id != null) {
+      return CourseSubscription.db.updateRow(session, subscription, transaction: transaction);
+    }
+    return CourseSubscription.db.insertRow(session, subscription, transaction: transaction);
   }
 }
 

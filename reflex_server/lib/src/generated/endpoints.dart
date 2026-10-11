@@ -12,6 +12,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:reflex_server/src/generated/dtos/create_question_input.dart'
     as _i27r3xjl;
+import 'package:reflex_server/src/generated/enums/subscription_status.dart'
+    as _ipub36mu;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -574,6 +576,44 @@ class Endpoints extends _is.EndpointDispatch {
                     optionId: params['optionId'],
                   ),
         ),
+        'requestCourseSubscription': _is.MethodConnector(
+          name: 'requestCourseSubscription',
+          params: {
+            'courseId': _is.ParameterDescription(
+              name: 'courseId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['practice'] as _izjuq0o1.PracticeEndpoint)
+                  .requestCourseSubscription(
+                    session,
+                    params['courseId'],
+                  ),
+        ),
+        'getCourseSubscriptionStatus': _is.MethodConnector(
+          name: 'getCourseSubscriptionStatus',
+          params: {
+            'courseId': _is.ParameterDescription(
+              name: 'courseId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['practice'] as _izjuq0o1.PracticeEndpoint)
+                  .getCourseSubscriptionStatus(
+                    session,
+                    params['courseId'],
+                  ),
+        ),
       },
     );
     connectors['questionAdmin'] = _is.EndpointConnector(
@@ -610,6 +650,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<List<String>?>(),
               nullable: true,
             ),
+            'isPublic': _is.ParameterDescription(
+              name: 'isPublic',
+              type: _is.getType<bool>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -623,6 +668,82 @@ class Endpoints extends _is.EndpointDispatch {
                         title: params['title'],
                         subject: params['subject'],
                         topics: params['topics'],
+                        isPublic: params['isPublic'],
+                      ),
+        ),
+        'updateCourseVisibility': _is.MethodConnector(
+          name: 'updateCourseVisibility',
+          params: {
+            'courseId': _is.ParameterDescription(
+              name: 'courseId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'isPublic': _is.ParameterDescription(
+              name: 'isPublic',
+              type: _is.getType<bool>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['questionAdmin']
+                          as _i28c2dxt.QuestionAdminEndpoint)
+                      .updateCourseVisibility(
+                        session,
+                        courseId: params['courseId'],
+                        isPublic: params['isPublic'],
+                      ),
+        ),
+        'listSubscriptions': _is.MethodConnector(
+          name: 'listSubscriptions',
+          params: {
+            'courseId': _is.ParameterDescription(
+              name: 'courseId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['questionAdmin']
+                          as _i28c2dxt.QuestionAdminEndpoint)
+                      .listSubscriptions(
+                        session,
+                        params['courseId'],
+                      ),
+        ),
+        'respondToSubscription': _is.MethodConnector(
+          name: 'respondToSubscription',
+          params: {
+            'subscriptionId': _is.ParameterDescription(
+              name: 'subscriptionId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'status': _is.ParameterDescription(
+              name: 'status',
+              type: _is.getType<_ipub36mu.SubscriptionStatus>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['questionAdmin']
+                          as _i28c2dxt.QuestionAdminEndpoint)
+                      .respondToSubscription(
+                        session,
+                        subscriptionId: params['subscriptionId'],
+                        status: params['status'],
                       ),
         ),
         'createQuestion': _is.MethodConnector(

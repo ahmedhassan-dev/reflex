@@ -232,6 +232,7 @@ Future<void> main(List<String> args) async {
       _SeedCourse(
         title: 'Physics: Mechanics & Kinematics',
         subject: 'Physics',
+        isPublic: false,
         topics: [
           'Kinematics',
           'Newtonian Dynamics',
@@ -403,27 +404,31 @@ Future<void> main(List<String> args) async {
       int courseId;
       if (existingCourse.isEmpty) {
         final inserted = await connection.execute(
-          Sql.named('INSERT INTO course (title, subject, topics) VALUES (@title, @subject, @topics::json) RETURNING id;'),
+          Sql.named('INSERT INTO course (title, subject, topics, "teacherId", "teacherName", "isPublic") VALUES (@title, @subject, @topics::json, 1, @tName, @isPublic) RETURNING id;'),
           parameters: {
             'title': courseSpec.title,
             'subject': courseSpec.subject,
             'topics': topicsJson,
+            'tName': 'Mr. Hassan (Teacher)',
+            'isPublic': courseSpec.isPublic,
           },
         );
         courseId = inserted.first.first as int;
         print('📚 Created Course: "${courseSpec.title}" (ID: $courseId) with ${courseSpec.topics.length} topics');
       } else {
         courseId = existingCourse.first.first as int;
-        // Ensure topics are up-to-date
+        // Ensure topics and teacher/visibility are up-to-date
         await connection.execute(
-          Sql.named('UPDATE course SET topics = @topics::json, subject = @subject WHERE id = @id;'),
+          Sql.named('UPDATE course SET topics = @topics::json, subject = @subject, "teacherId" = 1, "teacherName" = @tName, "isPublic" = @isPublic WHERE id = @id;'),
           parameters: {
             'id': courseId,
             'topics': topicsJson,
             'subject': courseSpec.subject,
+            'tName': 'Mr. Hassan (Teacher)',
+            'isPublic': courseSpec.isPublic,
           },
         );
-        print('ℹ️ Updated topics for Course: "${courseSpec.title}" (ID: $courseId)');
+        print('ℹ️ Updated topics and visibility for Course: "${courseSpec.title}" (ID: $courseId, Public: ${courseSpec.isPublic})');
       }
 
       // Check existing questions
@@ -583,6 +588,38 @@ WHERE id = @qId;
       } else {
         print('  ℹ️ Cohort attempts already present ($courseAttemptCount found).');
       }
+
+      // 5. If course is private, seed sample student subscriptions
+      if (!courseSpec.isPublic) {
+        final subStatuses = [
+          'accepted', // Alice
+          'accepted', // Bob
+          'pending',  // Charlie
+          'pending',  // Dana
+          'rejected', // Eman
+        ];
+        for (var i = 0; i < studentIds.length && i < subStatuses.length; i++) {
+          final sId = studentIds[i];
+          final st = subStatuses[i];
+          final existingSub = await connection.execute(
+            Sql.named('SELECT id FROM course_subscription WHERE "courseId" = @cId AND "studentId" = @sId;'),
+            parameters: {'cId': courseId, 'sId': sId},
+          );
+          if (existingSub.isEmpty) {
+            await connection.execute(
+              Sql.named('INSERT INTO course_subscription ("courseId", "studentId", status, "requestedAt", "decidedAt") VALUES (@cId, @sId, @st, @reqAt, @decAt);'),
+              parameters: {
+                'cId': courseId,
+                'sId': sId,
+                'st': st,
+                'reqAt': DateTime.now().toUtc().subtract(Duration(days: 2 - i)),
+                'decAt': st == 'pending' ? null : DateTime.now().toUtc(),
+              },
+            );
+          }
+        }
+        print('  🔐 Student subscriptions seeded for private course "${courseSpec.title}".');
+      }
     }
 
     print('🎉 Database seeding complete! All courses, topics, questions, and telemetry are ready.');
@@ -597,12 +634,14 @@ class _SeedCourse {
   final String subject;
   final List<String> topics;
   final List<_SeedQuestion> questions;
+  final bool isPublic;
 
   const _SeedCourse({
     required this.title,
     required this.subject,
     required this.topics,
     required this.questions,
+    this.isPublic = true,
   });
 }
 

@@ -1,0 +1,12 @@
+class: CourseSubscription
+table: course_subscription
+fields:
+  courseId: int, relation(parent=course)
+  studentId: int, relation(parent=learner)
+  status: SubscriptionStatus
+  requestedAt: DateTime
+  decidedAt: DateTime?
+indexes:
+  course_student_sub_idx:
+    fields: courseId, studentId
+    unique: true

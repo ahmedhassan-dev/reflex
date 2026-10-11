@@ -52,4 +52,32 @@ class PracticeEndpoint extends Endpoint {
       optionId: optionId,
     );
   }
+
+  /// Requests subscription to a private course.
+  Future<CourseSubscription> requestCourseSubscription(
+    Session session,
+    int courseId,
+  ) async {
+    final container = AppContainer(session);
+    final learner = await container.resolveCurrentLearner();
+    final practiceService = await container.getPracticeService();
+    return practiceService.requestSubscription(
+      learnerId: learner.id!,
+      courseId: courseId,
+    );
+  }
+
+  /// Checks subscription status of active learner for a course.
+  Future<SubscriptionStatus?> getCourseSubscriptionStatus(
+    Session session,
+    int courseId,
+  ) async {
+    final container = AppContainer(session);
+    final learner = await container.resolveCurrentLearner();
+    final practiceService = await container.getPracticeService();
+    return practiceService.getSubscriptionStatus(
+      learnerId: learner.id!,
+      courseId: courseId,
+    );
+  }
 }

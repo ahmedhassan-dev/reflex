@@ -13,8 +13,12 @@
 import 'dart:async' as _ida;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:reflex_client/src/protocol/course.dart' as _irm1rqva;
+import 'package:reflex_client/src/protocol/course_subscription.dart'
+    as _im39ob9f;
 import 'package:reflex_client/src/protocol/dtos/cohort_summary.dart'
     as _ipp2lvvc;
+import 'package:reflex_client/src/protocol/dtos/course_subscription_view.dart'
+    as _ienigelz;
 import 'package:reflex_client/src/protocol/dtos/create_question_input.dart'
     as _igxwd1ae;
 import 'package:reflex_client/src/protocol/dtos/help_result.dart' as _i38zaplx;
@@ -24,6 +28,8 @@ import 'package:reflex_client/src/protocol/dtos/student_progress.dart'
     as _ibk5hkxp;
 import 'package:reflex_client/src/protocol/dtos/submit_result.dart'
     as _ida54fs3;
+import 'package:reflex_client/src/protocol/enums/subscription_status.dart'
+    as _iuzp1e2t;
 import 'package:reflex_client/src/protocol/greetings/greeting.dart'
     as _igwxqmcb;
 import 'package:reflex_client/src/protocol/question.dart' as _idjaghnf;
@@ -442,6 +448,24 @@ class EndpointPractice extends _isc.EndpointRef {
       'optionId': optionId,
     },
   );
+
+  /// Requests subscription to a private course.
+  _ida.Future<_im39ob9f.CourseSubscription> requestCourseSubscription(
+    int courseId,
+  ) => caller.callServerEndpoint<_im39ob9f.CourseSubscription>(
+    'practice',
+    'requestCourseSubscription',
+    {'courseId': courseId},
+  );
+
+  /// Checks subscription status of active learner for a course.
+  _ida.Future<_iuzp1e2t.SubscriptionStatus?> getCourseSubscriptionStatus(
+    int courseId,
+  ) => caller.callServerEndpoint<_iuzp1e2t.SubscriptionStatus?>(
+    'practice',
+    'getCourseSubscriptionStatus',
+    {'courseId': courseId},
+  );
 }
 
 /// Endpoint allowing teachers to inspect questions, create courses/questions, update topic notes, and manage hints.
@@ -465,6 +489,7 @@ class EndpointQuestionAdmin extends _isc.EndpointRef {
     required String title,
     required String subject,
     List<String>? topics,
+    required bool isPublic,
   }) => caller.callServerEndpoint<_irm1rqva.Course>(
     'questionAdmin',
     'createCourse',
@@ -472,6 +497,42 @@ class EndpointQuestionAdmin extends _isc.EndpointRef {
       'title': title,
       'subject': subject,
       'topics': topics,
+      'isPublic': isPublic,
+    },
+  );
+
+  /// Updates course visibility (public vs private).
+  _ida.Future<_irm1rqva.Course> updateCourseVisibility({
+    required int courseId,
+    required bool isPublic,
+  }) => caller.callServerEndpoint<_irm1rqva.Course>(
+    'questionAdmin',
+    'updateCourseVisibility',
+    {
+      'courseId': courseId,
+      'isPublic': isPublic,
+    },
+  );
+
+  /// Lists student subscription requests for a course.
+  _ida.Future<List<_ienigelz.CourseSubscriptionView>> listSubscriptions(
+    int courseId,
+  ) => caller.callServerEndpoint<List<_ienigelz.CourseSubscriptionView>>(
+    'questionAdmin',
+    'listSubscriptions',
+    {'courseId': courseId},
+  );
+
+  /// Accepts or rejects a student's course subscription request.
+  _ida.Future<_im39ob9f.CourseSubscription> respondToSubscription({
+    required int subscriptionId,
+    required _iuzp1e2t.SubscriptionStatus status,
+  }) => caller.callServerEndpoint<_im39ob9f.CourseSubscription>(
+    'questionAdmin',
+    'respondToSubscription',
+    {
+      'subscriptionId': subscriptionId,
+      'status': status,
     },
   );
 

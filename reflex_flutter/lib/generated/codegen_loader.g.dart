@@ -76,7 +76,12 @@ class CodegenLoader extends AssetLoader{
     "mastered_count": "Mastered Cards",
     "clean_first_try": "Clean 1st Try",
     "avg_latency": "Avg Latency",
-    "no_cohort_data": "No student attempt data recorded yet."
+    "no_cohort_data": "No student attempt data recorded yet.",
+    "select_course": "Select Course",
+    "topic_questions_count": "{} Questions",
+    "view_topic_questions": "Question Insights for this Topic",
+    "hide_topic_questions": "Hide Question Insights",
+    "all_courses": "All Courses"
   },
   "questions_admin": {
     "title": "Question Notes & Hints",
@@ -121,7 +126,35 @@ class CodegenLoader extends AssetLoader{
     "course_topics_label": "Course Topics",
     "course_topics_hint": "Type topic and tap + (e.g. Algebra, Kinematics)",
     "add_topic_tooltip": "Add Topic",
-    "no_course_topics": "No topics assigned"
+    "no_course_topics": "No topics assigned",
+    "course_visibility_label": "Course Visibility",
+    "visibility_public": "Public",
+    "visibility_private": "Private",
+    "visibility_public_desc": "Anyone can join and practice freely",
+    "visibility_private_desc": "Requires student subscription and teacher approval",
+    "make_private": "Make Private",
+    "make_public": "Make Public",
+    "teacher_label": "Teacher: {}",
+    "subscriptions_button": "Student Subscriptions",
+    "subscriptions_count": "{} Subscriptions",
+    "pending_badge": "{} Pending"
+  },
+  "subscriptions": {
+    "title": "Course Subscriptions",
+    "no_subscriptions": "No subscription requests for this course yet.",
+    "status_pending": "Pending Approval",
+    "status_accepted": "Accepted",
+    "status_rejected": "Rejected",
+    "accept_action": "Accept",
+    "reject_action": "Reject",
+    "student_label": "Student: {}",
+    "requested_on": "Requested: {}",
+    "request_access": "Request Subscription",
+    "request_access_desc": "This course is private. Request access from the teacher to unlock practice flashcards.",
+    "pending_approval": "Subscription Pending Teacher Approval",
+    "access_denied": "Private Course",
+    "subscribed": "Subscribed",
+    "request_sent_success": "Subscription requested! Waiting for teacher approval."
   },
   "demo_clock": {
     "title": "Time Machine (Demo Clock)",
@@ -240,7 +273,12 @@ static const Map<String,dynamic> _ar = {
     "mastered_count": "البطاقات المتقنة",
     "clean_first_try": "حلول نظيفة أولى",
     "avg_latency": "متوسط سرعة الإجابة",
-    "no_cohort_data": "لا توجد محاولات مسجلة للطلاب حتى الآن."
+    "no_cohort_data": "لا توجد محاولات مسجلة للطلاب حتى الآن.",
+    "select_course": "اختر الدورة",
+    "topic_questions_count": "{} أسئلة",
+    "view_topic_questions": "تحليلات أسئلة هذا الموضوع",
+    "hide_topic_questions": "إخفاء تحليلات الأسئلة",
+    "all_courses": "كافة الدورات"
   },
   "questions_admin": {
     "title": "ملاحظات وتلميحات الأسئلة",
@@ -285,7 +323,35 @@ static const Map<String,dynamic> _ar = {
     "course_topics_label": "موضوعات الدورة",
     "course_topics_hint": "اكتب الموضوع واضغط + (مثال: الجبر، الحركة)",
     "add_topic_tooltip": "إضافة موضوع",
-    "no_course_topics": "لا توجد موضوعات مخصصة"
+    "no_course_topics": "لا توجد موضوعات مخصصة",
+    "course_visibility_label": "خصوصية الدورة",
+    "visibility_public": "عامة",
+    "visibility_private": "خاصة",
+    "visibility_public_desc": "يمكن لأي طالب الانضمام والتدرّب بحرية",
+    "visibility_private_desc": "دورة خاصة - تتطلب اشتراك الطالب وموافقة المعلم",
+    "make_private": "تحويل إلى خاصة",
+    "make_public": "تحويل إلى عامة",
+    "teacher_label": "المعلم: {}",
+    "subscriptions_button": "اشتراكات الطلاب",
+    "subscriptions_count": "{} اشتراكات",
+    "pending_badge": "{} قيد الانتظار"
+  },
+  "subscriptions": {
+    "title": "اشتراكات الدورة",
+    "no_subscriptions": "لا توجد طلبات اشتراك لهذه الدورة حتى الآن.",
+    "status_pending": "قيد الانتظار",
+    "status_accepted": "تمت الموافقة",
+    "status_rejected": "مرفوض",
+    "accept_action": "قبول",
+    "reject_action": "رفض",
+    "student_label": "الطالب: {}",
+    "requested_on": "تاريخ الطلب: {}",
+    "request_access": "طلب اشتراك",
+    "request_access_desc": "هذه الدورة خاصة. أرسل طلب اشتراك إلى المعلم لبدء التدرّب على البطاقات.",
+    "pending_approval": "طلب الاشتراك قيد انتظار موافقة المعلم",
+    "access_denied": "دورة خاصة",
+    "subscribed": "مشترك",
+    "request_sent_success": "تم إرسال طلب الاشتراك بنجاح! بانتظار موافقة المعلم."
   },
   "demo_clock": {
     "title": "آلة الزمن (ساعة العرض التجريبي)",

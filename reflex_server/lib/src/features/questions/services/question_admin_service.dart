@@ -8,12 +8,16 @@ class QuestionAdminService {
   final ICourseRepository? courseRepo;
   final IQuestionOptionRepository? optionRepo;
   final IAcceptedAnswerRepository? acceptedAnswerRepo;
+  final ICourseSubscriptionRepository? subscriptionRepo;
+  final ILearnerRepository? learnerRepo;
 
   QuestionAdminService({
     required this.questionRepo,
     this.courseRepo,
     this.optionRepo,
     this.acceptedAnswerRepo,
+    this.subscriptionRepo,
+    this.learnerRepo,
   });
 
   /// Lists all available courses.
@@ -22,11 +26,14 @@ class QuestionAdminService {
     return courseRepo!.listAll();
   }
 
-  /// Creates a new course.
+  /// Creates a new course with teacher association and visibility.
   Future<Course> createCourse({
     required String title,
     required String subject,
     List<String>? topics,
+    int? teacherId,
+    String? teacherName,
+    bool isPublic = true,
   }) async {
     final trimmedTitle = title.trim();
     final trimmedSubject = subject.trim();
@@ -49,8 +56,69 @@ class QuestionAdminService {
       title: trimmedTitle,
       subject: trimmedSubject,
       topics: cleanedTopics == null || cleanedTopics.isEmpty ? null : cleanedTopics,
+      teacherId: teacherId,
+      teacherName: teacherName,
+      isPublic: isPublic,
     );
     return courseRepo!.save(newCourse);
+  }
+
+  /// Updates course visibility (public vs private).
+  Future<Course> updateCourseVisibility({
+    required int courseId,
+    required bool isPublic,
+  }) async {
+    if (courseRepo == null) {
+      throw const ValidationException('Course repository is not configured.');
+    }
+    final course = await courseRepo!.findById(courseId);
+    if (course == null) throw CourseNotFoundException(courseId);
+
+    final updated = course.copyWith(isPublic: isPublic);
+    return courseRepo!.save(updated);
+  }
+
+  /// Lists subscription requests for a given course.
+  Future<List<CourseSubscriptionView>> listSubscriptions(int courseId) async {
+    if (subscriptionRepo == null || courseRepo == null) return [];
+    final course = await courseRepo!.findById(courseId);
+    if (course == null) throw CourseNotFoundException(courseId);
+
+    final subs = await subscriptionRepo!.listByCourse(courseId);
+    final allLearners = learnerRepo != null ? await learnerRepo!.listAll() : <Learner>[];
+    final learnerMap = {for (final l in allLearners) l.id: l.displayName};
+
+    return subs.map((s) {
+      return CourseSubscriptionView(
+        id: s.id!,
+        courseId: courseId,
+        courseTitle: course.title,
+        studentId: s.studentId,
+        studentName: learnerMap[s.studentId] ?? 'Student #${s.studentId}',
+        status: s.status,
+        requestedAt: s.requestedAt,
+        decidedAt: s.decidedAt,
+      );
+    }).toList();
+  }
+
+  /// Accepts or rejects a student's course subscription request.
+  Future<CourseSubscription> respondToSubscription({
+    required int subscriptionId,
+    required SubscriptionStatus status,
+  }) async {
+    if (subscriptionRepo == null) {
+      throw const ValidationException('Subscription repository is not configured.');
+    }
+    final sub = await subscriptionRepo!.findById(subscriptionId);
+    if (sub == null) {
+      throw const ValidationException('Subscription not found.');
+    }
+    final updated = sub.copyWith(
+      status: status,
+      decidedAt: DateTime.now(),
+    );
+    return subscriptionRepo!.save(updated);
   }
 
   /// Creates a new question within a course with optional options or accepted answers.

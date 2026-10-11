@@ -4,3 +4,6 @@ fields:
   title: String
   subject: String
   topics: List<String>?
+  teacherId: int?
+  teacherName: String?
+  isPublic: bool?

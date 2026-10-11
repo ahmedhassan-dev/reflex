@@ -121,8 +121,9 @@ void main() {
             title: any(named: 'title'),
             subject: any(named: 'subject'),
             topics: any(named: 'topics'),
+            isPublic: any(named: 'isPublic'),
           )).thenAnswer((_) async => Result.success(
-            Course(id: 2, title: 'Calculus Advanced', subject: 'Math', topics: ['Algebra']),
+            Course(id: 2, title: 'Calculus Advanced', subject: 'Math', topics: ['Algebra'], isPublic: true),
           ));
 
       await tester.pumpWidget(
@@ -139,6 +140,9 @@ void main() {
       expect(addCourseBtn, findsOneWidget);
       await tester.tap(addCourseBtn);
       await tester.pumpAndSettle();
+
+      // Verify visibility switch is present
+      expect(find.byKey(const Key('switch_course_visibility')), findsOneWidget);
 
       // Enter Title, Subject, and Tag
       await tester.enterText(find.byKey(const Key('input_new_course_title')), 'Calculus Advanced');
@@ -157,6 +161,7 @@ void main() {
             title: 'Calculus Advanced',
             subject: 'Math',
             topics: ['Algebra'],
+            isPublic: true,
           )).called(1);
     });
 
@@ -229,6 +234,95 @@ void main() {
       await tester.pumpAndSettle();
 
       verify(() => mockRepo.createQuestion(any())).called(1);
+    });
+
+    testWidgets('teacher can toggle course visibility', (tester) async {
+      when(() => mockRepo.listCourses()).thenAnswer(
+        (_) async => Result.success([
+          Course(id: 1, title: 'STEM Math', subject: 'Math', isPublic: true),
+        ]),
+      );
+      when(() => mockRepo.listQuestions(any()))
+          .thenAnswer((_) async => Result.success([]));
+      when(() => mockRepo.updateCourseVisibility(1, false))
+          .thenAnswer((_) async => Result.success(
+                Course(id: 1, title: 'STEM Math', subject: 'Math', isPublic: false),
+              ));
+      when(() => mockRepo.listSubscriptions(1))
+          .thenAnswer((_) async => Result.success([]));
+
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: QuestionAdminScreen(
+            repositoryOverride: mockRepo,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final toggleChip = find.byKey(const Key('chip_course_visibility_toggle'));
+      expect(toggleChip, findsOneWidget);
+      await tester.tap(toggleChip);
+      await tester.pumpAndSettle();
+
+      verify(() => mockRepo.updateCourseVisibility(1, false)).called(1);
+    });
+
+    testWidgets('teacher can open subscriptions sheet and accept pending student', (tester) async {
+      when(() => mockRepo.listCourses()).thenAnswer(
+        (_) async => Result.success([
+          Course(id: 2, title: 'Private Math', subject: 'Math', isPublic: false, teacherName: 'Dr. Euler'),
+        ]),
+      );
+      when(() => mockRepo.listQuestions(any()))
+          .thenAnswer((_) async => Result.success([]));
+      when(() => mockRepo.listSubscriptions(2)).thenAnswer(
+        (_) async => Result.success([
+          CourseSubscriptionView(
+            id: 101,
+            courseId: 2,
+            courseTitle: 'Private Math',
+            studentId: 5,
+            studentName: 'Alice Student',
+            status: SubscriptionStatus.pending,
+            requestedAt: DateTime.now(),
+          ),
+        ]),
+      );
+      when(() => mockRepo.respondToSubscription(101, SubscriptionStatus.accepted))
+          .thenAnswer((_) async => Result.success(CourseSubscription(
+                id: 101,
+                courseId: 2,
+                studentId: 5,
+                status: SubscriptionStatus.accepted,
+                requestedAt: DateTime.now(),
+              )));
+
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: QuestionAdminScreen(
+            repositoryOverride: mockRepo,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify subscriptions button exists
+      final subBtn = find.byKey(const Key('btn_manage_subscriptions'));
+      expect(subBtn, findsOneWidget);
+      await tester.tap(subBtn);
+      await tester.pumpAndSettle();
+
+      // Student name should be visible
+      expect(find.text('Student: Alice Student'), findsOneWidget);
+
+      // Tap Accept button
+      final acceptBtn = find.byKey(const Key('btn_accept_sub_101'));
+      expect(acceptBtn, findsOneWidget);
+      await tester.tap(acceptBtn);
+      await tester.pumpAndSettle();
+
+      verify(() => mockRepo.respondToSubscription(101, SubscriptionStatus.accepted)).called(1);
     });
   });
 }

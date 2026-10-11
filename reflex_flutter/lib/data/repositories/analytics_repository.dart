@@ -3,6 +3,7 @@ import '../../core/result.dart';
 import '../../client.dart';
 
 abstract interface class IAnalyticsRepository {
+  Future<Result<List<Course>>> listCourses();
   Future<Result<CohortSummary>> getCohortSummary(int courseId);
   Future<Result<StudentProgress>> getMyProgress(int courseId);
 }
@@ -12,6 +13,16 @@ class AnalyticsRepositoryImpl implements IAnalyticsRepository {
 
   AnalyticsRepositoryImpl([Client? clientInstance])
       : _client = clientInstance ?? client;
+
+  @override
+  Future<Result<List<Course>>> listCourses() async {
+    try {
+      final list = await _client.questionAdmin.listCourses();
+      return Result.success(list);
+    } catch (e) {
+      return Result.failure(e.toString());
+    }
+  }
 
   @override
   Future<Result<CohortSummary>> getCohortSummary(int courseId) async {

@@ -13,6 +13,12 @@ abstract class PracticeController extends State<PracticeScreen> {
 
   // ── State variables ────────────────────────────────────────────────────────
   int courseId = 1;
+  List<Course> courses = [];
+  Course? selectedCourse;
+  SubscriptionStatus? subscriptionStatus;
+  bool isPrivateAccessRestricted = false;
+  bool isRequestingSubscription = false;
+
   PracticeItem? currentCard;
   bool isLoading = false;
   bool isSubmitting = false;
@@ -31,13 +37,105 @@ abstract class PracticeController extends State<PracticeScreen> {
   void initState() {
     super.initState();
     practiceRepo = widget.repositoryOverride ?? PracticeRepositoryImpl();
-    loadNextCard();
+    initCoursesAndCards();
   }
 
   @override
   void dispose() {
     textAnswerController.dispose();
     super.dispose();
+  }
+
+  // ── Course & Access Handling ───────────────────────────────────────────────
+  Future<void> initCoursesAndCards() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      final coursesRes = await practiceRepo.listCourses();
+      if (coursesRes.isSuccess && (coursesRes.data?.isNotEmpty ?? false)) {
+        courses = coursesRes.data!;
+        selectedCourse = courses.firstWhere(
+          (c) => c.id == courseId,
+          orElse: () => courses.first,
+        );
+        courseId = selectedCourse!.id ?? 1;
+      }
+    } catch (_) {
+      // Gracefully continue if listCourses is unmocked
+    }
+
+    await checkAccessAndLoad();
+  }
+
+  Future<void> onCourseSelected(Course course) async {
+    if (course.id == null || course.id == courseId) return;
+    setState(() {
+      selectedCourse = course;
+      courseId = course.id!;
+      currentCard = null;
+      submitResult = null;
+      selectedOptionId = null;
+      textAnswerController.clear();
+      isNoteAcknowledged = false;
+      isDeckComplete = false;
+      subscriptionStatus = null;
+      isPrivateAccessRestricted = false;
+      errorMessage = null;
+    });
+
+    await checkAccessAndLoad();
+  }
+
+  Future<void> checkAccessAndLoad() async {
+    if (selectedCourse != null && (selectedCourse!.isPublic == false)) {
+      try {
+        final statusRes = await practiceRepo.getCourseSubscriptionStatus(courseId);
+        if (statusRes.isSuccess) {
+          subscriptionStatus = statusRes.data;
+          if (subscriptionStatus != SubscriptionStatus.accepted) {
+            setState(() {
+              isLoading = false;
+              isPrivateAccessRestricted = true;
+            });
+            return;
+          }
+        }
+      } catch (_) {
+        // Fallback to serveNextCard
+      }
+    }
+
+    setState(() {
+      isPrivateAccessRestricted = false;
+    });
+    await loadNextCard();
+  }
+
+  Future<void> requestSubscription() async {
+    if (isRequestingSubscription) return;
+    setState(() {
+      isRequestingSubscription = true;
+      errorMessage = null;
+    });
+
+    final res = await practiceRepo.requestCourseSubscription(courseId);
+    if (!mounted) return;
+
+    if (res.isSuccess) {
+      setState(() {
+        isRequestingSubscription = false;
+        subscriptionStatus = res.data?.status ?? SubscriptionStatus.pending;
+        isPrivateAccessRestricted = true;
+      });
+    } else {
+      setState(() {
+        isRequestingSubscription = false;
+        errorMessage = res.error;
+      });
+    }
   }
 
   // ── Actions ────────────────────────────────────────────────────────────────
@@ -58,6 +156,7 @@ abstract class PracticeController extends State<PracticeScreen> {
     if (result.isSuccess) {
       setState(() {
         isLoading = false;
+        isPrivateAccessRestricted = false;
         if (result.data != null) {
           currentCard = result.data;
           isDeckComplete = false;
@@ -67,10 +166,19 @@ abstract class PracticeController extends State<PracticeScreen> {
         }
       });
     } else {
-      setState(() {
-        isLoading = false;
-        errorMessage = result.error;
-      });
+      final err = result.error ?? '';
+      if (err.toLowerCase().contains('private') || err.contains('CourseAccessDeniedException')) {
+        setState(() {
+          isLoading = false;
+          isPrivateAccessRestricted = true;
+          errorMessage = err;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+          errorMessage = err;
+        });
+      }
     }
   }
 

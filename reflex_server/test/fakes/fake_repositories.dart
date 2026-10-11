@@ -41,10 +41,49 @@ class FakeCourseRepository implements ICourseRepository {
   Future<List<Course>> listAll() async => _storage.values.toList();
 
   @override
+  Future<List<Course>> listByTeacher(int teacherId) async =>
+      _storage.values.where((c) => c.teacherId == teacherId).toList();
+
+  @override
   Future<Course> save(Course course) async {
     final id = course.id ?? _nextId++;
     if (id >= _nextId) _nextId = id + 1;
     final saved = course.copyWith(id: id);
+    _storage[id] = saved;
+    return saved;
+  }
+}
+
+class FakeCourseSubscriptionRepository implements ICourseSubscriptionRepository {
+  final Map<int, CourseSubscription> _storage = {};
+  int _nextId = 1;
+
+  @override
+  Future<CourseSubscription?> findByCourseAndStudent(int courseId, int studentId) async {
+    return _storage.values.cast<CourseSubscription?>().firstWhere(
+          (s) => s?.courseId == courseId && s?.studentId == studentId,
+          orElse: () => null,
+        );
+  }
+
+  @override
+  Future<List<CourseSubscription>> listByCourse(int courseId) async {
+    return _storage.values.where((s) => s.courseId == courseId).toList();
+  }
+
+  @override
+  Future<List<CourseSubscription>> listByStudent(int studentId) async {
+    return _storage.values.where((s) => s.studentId == studentId).toList();
+  }
+
+  @override
+  Future<CourseSubscription?> findById(int id) async => _storage[id];
+
+  @override
+  Future<CourseSubscription> save(CourseSubscription subscription) async {
+    final id = subscription.id ?? _nextId++;
+    if (id >= _nextId) _nextId = id + 1;
+    final saved = subscription.copyWith(id: id);
     _storage[id] = saved;
     return saved;
   }

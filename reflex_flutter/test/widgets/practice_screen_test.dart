@@ -79,5 +79,60 @@ void main() {
 
       expect(find.byType(HelpBottomSheet), findsNothing);
     });
+
+    testWidgets('private course shows subscription request barrier', (tester) async {
+      when(() => mockRepo.listCourses()).thenAnswer((_) async => Result.success([
+            Course(id: 2, title: 'Private Physics', subject: 'Physics', isPublic: false, teacherName: 'Dr. Feynman'),
+          ]));
+      when(() => mockRepo.getCourseSubscriptionStatus(2))
+          .thenAnswer((_) async => Result.success(null));
+
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: PracticeScreen(
+            repositoryOverride: mockRepo,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify Private access card is shown
+      expect(find.byKey(const Key('btn_request_subscription')), findsOneWidget);
+      expect(find.text('Teacher: Dr. Feynman'), findsOneWidget);
+    });
+
+    testWidgets('student can request subscription on private course', (tester) async {
+      when(() => mockRepo.listCourses()).thenAnswer((_) async => Result.success([
+            Course(id: 2, title: 'Private Physics', subject: 'Physics', isPublic: false),
+          ]));
+      when(() => mockRepo.getCourseSubscriptionStatus(2))
+          .thenAnswer((_) async => Result.success(null));
+      when(() => mockRepo.requestCourseSubscription(2)).thenAnswer(
+        (_) async => Result.success(CourseSubscription(
+          id: 1,
+          courseId: 2,
+          studentId: 99,
+          status: SubscriptionStatus.pending,
+          requestedAt: DateTime.now(),
+        )),
+      );
+
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: PracticeScreen(
+            repositoryOverride: mockRepo,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final reqBtn = find.byKey(const Key('btn_request_subscription'));
+      expect(reqBtn, findsOneWidget);
+      await tester.tap(reqBtn);
+      await tester.pumpAndSettle();
+
+      verify(() => mockRepo.requestCourseSubscription(2)).called(1);
+      expect(find.byKey(const Key('btn_refresh_subscription_status')), findsOneWidget);
+    });
   });
 }

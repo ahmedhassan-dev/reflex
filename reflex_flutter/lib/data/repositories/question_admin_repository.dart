@@ -8,7 +8,14 @@ abstract interface class IQuestionAdminRepository {
     required String title,
     required String subject,
     List<String>? topics,
+    bool isPublic = true,
   });
+  Future<Result<Course>> updateCourseVisibility(int courseId, bool isPublic);
+  Future<Result<List<CourseSubscriptionView>>> listSubscriptions(int courseId);
+  Future<Result<CourseSubscription>> respondToSubscription(
+    int subscriptionId,
+    SubscriptionStatus status,
+  );
   Future<Result<List<Question>>> listQuestions(int courseId);
   Future<Result<Question>> createQuestion(CreateQuestionInput input);
   Future<Result<Question>> updateTopicNoteAndHint(
@@ -39,14 +46,55 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
     required String title,
     required String subject,
     List<String>? topics,
+    bool isPublic = true,
   }) async {
     try {
       final course = await _client.questionAdmin.createCourse(
         title: title,
         subject: subject,
         topics: topics,
+        isPublic: isPublic,
       );
       return Result.success(course);
+    } catch (e) {
+      return Result.failure(e.toString());
+    }
+  }
+
+  @override
+  Future<Result<Course>> updateCourseVisibility(int courseId, bool isPublic) async {
+    try {
+      final course = await _client.questionAdmin.updateCourseVisibility(
+        courseId: courseId,
+        isPublic: isPublic,
+      );
+      return Result.success(course);
+    } catch (e) {
+      return Result.failure(e.toString());
+    }
+  }
+
+  @override
+  Future<Result<List<CourseSubscriptionView>>> listSubscriptions(int courseId) async {
+    try {
+      final list = await _client.questionAdmin.listSubscriptions(courseId);
+      return Result.success(list);
+    } catch (e) {
+      return Result.failure(e.toString());
+    }
+  }
+
+  @override
+  Future<Result<CourseSubscription>> respondToSubscription(
+    int subscriptionId,
+    SubscriptionStatus status,
+  ) async {
+    try {
+      final sub = await _client.questionAdmin.respondToSubscription(
+        subscriptionId: subscriptionId,
+        status: status,
+      );
+      return Result.success(sub);
     } catch (e) {
       return Result.failure(e.toString());
     }

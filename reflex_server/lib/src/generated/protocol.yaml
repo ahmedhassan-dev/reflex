@@ -28,9 +28,14 @@ practice:
   - serveNextCard:
   - requestHelp:
   - submitAnswer:
+  - requestCourseSubscription:
+  - getCourseSubscriptionStatus:
 questionAdmin:
   - listCourses:
   - createCourse:
+  - updateCourseVisibility:
+  - listSubscriptions:
+  - respondToSubscription:
   - createQuestion:
   - updateTopicNoteAndHint:
   - listQuestions:

@@ -26,6 +26,7 @@ class _QuestionAdminScreenState extends QuestionAdminController {
     final subjectCtrl = TextEditingController();
     final topicCtrl = TextEditingController();
     final List<String> topics = [];
+    bool isPublic = true;
 
     showDialog(
       context: context,
@@ -68,6 +69,52 @@ class _QuestionAdminScreenState extends QuestionAdminController {
                   controller: subjectCtrl,
                   decoration: InputDecoration(
                     hintText: LocaleKeys.questions_admin_course_subject_hint.tr(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  LocaleKeys.questions_admin_course_visibility_label.tr(),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                const SizedBox(height: 4),
+                Material(
+                  color: ReflexColors.primary.withValues(alpha: 0.05),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: ReflexColors.primary.withValues(alpha: 0.2)),
+                  ),
+                  child: SwitchListTile(
+                    key: const Key('switch_course_visibility'),
+                    value: isPublic,
+                    activeThumbColor: ReflexColors.chromaticGreen,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                    title: Row(
+                      children: [
+                        Icon(
+                          isPublic ? Icons.public : Icons.lock_outline_rounded,
+                          size: 18,
+                          color: isPublic ? ReflexColors.chromaticGreen : ReflexColors.chromaticYellow,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          isPublic
+                              ? LocaleKeys.questions_admin_visibility_public.tr()
+                              : LocaleKeys.questions_admin_visibility_private.tr(),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                      ],
+                    ),
+                    subtitle: Text(
+                      isPublic
+                          ? LocaleKeys.questions_admin_visibility_public_desc.tr()
+                          : LocaleKeys.questions_admin_visibility_private_desc.tr(),
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                    onChanged: (val) {
+                      setDialogState(() {
+                        isPublic = val;
+                      });
+                    },
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -163,6 +210,7 @@ class _QuestionAdminScreenState extends QuestionAdminController {
                   title: t,
                   subject: s,
                   topics: topics.isNotEmpty ? topics : null,
+                  isPublic: isPublic,
                 );
                 if (ok && mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -179,6 +227,205 @@ class _QuestionAdminScreenState extends QuestionAdminController {
         ),
       ),
     );
+  }
+
+  void _openSubscriptionsSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (modalCtx, setSheetState) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.75,
+            decoration: BoxDecoration(
+              color: isDark ? ReflexColors.darkBackground : Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.people_alt_rounded, color: ReflexColors.primary),
+                        const SizedBox(width: 8),
+                        Text(
+                          LocaleKeys.subscriptions_title.tr(),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                Text(
+                  selectedCourse?.title ?? '',
+                  style: TextStyle(fontSize: 13, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                ),
+                const Divider(height: 24),
+                Expanded(
+                  child: isLoadingSubscriptions
+                      ? const Center(child: CircularProgressIndicator())
+                      : subscriptions.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.person_off_outlined, size: 48, color: Colors.grey.withValues(alpha: 0.5)),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    LocaleKeys.subscriptions_no_subscriptions.tr(),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.separated(
+                              itemCount: subscriptions.length,
+                              separatorBuilder: (context, index) => const SizedBox(height: 10),
+                              itemBuilder: (context, index) {
+                                final sub = subscriptions[index];
+                                final isPending = sub.status == SubscriptionStatus.pending;
+                                final isAccepted = sub.status == SubscriptionStatus.accepted;
+                                final isRejected = sub.status == SubscriptionStatus.rejected;
+
+                                return Container(
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: isDark ? ReflexColors.darkCard : ReflexColors.lightCard,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: isPending
+                                          ? ReflexColors.chromaticYellow.withValues(alpha: 0.5)
+                                          : isDark
+                                              ? ReflexColors.darkBorder
+                                              : ReflexColors.lightBorder,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              LocaleKeys.subscriptions_student_label.tr(
+                                                args: [sub.studentName],
+                                              ),
+                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                            ),
+                                          ),
+                                          _buildSubscriptionStatusChip(sub.status),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        LocaleKeys.subscriptions_requested_on.tr(
+                                          args: [sub.requestedAt.toLocal().toString().substring(0, 16)],
+                                        ),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          if (!isAccepted)
+                                            ElevatedButton.icon(
+                                              key: Key('btn_accept_sub_${sub.id}'),
+                                              icon: const Icon(Icons.check_circle_rounded, size: 16),
+                                              label: Text(LocaleKeys.subscriptions_accept_action.tr()),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: ReflexColors.chromaticGreen,
+                                                foregroundColor: Colors.white,
+                                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                              ),
+                                              onPressed: () async {
+                                                await respondToSubscription(sub.id, SubscriptionStatus.accepted);
+                                                setSheetState(() {});
+                                              },
+                                            ),
+                                          if (!isAccepted && !isRejected) const SizedBox(width: 8),
+                                          if (!isRejected)
+                                            OutlinedButton.icon(
+                                              key: Key('btn_reject_sub_${sub.id}'),
+                                              icon: const Icon(Icons.cancel_outlined, size: 16),
+                                              label: Text(LocaleKeys.subscriptions_reject_action.tr()),
+                                              style: OutlinedButton.styleFrom(
+                                                foregroundColor: ReflexColors.chromaticRed,
+                                                side: const BorderSide(color: ReflexColors.chromaticRed),
+                                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                              ),
+                                              onPressed: () async {
+                                                await respondToSubscription(sub.id, SubscriptionStatus.rejected);
+                                                setSheetState(() {});
+                                              },
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSubscriptionStatusChip(SubscriptionStatus status) {
+    switch (status) {
+      case SubscriptionStatus.accepted:
+        return Chip(
+          label: Text(LocaleKeys.subscriptions_status_accepted.tr(), style: const TextStyle(fontSize: 11, color: Colors.white)),
+          backgroundColor: ReflexColors.chromaticGreen,
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+        );
+      case SubscriptionStatus.rejected:
+        return Chip(
+          label: Text(LocaleKeys.subscriptions_status_rejected.tr(), style: const TextStyle(fontSize: 11, color: Colors.white)),
+          backgroundColor: ReflexColors.chromaticRed,
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+        );
+      case SubscriptionStatus.pending:
+        return Chip(
+          label: Text(LocaleKeys.subscriptions_status_pending.tr(), style: const TextStyle(fontSize: 11, color: Colors.white)),
+          backgroundColor: ReflexColors.chromaticYellow,
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+        );
+    }
   }
 
   void _openCreateQuestionDialog() {
@@ -613,6 +860,100 @@ class _QuestionAdminScreenState extends QuestionAdminController {
                               ),
                               onPressed: _openCreateCourseDialog,
                             ),
+                          ],
+                        ),
+                        // Visibility status, teacher name, and subscription actions
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            // Visibility Badge & Toggle Button
+                            ActionChip(
+                              key: const Key('chip_course_visibility_toggle'),
+                              avatar: Icon(
+                                (selectedCourse?.isPublic ?? true)
+                                    ? Icons.public_rounded
+                                    : Icons.lock_outline_rounded,
+                                size: 16,
+                                color: (selectedCourse?.isPublic ?? true)
+                                    ? ReflexColors.chromaticGreen
+                                    : ReflexColors.chromaticYellow,
+                              ),
+                              label: Text(
+                                (selectedCourse?.isPublic ?? true)
+                                    ? LocaleKeys.questions_admin_visibility_public.tr()
+                                    : LocaleKeys.questions_admin_visibility_private.tr(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: (selectedCourse?.isPublic ?? true)
+                                      ? ReflexColors.chromaticGreen
+                                      : ReflexColors.chromaticYellow,
+                                ),
+                              ),
+                              tooltip: (selectedCourse?.isPublic ?? true)
+                                  ? LocaleKeys.questions_admin_make_private.tr()
+                                  : LocaleKeys.questions_admin_make_public.tr(),
+                              backgroundColor: ((selectedCourse?.isPublic ?? true)
+                                      ? ReflexColors.chromaticGreen
+                                      : ReflexColors.chromaticYellow)
+                                  .withValues(alpha: 0.1),
+                              side: BorderSide(
+                                color: ((selectedCourse?.isPublic ?? true)
+                                        ? ReflexColors.chromaticGreen
+                                        : ReflexColors.chromaticYellow)
+                                    .withValues(alpha: 0.3),
+                              ),
+                              onPressed: toggleCourseVisibility,
+                            ),
+
+                            // Teacher name if available
+                            if (selectedCourse?.teacherName != null)
+                              Chip(
+                                key: const Key('chip_course_teacher'),
+                                avatar: const Icon(Icons.person_rounded, size: 14, color: ReflexColors.primary),
+                                label: Text(
+                                  LocaleKeys.questions_admin_teacher_label.tr(args: [selectedCourse!.teacherName!]),
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                ),
+                                backgroundColor: ReflexColors.primary.withValues(alpha: 0.08),
+                                side: BorderSide(color: ReflexColors.primary.withValues(alpha: 0.2)),
+                                visualDensity: VisualDensity.compact,
+                              ),
+
+                            // If Private: Manage Subscriptions Button with badge
+                            if (selectedCourse != null && (selectedCourse!.isPublic == false)) ...[
+                              Builder(
+                                builder: (context) {
+                                  final pendingCount = subscriptions
+                                      .where((s) => s.status == SubscriptionStatus.pending)
+                                      .length;
+                                  return ElevatedButton.icon(
+                                    key: const Key('btn_manage_subscriptions'),
+                                    icon: Badge(
+                                      isLabelVisible: pendingCount > 0,
+                                      label: Text('$pendingCount'),
+                                      backgroundColor: ReflexColors.chromaticYellow,
+                                      child: const Icon(Icons.people_outline_rounded, size: 16),
+                                    ),
+                                    label: Text(
+                                      LocaleKeys.questions_admin_subscriptions_button.tr(),
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: ReflexColors.primary,
+                                      foregroundColor: Colors.white,
+                                      visualDensity: VisualDensity.compact,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onPressed: _openSubscriptionsSheet,
+                                  );
+                                },
+                              ),
+                            ],
                           ],
                         ),
                         if (selectedCourse?.topics != null && selectedCourse!.topics!.isNotEmpty) ...[

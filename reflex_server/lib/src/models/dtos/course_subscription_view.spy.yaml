@@ -1,0 +1,10 @@
+class: CourseSubscriptionView
+fields:
+  id: int
+  courseId: int
+  courseTitle: String
+  studentId: int
+  studentName: String
+  status: SubscriptionStatus
+  requestedAt: DateTime
+  decidedAt: DateTime?

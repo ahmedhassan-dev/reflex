@@ -52,3 +52,8 @@ class DuplicateSubmissionException extends ReflexException {
 class ValidationException extends ReflexException {
   const ValidationException([super.message = 'Validation failed.']);
 }
+
+/// Thrown when a learner attempts to access a private course without teacher subscription approval.
+class CourseAccessDeniedException extends ReflexException {
+  const CourseAccessDeniedException([super.message = 'Course is private and requires teacher approval.']);
+}

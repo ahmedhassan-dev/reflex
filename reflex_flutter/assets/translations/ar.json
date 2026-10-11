@@ -60,7 +60,12 @@
     "mastered_count": "البطاقات المتقنة",
     "clean_first_try": "حلول نظيفة أولى",
     "avg_latency": "متوسط سرعة الإجابة",
-    "no_cohort_data": "لا توجد محاولات مسجلة للطلاب حتى الآن."
+    "no_cohort_data": "لا توجد محاولات مسجلة للطلاب حتى الآن.",
+    "select_course": "اختر الدورة",
+    "topic_questions_count": "{} أسئلة",
+    "view_topic_questions": "تحليلات أسئلة هذا الموضوع",
+    "hide_topic_questions": "إخفاء تحليلات الأسئلة",
+    "all_courses": "كافة الدورات"
   },
   "questions_admin": {
     "title": "ملاحظات وتلميحات الأسئلة",
@@ -105,7 +110,35 @@
     "course_topics_label": "موضوعات الدورة",
     "course_topics_hint": "اكتب الموضوع واضغط + (مثال: الجبر، الحركة)",
     "add_topic_tooltip": "إضافة موضوع",
-    "no_course_topics": "لا توجد موضوعات مخصصة"
+    "no_course_topics": "لا توجد موضوعات مخصصة",
+    "course_visibility_label": "خصوصية الدورة",
+    "visibility_public": "عامة",
+    "visibility_private": "خاصة",
+    "visibility_public_desc": "يمكن لأي طالب الانضمام والتدرّب بحرية",
+    "visibility_private_desc": "دورة خاصة - تتطلب اشتراك الطالب وموافقة المعلم",
+    "make_private": "تحويل إلى خاصة",
+    "make_public": "تحويل إلى عامة",
+    "teacher_label": "المعلم: {}",
+    "subscriptions_button": "اشتراكات الطلاب",
+    "subscriptions_count": "{} اشتراكات",
+    "pending_badge": "{} قيد الانتظار"
+  },
+  "subscriptions": {
+    "title": "اشتراكات الدورة",
+    "no_subscriptions": "لا توجد طلبات اشتراك لهذه الدورة حتى الآن.",
+    "status_pending": "قيد الانتظار",
+    "status_accepted": "تمت الموافقة",
+    "status_rejected": "مرفوض",
+    "accept_action": "قبول",
+    "reject_action": "رفض",
+    "student_label": "الطالب: {}",
+    "requested_on": "تاريخ الطلب: {}",
+    "request_access": "طلب اشتراك",
+    "request_access_desc": "هذه الدورة خاصة. أرسل طلب اشتراك إلى المعلم لبدء التدرّب على البطاقات.",
+    "pending_approval": "طلب الاشتراك قيد انتظار موافقة المعلم",
+    "access_denied": "دورة خاصة",
+    "subscribed": "مشترك",
+    "request_sent_success": "تم إرسال طلب الاشتراك بنجاح! بانتظار موافقة المعلم."
   },
   "demo_clock": {
     "title": "آلة الزمن (ساعة العرض التجريبي)",

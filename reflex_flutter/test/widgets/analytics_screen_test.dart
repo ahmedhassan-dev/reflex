@@ -54,6 +54,11 @@ void main() {
         ],
       );
 
+      when(() => mockRepo.listCourses()).thenAnswer(
+        (_) async => Result.success([
+          Course(id: 1, title: 'Physics 101', subject: 'Physics', isPublic: true),
+        ]),
+      );
       when(() => mockRepo.getCohortSummary(any()))
           .thenAnswer((_) async => Result.success(sampleSummary));
 
@@ -66,13 +71,16 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tab 1: Topic Mastery
-      expect(find.text('Physics'), findsOneWidget);
+      // Tab 1: Topic Mastery (embedded Question Insights inside topics!)
+      expect(find.text('Physics'), findsWidgets);
       expect(find.text('85%'), findsOneWidget);
       expect(find.text('Chemistry'), findsOneWidget);
       expect(find.text('45%'), findsOneWidget);
 
-      // Switch to Tab 2: Question Insights
+      // Verify question insights are embedded directly inside the Topic Mastery tab!
+      expect(find.text('What is Newton second law?'), findsOneWidget);
+
+      // Switch to Tab 2: Question Insights table
       await tester.tap(find.text('Question Insights (Atomic Counters)'));
       await tester.pumpAndSettle();
 

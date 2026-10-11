@@ -14,8 +14,12 @@
 import 'dart:async' as _ida;
 import 'dart:io' as _idi;
 import 'package:reflex_server/src/generated/course.dart' as _ik7qkox3;
+import 'package:reflex_server/src/generated/course_subscription.dart'
+    as _iw2qx1eo;
 import 'package:reflex_server/src/generated/dtos/cohort_summary.dart'
     as _ixurc78g;
+import 'package:reflex_server/src/generated/dtos/course_subscription_view.dart'
+    as _iujwpemq;
 import 'package:reflex_server/src/generated/dtos/create_question_input.dart'
     as _i27r3xjl;
 import 'package:reflex_server/src/generated/dtos/help_result.dart' as _i85i1esk;
@@ -25,6 +29,8 @@ import 'package:reflex_server/src/generated/dtos/student_progress.dart'
     as _ihq2x624;
 import 'package:reflex_server/src/generated/dtos/submit_result.dart'
     as _ief2073l;
+import 'package:reflex_server/src/generated/enums/subscription_status.dart'
+    as _ipub36mu;
 import 'package:reflex_server/src/generated/greetings/greeting.dart'
     as _i8vs3g7d;
 import 'package:reflex_server/src/generated/question.dart' as _igqv87t7;
@@ -1035,6 +1041,68 @@ class _PracticeEndpoint {
       }
     });
   }
+
+  _ida.Future<_iw2qx1eo.CourseSubscription> requestCourseSubscription(
+    _ist.TestSessionBuilder sessionBuilder,
+    int courseId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'practice',
+            method: 'requestCourseSubscription',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'practice',
+          methodName: 'requestCourseSubscription',
+          parameters: _ist.testObjectToJson({'courseId': courseId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iw2qx1eo.CourseSubscription>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ipub36mu.SubscriptionStatus?> getCourseSubscriptionStatus(
+    _ist.TestSessionBuilder sessionBuilder,
+    int courseId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'practice',
+            method: 'getCourseSubscriptionStatus',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'practice',
+          methodName: 'getCourseSubscriptionStatus',
+          parameters: _ist.testObjectToJson({'courseId': courseId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ipub36mu.SubscriptionStatus?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _QuestionAdminEndpoint {
@@ -1082,6 +1150,7 @@ class _QuestionAdminEndpoint {
     required String title,
     required String subject,
     List<String>? topics,
+    required bool isPublic,
   }) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1098,6 +1167,7 @@ class _QuestionAdminEndpoint {
             'title': title,
             'subject': subject,
             'topics': topics,
+            'isPublic': isPublic,
           }),
           serializationManager: _serializationManager,
         );
@@ -1107,6 +1177,107 @@ class _QuestionAdminEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<_ik7qkox3.Course>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ik7qkox3.Course> updateCourseVisibility(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required int courseId,
+    required bool isPublic,
+  }) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'questionAdmin',
+            method: 'updateCourseVisibility',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'questionAdmin',
+          methodName: 'updateCourseVisibility',
+          parameters: _ist.testObjectToJson({
+            'courseId': courseId,
+            'isPublic': isPublic,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ik7qkox3.Course>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_iujwpemq.CourseSubscriptionView>> listSubscriptions(
+    _ist.TestSessionBuilder sessionBuilder,
+    int courseId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'questionAdmin',
+            method: 'listSubscriptions',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'questionAdmin',
+          methodName: 'listSubscriptions',
+          parameters: _ist.testObjectToJson({'courseId': courseId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iujwpemq.CourseSubscriptionView>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iw2qx1eo.CourseSubscription> respondToSubscription(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required int subscriptionId,
+    required _ipub36mu.SubscriptionStatus status,
+  }) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'questionAdmin',
+            method: 'respondToSubscription',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'questionAdmin',
+          methodName: 'respondToSubscription',
+          parameters: _ist.testObjectToJson({
+            'subscriptionId': subscriptionId,
+            'status': status,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iw2qx1eo.CourseSubscription>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

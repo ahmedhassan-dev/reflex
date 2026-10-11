@@ -14,7 +14,17 @@ abstract interface class ILearnerRepository {
 abstract interface class ICourseRepository {
   Future<Course?> findById(int id);
   Future<List<Course>> listAll();
+  Future<List<Course>> listByTeacher(int teacherId);
   Future<Course> save(Course course);
+}
+
+/// Repository interface for CourseSubscription entities.
+abstract interface class ICourseSubscriptionRepository {
+  Future<CourseSubscription?> findByCourseAndStudent(int courseId, int studentId);
+  Future<List<CourseSubscription>> listByCourse(int courseId);
+  Future<List<CourseSubscription>> listByStudent(int studentId);
+  Future<CourseSubscription?> findById(int id);
+  Future<CourseSubscription> save(CourseSubscription subscription);
 }
 
 /// Repository interface for Question entities and atomic counter operations.

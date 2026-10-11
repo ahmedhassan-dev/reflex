@@ -20,6 +20,9 @@ abstract class Course
     required this.title,
     required this.subject,
     this.topics,
+    this.teacherId,
+    this.teacherName,
+    this.isPublic,
   });
 
   factory Course({
@@ -27,6 +30,9 @@ abstract class Course
     required String title,
     required String subject,
     List<String>? topics,
+    int? teacherId,
+    String? teacherName,
+    bool? isPublic,
   }) = _CourseImpl;
 
   factory Course.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -39,6 +45,11 @@ abstract class Course
           : _i733dxuy.Protocol().deserialize<List<String>>(
               jsonSerialization['topics'],
             ),
+      teacherId: jsonSerialization['teacherId'] as int?,
+      teacherName: jsonSerialization['teacherName'] as String?,
+      isPublic: jsonSerialization['isPublic'] == null
+          ? null
+          : _isc.BoolJsonExtension.fromJson(jsonSerialization['isPublic']),
     );
   }
 
@@ -53,6 +64,12 @@ abstract class Course
 
   List<String>? topics;
 
+  int? teacherId;
+
+  String? teacherName;
+
+  bool? isPublic;
+
   /// Returns a shallow copy of this [Course]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -61,6 +78,9 @@ abstract class Course
     String? title,
     String? subject,
     List<String>? topics,
+    int? teacherId,
+    String? teacherName,
+    bool? isPublic,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -70,6 +90,9 @@ abstract class Course
       'title': title,
       'subject': subject,
       if (topics != null) 'topics': topics?.toJson(),
+      if (teacherId != null) 'teacherId': teacherId,
+      if (teacherName != null) 'teacherName': teacherName,
+      if (isPublic != null) 'isPublic': isPublic,
     };
   }
 
@@ -81,6 +104,9 @@ abstract class Course
       'title': title,
       'subject': subject,
       if (topics != null) 'topics': topics?.toJson(),
+      if (teacherId != null) 'teacherId': teacherId,
+      if (teacherName != null) 'teacherName': teacherName,
+      if (isPublic != null) 'isPublic': isPublic,
     };
   }
 
@@ -98,11 +124,17 @@ class _CourseImpl extends Course {
     required String title,
     required String subject,
     List<String>? topics,
+    int? teacherId,
+    String? teacherName,
+    bool? isPublic,
   }) : super._(
          id: id,
          title: title,
          subject: subject,
          topics: topics,
+         teacherId: teacherId,
+         teacherName: teacherName,
+         isPublic: isPublic,
        );
 
   /// Returns a shallow copy of this [Course]
@@ -114,6 +146,9 @@ class _CourseImpl extends Course {
     String? title,
     String? subject,
     Object? topics = _Undefined,
+    Object? teacherId = _Undefined,
+    Object? teacherName = _Undefined,
+    Object? isPublic = _Undefined,
   }) {
     return Course(
       id: id is int? ? id : this.id,
@@ -122,6 +157,9 @@ class _CourseImpl extends Course {
       topics: topics is List<String>?
           ? topics
           : this.topics?.map((e0) => e0).toList(),
+      teacherId: teacherId is int? ? teacherId : this.teacherId,
+      teacherName: teacherName is String? ? teacherName : this.teacherName,
+      isPublic: isPublic is bool? ? isPublic : this.isPublic,
     );
   }
 }

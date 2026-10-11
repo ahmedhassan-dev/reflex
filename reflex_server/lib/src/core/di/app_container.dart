@@ -22,6 +22,8 @@ class AppContainer {
   ServerpodAttemptRepository get attemptRepo => ServerpodAttemptRepository(session);
   ServerpodReviewStateRepository get reviewStateRepo => ServerpodReviewStateRepository(session);
   ServerpodDemoClockRepository get demoClockRepo => ServerpodDemoClockRepository(session);
+  ServerpodCourseSubscriptionRepository get courseSubscriptionRepo =>
+      ServerpodCourseSubscriptionRepository(session);
 
   Future<Clock> getEffectiveClock() async {
     final offsetDays = await demoClockRepo.getOffsetDays();
@@ -39,6 +41,8 @@ class AppContainer {
       acceptedAnswerRepo: acceptedAnswerRepo,
       attemptRepo: attemptRepo,
       reviewStateRepo: reviewStateRepo,
+      courseRepo: courseRepo,
+      subscriptionRepo: courseSubscriptionRepo,
       clock: clock,
     );
   }
@@ -55,6 +59,8 @@ class AppContainer {
         courseRepo: courseRepo,
         optionRepo: optionRepo,
         acceptedAnswerRepo: acceptedAnswerRepo,
+        subscriptionRepo: courseSubscriptionRepo,
+        learnerRepo: learnerRepo,
       );
 
   AuthProvisioningService get authProvisioningService => AuthProvisioningService(
@@ -72,13 +78,13 @@ class AppContainer {
       return authProvisioningService.ensureLearnerForSession(session);
     }
 
-    final demoAuthId = UuidValue.fromString('00000000-0000-4000-8000-000000000001');
+    final demoAuthId = UuidValue.fromString('00000000-0000-4000-8000-000000000011');
     final existing = await learnerRepo.findByAuthUserId(demoAuthId);
     if (existing != null) return existing;
 
     return learnerRepo.save(Learner(
       authUserId: demoAuthId,
-      displayName: defaultDisplayName ?? 'Demo Student',
+      displayName: defaultDisplayName ?? 'Alice (Student)',
       role: Role.student,
     ));
   }

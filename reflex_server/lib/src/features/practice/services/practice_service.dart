@@ -16,6 +16,8 @@ class PracticeService {
   final IAcceptedAnswerRepository acceptedAnswerRepo;
   final IAttemptRepository attemptRepo;
   final IReviewStateRepository reviewStateRepo;
+  final ICourseRepository? courseRepo;
+  final ICourseSubscriptionRepository? subscriptionRepo;
   final Clock clock;
   final CardSelector cardSelector;
 
@@ -26,6 +28,8 @@ class PracticeService {
     required this.attemptRepo,
     required this.reviewStateRepo,
     required this.clock,
+    this.courseRepo,
+    this.subscriptionRepo,
     CardSelector? cardSelector,
   }) : cardSelector = cardSelector ??
             CardSelector(
@@ -39,6 +43,18 @@ class PracticeService {
     required int learnerId,
     required int courseId,
   }) async {
+    if (courseRepo != null && subscriptionRepo != null) {
+      final course = await courseRepo!.findById(courseId);
+      if (course != null && course.isPublic == false) {
+        final sub = await subscriptionRepo!.findByCourseAndStudent(courseId, learnerId);
+        if (sub == null || sub.status != SubscriptionStatus.accepted) {
+          throw const CourseAccessDeniedException(
+            'This course is private. You must be accepted by the teacher to practice.',
+          );
+        }
+      }
+    }
+
     final now = clock.now();
 
     final selection = await cardSelector.selectNextCard(
@@ -231,5 +247,50 @@ class PracticeService {
       selectedOptionExplanation: selectedOptionExplanation,
       optionExplanations: optionExplanations,
     );
+  }
+
+  /// Requests subscription to a private course.
+  Future<CourseSubscription> requestSubscription({
+    required int learnerId,
+    required int courseId,
+  }) async {
+    if (courseRepo != null) {
+      final course = await courseRepo!.findById(courseId);
+      if (course == null) throw CourseNotFoundException(courseId);
+    }
+    if (subscriptionRepo == null) {
+      throw const ValidationException('Subscription repository is not configured.');
+    }
+
+    final existing = await subscriptionRepo!.findByCourseAndStudent(courseId, learnerId);
+    if (existing != null) {
+      if (existing.status == SubscriptionStatus.accepted) {
+        return existing;
+      }
+      final updated = existing.copyWith(
+        status: SubscriptionStatus.pending,
+        requestedAt: clock.now(),
+        decidedAt: null,
+      );
+      return subscriptionRepo!.save(updated);
+    }
+
+    final newSub = CourseSubscription(
+      courseId: courseId,
+      studentId: learnerId,
+      status: SubscriptionStatus.pending,
+      requestedAt: clock.now(),
+    );
+    return subscriptionRepo!.save(newSub);
+  }
+
+  /// Checks the subscription status of a student for a course.
+  Future<SubscriptionStatus?> getSubscriptionStatus({
+    required int learnerId,
+    required int courseId,
+  }) async {
+    if (subscriptionRepo == null) return null;
+    final sub = await subscriptionRepo!.findByCourseAndStudent(courseId, learnerId);
+    return sub?.status;
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
 import '../../../../data/repositories/question_admin_repository.dart';
@@ -57,6 +58,9 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
         orElse: () => courses.first,
       );
       courseId = selectedCourse!.id!;
+      if (selectedCourse!.isPublic == false) {
+        unawaited(loadSubscriptions());
+      }
     }
 
     await loadQuestions();
@@ -68,11 +72,15 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
       selectedCourse = course;
       courseId = course.id!;
       selectedQuestion = null;
+      subscriptions = [];
       topicNoteController.clear();
       helpHintController.clear();
       successMessage = null;
       errorMessage = null;
     });
+    if (course.isPublic == false) {
+      unawaited(loadSubscriptions());
+    }
     await loadQuestions();
   }
 
@@ -116,15 +124,20 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
     });
   }
 
+  List<CourseSubscriptionView> subscriptions = [];
+  bool isLoadingSubscriptions = false;
+
   Future<bool> createNewCourse({
     required String title,
     required String subject,
     List<String>? topics,
+    bool isPublic = true,
   }) async {
     final res = await questionRepo.createCourse(
       title: title,
       subject: subject,
       topics: topics,
+      isPublic: isPublic,
     );
     if (!mounted) return false;
 
@@ -146,6 +159,53 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
         errorMessage = res.error;
       });
       return false;
+    }
+  }
+
+  Future<void> toggleCourseVisibility() async {
+    if (selectedCourse == null) return;
+    final currentIsPublic = selectedCourse!.isPublic ?? true;
+    final newIsPublic = !currentIsPublic;
+
+    final res = await questionRepo.updateCourseVisibility(courseId, newIsPublic);
+    if (!mounted) return;
+
+    if (res.isSuccess) {
+      final updated = res.data!;
+      setState(() {
+        selectedCourse = updated;
+        final idx = courses.indexWhere((c) => c.id == updated.id);
+        if (idx != -1) courses[idx] = updated;
+      });
+      if (!newIsPublic) {
+        await loadSubscriptions();
+      }
+    }
+  }
+
+  Future<void> loadSubscriptions() async {
+    if (selectedCourse == null) return;
+    setState(() => isLoadingSubscriptions = true);
+
+    final res = await questionRepo.listSubscriptions(courseId);
+    if (!mounted) return;
+
+    if (res.isSuccess) {
+      setState(() {
+        isLoadingSubscriptions = false;
+        subscriptions = res.data ?? [];
+      });
+    } else {
+      setState(() => isLoadingSubscriptions = false);
+    }
+  }
+
+  Future<void> respondToSubscription(int subscriptionId, SubscriptionStatus status) async {
+    final res = await questionRepo.respondToSubscription(subscriptionId, status);
+    if (!mounted) return;
+
+    if (res.isSuccess) {
+      await loadSubscriptions();
     }
   }
 

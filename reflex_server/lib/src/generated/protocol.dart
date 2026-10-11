@@ -12,6 +12,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:reflex_server/src/generated/course.dart' as _ik7qkox3;
+import 'package:reflex_server/src/generated/dtos/course_subscription_view.dart'
+    as _iujwpemq;
 import 'package:reflex_server/src/generated/question.dart' as _igqv87t7;
 import 'package:serverpod/protocol.dart' as _isp;
 import 'package:serverpod/serverpod.dart' as _is;
@@ -22,8 +24,10 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
 import 'accepted_answer.dart' as _im0rixu4;
 import 'attempt.dart' as _iyzrlzh2;
 import 'course.dart' as _ink5e3of;
+import 'course_subscription.dart' as _iuhc77t0;
 import 'demo_clock.dart' as _itaqwut4;
 import 'dtos/cohort_summary.dart' as _il7knc0r;
+import 'dtos/course_subscription_view.dart' as _iugqjajm;
 import 'dtos/create_option_input.dart' as _i12skj47;
 import 'dtos/create_question_input.dart' as _i83lwmh8;
 import 'dtos/help_result.dart' as _ila2pk6h;
@@ -41,6 +45,7 @@ import 'enums/question_type.dart' as _in2t4eqa;
 import 'enums/reflex_tier.dart' as _i8m78wq8;
 import 'enums/result_reason.dart' as _i3yqrgm0;
 import 'enums/role.dart' as _iu4tij3a;
+import 'enums/subscription_status.dart' as _i5d9goyo;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'learner.dart' as _iia065xp;
 import 'question.dart' as _in6mynjk;
@@ -49,8 +54,10 @@ import 'review_state.dart' as _iiyeai10;
 export 'accepted_answer.dart';
 export 'attempt.dart';
 export 'course.dart';
+export 'course_subscription.dart';
 export 'demo_clock.dart';
 export 'dtos/cohort_summary.dart';
+export 'dtos/course_subscription_view.dart';
 export 'dtos/create_option_input.dart';
 export 'dtos/create_question_input.dart';
 export 'dtos/help_result.dart';
@@ -68,6 +75,7 @@ export 'enums/question_type.dart';
 export 'enums/reflex_tier.dart';
 export 'enums/result_reason.dart';
 export 'enums/role.dart';
+export 'enums/subscription_status.dart';
 export 'greetings/greeting.dart';
 export 'learner.dart';
 export 'question.dart';
@@ -274,9 +282,114 @@ class Protocol extends _is.DatabaseSerializationManager {
           isNullable: true,
           dartType: 'List<String>?',
         ),
+        _isp.ColumnDefinition(
+          name: 'teacherId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'teacherName',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'isPublic',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: true,
+          dartType: 'bool?',
+        ),
       ],
       foreignKeys: [],
       indexes: [],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'course_subscription',
+      dartName: 'CourseSubscription',
+      schema: 'public',
+      module: 'reflex',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'courseId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'studentId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'status',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:SubscriptionStatus',
+        ),
+        _isp.ColumnDefinition(
+          name: 'requestedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'decidedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'course_subscription_fk_0',
+          columns: ['courseId'],
+          referenceTable: 'course',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'course_subscription_fk_1',
+          columns: ['studentId'],
+          referenceTable: 'learner',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'course_student_sub_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'courseId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'studentId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
       managed: true,
     ),
     _isp.TableDefinition(
@@ -662,11 +775,17 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ink5e3of.Course) {
       return _ink5e3of.Course.fromJson(data) as T;
     }
+    if (t == _iuhc77t0.CourseSubscription) {
+      return _iuhc77t0.CourseSubscription.fromJson(data) as T;
+    }
     if (t == _itaqwut4.DemoClock) {
       return _itaqwut4.DemoClock.fromJson(data) as T;
     }
     if (t == _il7knc0r.CohortSummary) {
       return _il7knc0r.CohortSummary.fromJson(data) as T;
+    }
+    if (t == _iugqjajm.CourseSubscriptionView) {
+      return _iugqjajm.CourseSubscriptionView.fromJson(data) as T;
     }
     if (t == _i12skj47.CreateOptionInput) {
       return _i12skj47.CreateOptionInput.fromJson(data) as T;
@@ -719,6 +838,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _iu4tij3a.Role) {
       return _iu4tij3a.Role.fromJson(data) as T;
     }
+    if (t == _i5d9goyo.SubscriptionStatus) {
+      return _i5d9goyo.SubscriptionStatus.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
@@ -744,11 +866,21 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_ink5e3of.Course?>()) {
       return (data != null ? _ink5e3of.Course.fromJson(data) : null) as T;
     }
+    if (t == _is.getType<_iuhc77t0.CourseSubscription?>()) {
+      return (data != null ? _iuhc77t0.CourseSubscription.fromJson(data) : null)
+          as T;
+    }
     if (t == _is.getType<_itaqwut4.DemoClock?>()) {
       return (data != null ? _itaqwut4.DemoClock.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_il7knc0r.CohortSummary?>()) {
       return (data != null ? _il7knc0r.CohortSummary.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_iugqjajm.CourseSubscriptionView?>()) {
+      return (data != null
+              ? _iugqjajm.CourseSubscriptionView.fromJson(data)
+              : null)
           as T;
     }
     if (t == _is.getType<_i12skj47.CreateOptionInput?>()) {
@@ -812,6 +944,10 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_iu4tij3a.Role?>()) {
       return (data != null ? _iu4tij3a.Role.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i5d9goyo.SubscriptionStatus?>()) {
+      return (data != null ? _i5d9goyo.SubscriptionStatus.fromJson(data) : null)
+          as T;
     }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
@@ -913,6 +1049,12 @@ class Protocol extends _is.DatabaseSerializationManager {
               : null)
           as T;
     }
+    if (t == List<_iujwpemq.CourseSubscriptionView>) {
+      return (data as List)
+              .map((e) => deserialize<_iujwpemq.CourseSubscriptionView>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_igqv87t7.Question>) {
       return (data as List)
               .map((e) => deserialize<_igqv87t7.Question>(e))
@@ -936,8 +1078,10 @@ class Protocol extends _is.DatabaseSerializationManager {
       _im0rixu4.AcceptedAnswer => 'AcceptedAnswer',
       _iyzrlzh2.Attempt => 'Attempt',
       _ink5e3of.Course => 'Course',
+      _iuhc77t0.CourseSubscription => 'CourseSubscription',
       _itaqwut4.DemoClock => 'DemoClock',
       _il7knc0r.CohortSummary => 'CohortSummary',
+      _iugqjajm.CourseSubscriptionView => 'CourseSubscriptionView',
       _i12skj47.CreateOptionInput => 'CreateOptionInput',
       _i83lwmh8.CreateQuestionInput => 'CreateQuestionInput',
       _ila2pk6h.HelpResult => 'HelpResult',
@@ -955,6 +1099,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _i8m78wq8.ReflexTier => 'ReflexTier',
       _i3yqrgm0.ResultReason => 'ResultReason',
       _iu4tij3a.Role => 'Role',
+      _i5d9goyo.SubscriptionStatus => 'SubscriptionStatus',
       _izw8z7ou.Greeting => 'Greeting',
       _iia065xp.Learner => 'Learner',
       _in6mynjk.Question => 'Question',
@@ -980,10 +1125,14 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'Attempt';
       case _ink5e3of.Course():
         return 'Course';
+      case _iuhc77t0.CourseSubscription():
+        return 'CourseSubscription';
       case _itaqwut4.DemoClock():
         return 'DemoClock';
       case _il7knc0r.CohortSummary():
         return 'CohortSummary';
+      case _iugqjajm.CourseSubscriptionView():
+        return 'CourseSubscriptionView';
       case _i12skj47.CreateOptionInput():
         return 'CreateOptionInput';
       case _i83lwmh8.CreateQuestionInput():
@@ -1018,6 +1167,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'ResultReason';
       case _iu4tij3a.Role():
         return 'Role';
+      case _i5d9goyo.SubscriptionStatus():
+        return 'SubscriptionStatus';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _iia065xp.Learner():
@@ -1063,11 +1214,17 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'Course') {
       return deserialize<_ink5e3of.Course>(data['data']);
     }
+    if (dataClassName == 'CourseSubscription') {
+      return deserialize<_iuhc77t0.CourseSubscription>(data['data']);
+    }
     if (dataClassName == 'DemoClock') {
       return deserialize<_itaqwut4.DemoClock>(data['data']);
     }
     if (dataClassName == 'CohortSummary') {
       return deserialize<_il7knc0r.CohortSummary>(data['data']);
+    }
+    if (dataClassName == 'CourseSubscriptionView') {
+      return deserialize<_iugqjajm.CourseSubscriptionView>(data['data']);
     }
     if (dataClassName == 'CreateOptionInput') {
       return deserialize<_i12skj47.CreateOptionInput>(data['data']);
@@ -1119,6 +1276,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'Role') {
       return deserialize<_iu4tij3a.Role>(data['data']);
+    }
+    if (dataClassName == 'SubscriptionStatus') {
+      return deserialize<_i5d9goyo.SubscriptionStatus>(data['data']);
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
@@ -1182,6 +1342,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _iyzrlzh2.Attempt.t;
       case _ink5e3of.Course:
         return _ink5e3of.Course.t;
+      case _iuhc77t0.CourseSubscription:
+        return _iuhc77t0.CourseSubscription.t;
       case _itaqwut4.DemoClock:
         return _itaqwut4.DemoClock.t;
       case _iia065xp.Learner:

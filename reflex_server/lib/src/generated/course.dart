@@ -19,6 +19,9 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
     required this.title,
     required this.subject,
     this.topics,
+    this.teacherId,
+    this.teacherName,
+    this.isPublic,
   });
 
   factory Course({
@@ -26,6 +29,9 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
     required String title,
     required String subject,
     List<String>? topics,
+    int? teacherId,
+    String? teacherName,
+    bool? isPublic,
   }) = _CourseImpl;
 
   factory Course.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -38,6 +44,11 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
           : _immqfr35.Protocol().deserialize<List<String>>(
               jsonSerialization['topics'],
             ),
+      teacherId: jsonSerialization['teacherId'] as int?,
+      teacherName: jsonSerialization['teacherName'] as String?,
+      isPublic: jsonSerialization['isPublic'] == null
+          ? null
+          : _is.BoolJsonExtension.fromJson(jsonSerialization['isPublic']),
     );
   }
 
@@ -54,6 +65,12 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
 
   List<String>? topics;
 
+  int? teacherId;
+
+  String? teacherName;
+
+  bool? isPublic;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -65,6 +82,9 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
     String? title,
     String? subject,
     List<String>? topics,
+    int? teacherId,
+    String? teacherName,
+    bool? isPublic,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -74,6 +94,9 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
       'title': title,
       'subject': subject,
       if (topics != null) 'topics': topics?.toJson(),
+      if (teacherId != null) 'teacherId': teacherId,
+      if (teacherName != null) 'teacherName': teacherName,
+      if (isPublic != null) 'isPublic': isPublic,
     };
   }
 
@@ -85,6 +108,9 @@ abstract class Course implements _is.TableRow<int?>, _is.ProtocolSerialization {
       'title': title,
       'subject': subject,
       if (topics != null) 'topics': topics?.toJson(),
+      if (teacherId != null) 'teacherId': teacherId,
+      if (teacherName != null) 'teacherName': teacherName,
+      if (isPublic != null) 'isPublic': isPublic,
     };
   }
 
@@ -124,11 +150,17 @@ class _CourseImpl extends Course {
     required String title,
     required String subject,
     List<String>? topics,
+    int? teacherId,
+    String? teacherName,
+    bool? isPublic,
   }) : super._(
          id: id,
          title: title,
          subject: subject,
          topics: topics,
+         teacherId: teacherId,
+         teacherName: teacherName,
+         isPublic: isPublic,
        );
 
   /// Returns a shallow copy of this [Course]
@@ -140,6 +172,9 @@ class _CourseImpl extends Course {
     String? title,
     String? subject,
     Object? topics = _Undefined,
+    Object? teacherId = _Undefined,
+    Object? teacherName = _Undefined,
+    Object? isPublic = _Undefined,
   }) {
     return Course(
       id: id is int? ? id : this.id,
@@ -148,6 +183,9 @@ class _CourseImpl extends Course {
       topics: topics is List<String>?
           ? topics
           : this.topics?.map((e0) => e0).toList(),
+      teacherId: teacherId is int? ? teacherId : this.teacherId,
+      teacherName: teacherName is String? ? teacherName : this.teacherName,
+      isPublic: isPublic is bool? ? isPublic : this.isPublic,
     );
   }
 }
@@ -170,6 +208,21 @@ class CourseUpdateTable extends _is.UpdateTable<CourseTable> {
         table.topics,
         value,
       );
+
+  _is.ColumnValue<int, int> teacherId(int? value) => _is.ColumnValue(
+    table.teacherId,
+    value,
+  );
+
+  _is.ColumnValue<String, String> teacherName(String? value) => _is.ColumnValue(
+    table.teacherName,
+    value,
+  );
+
+  _is.ColumnValue<bool, bool> isPublic(bool? value) => _is.ColumnValue(
+    table.isPublic,
+    value,
+  );
 }
 
 class CourseTable extends _is.Table<int?> {
@@ -187,6 +240,18 @@ class CourseTable extends _is.Table<int?> {
       'topics',
       this,
     );
+    teacherId = _is.ColumnInt(
+      'teacherId',
+      this,
+    );
+    teacherName = _is.ColumnString(
+      'teacherName',
+      this,
+    );
+    isPublic = _is.ColumnBool(
+      'isPublic',
+      this,
+    );
   }
 
   late final CourseUpdateTable updateTable;
@@ -197,12 +262,21 @@ class CourseTable extends _is.Table<int?> {
 
   late final _is.ColumnSerializable<List<String>> topics;
 
+  late final _is.ColumnInt teacherId;
+
+  late final _is.ColumnString teacherName;
+
+  late final _is.ColumnBool isPublic;
+
   @override
   List<_is.Column> get columns => [
     id,
     title,
     subject,
     topics,
+    teacherId,
+    teacherName,
+    isPublic,
   ];
 }
 

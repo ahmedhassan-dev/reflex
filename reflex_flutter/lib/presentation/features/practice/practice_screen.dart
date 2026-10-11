@@ -31,40 +31,311 @@ class PracticeScreen extends StatefulWidget {
 class _PracticeScreenState extends PracticeController {
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(LocaleKeys.practice_title.tr()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: LocaleKeys.retry.tr(),
+            onPressed: isLoading ? null : checkAccessAndLoad,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsetsDirectional.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildCourseSelectorHeader(context),
+            if (isPrivateAccessRestricted)
+              _buildPrivateCourseGate(context)
+            else if (isLoading && currentCard == null)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 40),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (isDeckComplete)
+              DeckCompleteWidget(onRefresh: loadNextCard)
+            else if (currentCard == null)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        errorMessage ?? LocaleKeys.no_response_yet.tr(),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: loadNextCard,
+                        child: Text(LocaleKeys.retry.tr()),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              _buildPracticeCardContent(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCourseSelectorHeader(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    if (isLoading && currentCard == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+    if (courses.isEmpty && selectedCourse == null) {
+      return const SizedBox.shrink();
     }
 
-    if (isDeckComplete) {
-      return DeckCompleteWidget(
-        onRefresh: loadNextCard,
-      );
-    }
+    final isPublic = selectedCourse?.isPublic ?? true;
 
-    if (currentCard == null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? ReflexColors.darkCard : ReflexColors.lightCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? ReflexColors.darkBorder : ReflexColors.lightBorder,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: courses.length > 1
+                    ? DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          key: const Key('practice_course_selector'),
+                          isDense: true,
+                          isExpanded: true,
+                          value: courses.any((c) => c.id == courseId) ? courseId : courses.first.id,
+                          items: courses.map((c) {
+                            return DropdownMenuItem<int>(
+                              value: c.id,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    (c.isPublic ?? true) ? Icons.menu_book_rounded : Icons.lock_outline_rounded,
+                                    size: 16,
+                                    color: (c.isPublic ?? true)
+                                        ? ReflexColors.primary
+                                        : ReflexColors.chromaticYellow,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      '${c.title} (${c.subject})',
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (newId) {
+                            if (newId != null) {
+                              final found = courses.where((c) => c.id == newId).firstOrNull;
+                              if (found != null) {
+                                onCourseSelected(found);
+                              }
+                            }
+                          },
+                        ),
+                      )
+                    : Row(
+                        children: [
+                          Icon(
+                            isPublic ? Icons.menu_book_rounded : Icons.lock_outline_rounded,
+                            size: 18,
+                            color: isPublic ? ReflexColors.primary : ReflexColors.chromaticYellow,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              selectedCourse != null
+                                  ? '${selectedCourse!.title} (${selectedCourse!.subject})'
+                                  : 'Reflex Practice',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: (isPublic ? ReflexColors.chromaticGreen : ReflexColors.chromaticYellow)
+                      .withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: (isPublic ? ReflexColors.chromaticGreen : ReflexColors.chromaticYellow)
+                        .withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isPublic ? Icons.public_rounded : Icons.lock_outline_rounded,
+                      size: 12,
+                      color: isPublic ? ReflexColors.chromaticGreen : ReflexColors.chromaticYellow,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      isPublic
+                          ? LocaleKeys.questions_admin_visibility_public.tr()
+                          : LocaleKeys.questions_admin_visibility_private.tr(),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: isPublic ? ReflexColors.chromaticGreen : ReflexColors.chromaticYellow,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (selectedCourse?.teacherName != null) ...[
+            const SizedBox(height: 6),
             Text(
-              errorMessage ?? LocaleKeys.no_response_yet.tr(),
-              style: theme.textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: loadNextCard,
-              child: Text(LocaleKeys.retry.tr()),
+              LocaleKeys.questions_admin_teacher_label.tr(args: [selectedCourse!.teacherName!]),
+              style: TextStyle(
+                fontSize: 11,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
             ),
           ],
-        ),
-      );
-    }
+        ],
+      ),
+    );
+  }
 
+  Widget _buildPrivateCourseGate(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final isPending = subscriptionStatus == SubscriptionStatus.pending;
+    final isRejected = subscriptionStatus == SubscriptionStatus.rejected;
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: isDark ? ReflexColors.darkCard : ReflexColors.lightCard,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isPending
+              ? ReflexColors.chromaticYellow.withValues(alpha: 0.4)
+              : isRejected
+                  ? ReflexColors.chromaticRed.withValues(alpha: 0.4)
+                  : isDark
+                      ? ReflexColors.darkBorder
+                      : ReflexColors.lightBorder,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: (isRejected
+                      ? ReflexColors.chromaticRed
+                      : isPending
+                          ? ReflexColors.chromaticYellow
+                          : ReflexColors.primary)
+                  .withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isRejected
+                  ? Icons.block_rounded
+                  : isPending
+                      ? Icons.hourglass_top_rounded
+                      : Icons.lock_outline_rounded,
+              size: 40,
+              color: isRejected
+                  ? ReflexColors.chromaticRed
+                  : isPending
+                      ? ReflexColors.chromaticYellow
+                      : ReflexColors.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            isRejected
+                ? LocaleKeys.subscriptions_status_rejected.tr()
+                : isPending
+                    ? LocaleKeys.subscriptions_pending_approval.tr()
+                    : LocaleKeys.subscriptions_access_denied.tr(),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            LocaleKeys.subscriptions_request_access_desc.tr(),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: isDark ? Colors.grey[400] : Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          if (isPending) ...[
+            OutlinedButton.icon(
+              key: const Key('btn_refresh_subscription_status'),
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: Text(LocaleKeys.retry.tr()),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: ReflexColors.chromaticYellow,
+                side: const BorderSide(color: ReflexColors.chromaticYellow),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: checkAccessAndLoad,
+            ),
+          ] else ...[
+            ElevatedButton.icon(
+              key: const Key('btn_request_subscription'),
+              icon: isRequestingSubscription
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Icon(Icons.send_rounded, size: 18),
+              label: Text(LocaleKeys.subscriptions_request_access.tr()),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ReflexColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: isRequestingSubscription ? null : requestSubscription,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPracticeCardContent(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final q = currentCard!.question;
     final isMcq = q.questionType == QuestionType.multipleChoice;
     final isSubmitted = submitResult != null;
@@ -74,42 +345,29 @@ class _PracticeScreenState extends PracticeController {
         ((isMcq && selectedOptionId != null) ||
             (!isMcq && textAnswerController.text.trim().isNotEmpty));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(LocaleKeys.practice_title.tr()),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: LocaleKeys.retry.tr(),
-            onPressed: isLoading ? null : loadNextCard,
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsetsDirectional.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // ── Top header bar: Topic & Response Timer ─────────────────────────
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // ── Top header bar: Topic & Response Timer ─────────────────────────
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Chip(
-                  label: Text(
-                    q.topic,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-                  ),
-                  backgroundColor: ReflexColors.primary.withValues(alpha: isDark ? 0.2 : 0.1),
-                  side: BorderSide(color: ReflexColors.primary.withValues(alpha: 0.3)),
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                ),
-                ResponseTimerWidget(
-                  expectedSeconds: q.expectedSeconds,
-                  isRunning: !isSubmitted,
-                ),
-              ],
+            Chip(
+              label: Text(
+                q.topic,
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+              ),
+              backgroundColor: ReflexColors.primary.withValues(alpha: isDark ? 0.2 : 0.1),
+              side: BorderSide(color: ReflexColors.primary.withValues(alpha: 0.3)),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
             ),
-            const SizedBox(height: 16),
+            ResponseTimerWidget(
+              expectedSeconds: q.expectedSeconds,
+              isRunning: !isSubmitted,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
 
             // ── Main Question Card with Chromatic Aura ─────────────────────────
             ChromaticAuraCard(
@@ -238,8 +496,6 @@ class _PracticeScreenState extends PracticeController {
               ),
             ],
           ],
-        ),
-      ),
-    );
+        );
   }
 }

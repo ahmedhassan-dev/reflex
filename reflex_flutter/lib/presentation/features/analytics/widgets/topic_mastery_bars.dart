@@ -4,13 +4,15 @@ import 'package:reflex_client/reflex_client.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../core/theme/app_colors.dart';
 
-/// Topic mastery breakdown progress bars.
+/// Topic mastery breakdown progress bars with embedded question insights.
 class TopicMasteryBars extends StatelessWidget {
   final List<TopicMastery> masteryList;
+  final List<QuestionInsight> questions;
 
   const TopicMasteryBars({
     super.key,
     required this.masteryList,
+    this.questions = const [],
   });
 
   @override
@@ -36,39 +38,58 @@ class TopicMasteryBars extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (final item in masteryList) ...[
-          _TopicBarItem(item: item),
-          const SizedBox(height: 12),
+          _TopicBarItem(
+            item: item,
+            questions: questions.where((q) => q.topic == item.topic).toList(),
+          ),
+          const SizedBox(height: 14),
         ],
       ],
     );
   }
 }
 
-class _TopicBarItem extends StatelessWidget {
+class _TopicBarItem extends StatefulWidget {
   final TopicMastery item;
+  final List<QuestionInsight> questions;
 
-  const _TopicBarItem({required this.item});
+  const _TopicBarItem({
+    required this.item,
+    required this.questions,
+  });
+
+  @override
+  State<_TopicBarItem> createState() => _TopicBarItemState();
+}
+
+class _TopicBarItemState extends State<_TopicBarItem> {
+  late bool _isExpanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = widget.questions.isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final pct = (item.masteryRate * 100).round();
+    final pct = (widget.item.masteryRate * 100).round();
     Color barColor;
-    if (item.masteryRate >= 0.8) {
+    if (widget.item.masteryRate >= 0.8) {
       barColor = ReflexColors.chromaticGreen;
-    } else if (item.masteryRate >= 0.5) {
+    } else if (widget.item.masteryRate >= 0.5) {
       barColor = ReflexColors.chromaticYellow;
     } else {
       barColor = ReflexColors.chromaticRed;
     }
 
     return Container(
-      padding: const EdgeInsetsDirectional.all(14),
       decoration: BoxDecoration(
         color: isDark ? ReflexColors.darkCard : ReflexColors.lightCard,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? ReflexColors.darkBorder : ReflexColors.lightBorder,
         ),
@@ -76,37 +97,254 @@ class _TopicBarItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  item.topic,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+          // Topic Header & Mastery Bar
+          Padding(
+            padding: const EdgeInsetsDirectional.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: barColor,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              widget.item.topic,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: barColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: barColor.withValues(alpha: 0.4)),
+                      ),
+                      child: Text(
+                        '$pct%',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: barColor,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: LinearProgressIndicator(
+                    value: widget.item.masteryRate.clamp(0.0, 1.0),
+                    minHeight: 8,
+                    backgroundColor: isDark
+                        ? ReflexColors.darkSurface
+                        : ReflexColors.lightBorder.withValues(alpha: 0.5),
+                    valueColor: AlwaysStoppedAnimation<Color>(barColor),
                   ),
                 ),
-              ),
-              Text(
-                '$pct%',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: barColor,
-                  fontSize: 14,
+                const SizedBox(height: 12),
+                // Toggle Question Insights button
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _isExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                          size: 18,
+                          color: ReflexColors.primary,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          _isExpanded
+                              ? LocaleKeys.dashboard_hide_topic_questions.tr()
+                              : LocaleKeys.dashboard_view_topic_questions.tr(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: ReflexColors.primary,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isDark ? ReflexColors.darkSurface : ReflexColors.lightSurface,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            LocaleKeys.dashboard_topic_questions_count.tr(
+                              args: [widget.questions.length.toString()],
+                            ),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isDark ? ReflexColors.textMutedDark : ReflexColors.textMutedLight,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: item.masteryRate.clamp(0.0, 1.0),
-              minHeight: 8,
-              backgroundColor: isDark
-                  ? ReflexColors.darkSurface
-                  : ReflexColors.lightBorder.withValues(alpha: 0.5),
-              valueColor: AlwaysStoppedAnimation<Color>(barColor),
+
+          // Embedded Question Insights inside this topic
+          if (_isExpanded) ...[
+            Divider(
+              height: 1,
+              color: isDark ? ReflexColors.darkBorder : ReflexColors.lightBorder,
+            ),
+            if (widget.questions.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  LocaleKeys.dashboard_no_cohort_data.tr(),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: isDark ? ReflexColors.textMutedDark : ReflexColors.textMutedLight,
+                  ),
+                ),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(12),
+                itemCount: widget.questions.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
+                itemBuilder: (context, idx) {
+                  final q = widget.questions[idx];
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark ? ReflexColors.darkSurface : ReflexColors.lightSurface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: ReflexColors.primary.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '#${idx + 1}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: ReflexColors.primary,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                q.prompt,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          children: [
+                            _MetricBadge(
+                              icon: Icons.check_circle_rounded,
+                              label: '${LocaleKeys.dashboard_clean_solves.tr()}: ${q.cleanSolveCount}',
+                              color: ReflexColors.chromaticGreen,
+                            ),
+                            _MetricBadge(
+                              icon: Icons.flag_rounded,
+                              label: '${LocaleKeys.dashboard_first_try_rate.tr()}: ${(q.firstTryRate * 100).round()}%',
+                              color: ReflexColors.primary,
+                            ),
+                            _MetricBadge(
+                              icon: Icons.speed_rounded,
+                              label: '${q.avgResponseMs.round()} ms',
+                              color: ReflexColors.chromaticYellow,
+                            ),
+                            _MetricBadge(
+                              icon: Icons.repeat_rounded,
+                              label: '${LocaleKeys.dashboard_total_attempts.tr()}: ${q.attemptCount}',
+                              color: isDark ? Colors.white70 : Colors.black87,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _MetricBadge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _MetricBadge({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
         ],
