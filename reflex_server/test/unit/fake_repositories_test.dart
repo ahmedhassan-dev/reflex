@@ -8,7 +8,7 @@ void main() {
   group('T-016: Fake Repositories Verification', () {
     test('FakeLearnerRepository supports CRUD and lookup by authUserId', () async {
       final repo = FakeLearnerRepository();
-      final authId = UuidValue.fromString('11111111-1111-1111-1111-111111111111');
+      final authId = UuidValue.fromString('00000000-0000-4000-8000-000000000001');
 
       final learner = Learner(
         authUserId: authId,

@@ -4,8 +4,10 @@ import "package:flutter/material.dart";
 import "package:reflex_client/reflex_client.dart";
 import "package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart";
 import "../../../../client.dart";
+import "../../../../core/storage/role_preferences.dart";
 import "../../../shell/app_shell.dart";
 import "../auth_screen.dart";
+import "../role_selection_screen.dart";
 
 /// State Controller managing authentication, persona selection, and Google OAuth sign-in.
 abstract class AuthController extends State<AuthScreen> with SingleTickerProviderStateMixin {
@@ -22,6 +24,9 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
   void initState() {
     super.initState();
     tabController = TabController(length: 3, vsync: this);
+    if (widget.initialRole != null) {
+      selectedRole = widget.initialRole!;
+    }
   }
 
   @override
@@ -45,6 +50,7 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
         selectedRole = role;
         errorMessage = null;
       });
+      RolePreferences.saveRole(role);
     }
   }
 
@@ -188,11 +194,20 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
     }
   }
 
+  void switchToRoleSelection(BuildContext context) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => RoleSelectionScreen(initialRole: selectedRole),
+      ),
+    );
+  }
+
   void _navigateToAppShell(
     BuildContext context, {
     required Role role,
     required String userName,
   }) {
+    RolePreferences.saveRole(role);
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => AppShell(

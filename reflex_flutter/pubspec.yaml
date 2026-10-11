@@ -39,6 +39,7 @@ dependencies:
   sentry_flutter: ^9.30.1
   serverpod_auth_idp_flutter: 4.0.4
   serverpod_flutter: 4.0.4
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   # Used for agents to drive the app through the Dart MCP
@@ -48,7 +49,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.5
-  shared_preferences: ^2.5.3
 
 dependency_overrides:
   flutter_secure_storage: ^10.0.0

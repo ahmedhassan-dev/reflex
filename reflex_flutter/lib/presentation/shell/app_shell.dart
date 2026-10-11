@@ -4,7 +4,7 @@ import 'package:reflex_client/reflex_client.dart';
 import '../../generated/locale_keys.g.dart';
 import '../core/theme/app_colors.dart';
 import '../features/analytics/analytics_screen.dart';
-import '../features/auth/auth_screen.dart';
+import '../features/auth/role_selection_screen.dart';
 import '../features/demo_clock/widgets/demo_clock_widget.dart';
 import '../features/practice/practice_screen.dart';
 import '../features/profile/student_progress_screen.dart';
@@ -45,7 +45,7 @@ class _AppShellState extends State<AppShell> {
   void _switchToAuthScreen() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => const AuthScreen(),
+        builder: (_) => RoleSelectionScreen(initialRole: _currentRole),
       ),
     );
   }

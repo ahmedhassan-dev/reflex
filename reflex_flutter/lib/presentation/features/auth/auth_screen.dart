@@ -4,12 +4,16 @@ import 'package:reflex_client/reflex_client.dart';
 import '../../core/theme/app_colors.dart';
 import '../../../generated/locale_keys.g.dart';
 import 'controller/auth_controller.dart';
-import 'widgets/role_card.dart';
 
-/// Authentication Screen with Persona Selection, Email Sign In/Sign Up,
+/// Authentication Screen with Persona Banner, Email Sign In/Sign Up,
 /// Google & Apple OAuth sign-in integration, and Quick Demo profiles.
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+  final Role? initialRole;
+
+  const AuthScreen({
+    super.key,
+    this.initialRole,
+  });
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -45,6 +49,12 @@ class _AuthScreenState extends AuthController {
           ],
         ),
         actions: [
+          IconButton(
+            key: const Key('btn_switch_role_appbar'),
+            icon: const Icon(Icons.switch_account_outlined),
+            tooltip: LocaleKeys.auth_switch_role.tr(),
+            onPressed: () => switchToRoleSelection(context),
+          ),
           IconButton(
             icon: const Icon(Icons.language_rounded),
             tooltip: LocaleKeys.switch_language.tr(),
@@ -86,7 +96,9 @@ class _AuthScreenState extends AuthController {
                         ],
                       ),
                       child: Icon(
-                        Icons.bolt_rounded,
+                        selectedRole == Role.student
+                            ? Icons.school_rounded
+                            : Icons.co_present_rounded,
                         size: 40,
                         color: roleColor,
                       ),
@@ -113,51 +125,85 @@ class _AuthScreenState extends AuthController {
                           : ReflexColors.textSecondaryLight,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
-                  // 1. Role Selection Cards
-                  Text(
-                    LocaleKeys.auth_choose_role_prompt.tr(),
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                  // Active Persona Banner with Switch Role Action
+                  Container(
+                    key: const Key('persona_banner'),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: roleColor.withValues(alpha: isDark ? 0.15 : 0.08),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: roleColor.withValues(alpha: 0.35),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: roleColor.withValues(alpha: 0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            selectedRole == Role.student
+                                ? Icons.school_rounded
+                                : Icons.co_present_rounded,
+                            color: roleColor,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                selectedRole == Role.student
+                                    ? LocaleKeys.auth_role_student.tr()
+                                    : LocaleKeys.auth_role_teacher.tr(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: roleColor,
+                                ),
+                              ),
+                              Text(
+                                selectedRole == Role.student
+                                    ? LocaleKeys.auth_role_student_desc.tr()
+                                    : LocaleKeys.auth_role_teacher_desc.tr(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark
+                                      ? ReflexColors.textSecondaryDark
+                                      : ReflexColors.textSecondaryLight,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        TextButton.icon(
+                          key: const Key('btn_change_role'),
+                          icon: const Icon(Icons.swap_horiz_rounded, size: 18),
+                          label: Text(
+                            LocaleKeys.auth_switch_role.tr(),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                          style: TextButton.styleFrom(
+                            foregroundColor: roleColor,
+                          ),
+                          onPressed: () => switchToRoleSelection(context),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: RoleCard(
-                          role: Role.student,
-                          title: LocaleKeys.auth_role_student.tr(),
-                          description: LocaleKeys.auth_role_student_desc.tr(),
-                          icon: Icons.school_rounded,
-                          isSelected: selectedRole == Role.student,
-                          accentColor: ReflexColors.primary,
-                          onTap: () => selectRole(Role.student),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: RoleCard(
-                          role: Role.teacher,
-                          title: LocaleKeys.auth_role_teacher.tr(),
-                          description: LocaleKeys.auth_role_teacher_desc.tr(),
-                          icon: Icons.co_present_rounded,
-                          isSelected: selectedRole == Role.teacher,
-                          accentColor: ReflexColors.accent,
-                          onTap: () => selectRole(Role.teacher),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
-                  // 2. Authentication Tabs (Sign In, Sign Up, Quick Demo)
+                  // Authentication Tabs (Sign In, Sign Up, Quick Demo)
                   Container(
                     decoration: BoxDecoration(
                       color: isDark ? ReflexColors.darkSurface : ReflexColors.lightCard,
