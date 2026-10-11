@@ -10,10 +10,22 @@
   "loading": "Loading...",
   "switch_language": "Switch Language",
   "nav": {
+    "courses": "Courses",
     "practice": "Practice",
     "dashboard": "Teacher Analytics",
     "questions": "Question Notes",
     "profile": "My Progress"
+  },
+  "courses": {
+    "title": "Available Courses",
+    "subtitle": "Discover public practice decks and enroll in private teacher courses",
+    "filter_all": "All Courses",
+    "filter_public": "Public Decks",
+    "filter_private": "Private Courses",
+    "start_practice": "Start Practice",
+    "enrolled": "Enrolled",
+    "no_courses": "No courses available.",
+    "pending_desc": "Request submitted. Waiting for instructor approval."
   },
   "practice": {
     "title": "Adaptive Practice",
@@ -39,7 +51,7 @@
     "target_time": "Target Time: {}s",
     "peer_stats": "{} of {} students solved this",
     "first_try_stat": "{}% solved on first try",
-    "latency": "{}ms"
+    "latency": "{}s"
   },
   "dashboard": {
     "title": "Teacher Analytics Dashboard",

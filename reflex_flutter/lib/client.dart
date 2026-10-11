@@ -2,6 +2,7 @@ import "dart:async";
 
 import "package:flutter/foundation.dart";
 import "package:reflex_client/reflex_client.dart";
+import "package:sentry_flutter/sentry_flutter.dart";
 import "package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart";
 import "package:serverpod_flutter/serverpod_flutter.dart";
 
@@ -44,8 +45,9 @@ Future<void> initializeClient() async {
           clientId: googleClientId,
         );
       }
-    } catch (e) {
-      debugPrint("[Auth] Note: Google Sign In pre-initialization skipped: \$e");
+    } catch (e, st) {
+      debugPrint("[Auth] Note: Google Sign In pre-initialization skipped: \$e\n\$st");
+      unawaited(Sentry.captureException(e, stackTrace: st));
     }
   }
 }

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import '../../../../data/repositories/practice_repository.dart';
 import '../practice_screen.dart';
 import '../widgets/help_bottom_sheet.dart';
@@ -36,8 +38,28 @@ abstract class PracticeController extends State<PracticeScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialCourseId != null) {
+      courseId = widget.initialCourseId!;
+    }
     practiceRepo = widget.repositoryOverride ?? PracticeRepositoryImpl();
     initCoursesAndCards();
+  }
+
+  @override
+  void didUpdateWidget(covariant PracticeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialCourseId != null &&
+        widget.initialCourseId != oldWidget.initialCourseId &&
+        widget.initialCourseId != courseId) {
+      final found =
+          courses.where((c) => c.id == widget.initialCourseId).firstOrNull;
+      if (found != null) {
+        onCourseSelected(found);
+      } else {
+        courseId = widget.initialCourseId!;
+        checkAccessAndLoad();
+      }
+    }
   }
 
   @override
@@ -63,8 +85,9 @@ abstract class PracticeController extends State<PracticeScreen> {
         );
         courseId = selectedCourse!.id ?? 1;
       }
-    } catch (_) {
-      // Gracefully continue if listCourses is unmocked
+    } catch (e, st) {
+      debugPrint('[PracticeController.initCoursesAndCards] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
     }
 
     await checkAccessAndLoad();
@@ -103,8 +126,9 @@ abstract class PracticeController extends State<PracticeScreen> {
             return;
           }
         }
-      } catch (_) {
-        // Fallback to serveNextCard
+      } catch (e, st) {
+        debugPrint('[PracticeController.checkAccessAndLoad] error: $e\n$st');
+        unawaited(Sentry.captureException(e, stackTrace: st));
       }
     }
 

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import '../../../../data/repositories/analytics_repository.dart';
 import '../analytics_screen.dart';
 
@@ -42,8 +44,9 @@ abstract class AnalyticsController extends State<AnalyticsScreen> {
         );
         courseId = selectedCourse!.id ?? 1;
       }
-    } catch (_) {
-      // Gracefully handle unmocked or failing listCourses
+    } catch (e, st) {
+      debugPrint('[AnalyticsController.loadCoursesAndSummary] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
     }
 
     await loadSummary();

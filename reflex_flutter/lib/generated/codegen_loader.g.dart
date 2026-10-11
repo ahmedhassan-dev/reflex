@@ -26,10 +26,22 @@ class CodegenLoader extends AssetLoader{
   "loading": "Loading...",
   "switch_language": "Switch Language",
   "nav": {
+    "courses": "Courses",
     "practice": "Practice",
     "dashboard": "Teacher Analytics",
     "questions": "Question Notes",
     "profile": "My Progress"
+  },
+  "courses": {
+    "title": "Available Courses",
+    "subtitle": "Discover public practice decks and enroll in private teacher courses",
+    "filter_all": "All Courses",
+    "filter_public": "Public Decks",
+    "filter_private": "Private Courses",
+    "start_practice": "Start Practice",
+    "enrolled": "Enrolled",
+    "no_courses": "No courses available.",
+    "pending_desc": "Request submitted. Waiting for instructor approval."
   },
   "practice": {
     "title": "Adaptive Practice",
@@ -55,7 +67,7 @@ class CodegenLoader extends AssetLoader{
     "target_time": "Target Time: {}s",
     "peer_stats": "{} of {} students solved this",
     "first_try_stat": "{}% solved on first try",
-    "latency": "{}ms"
+    "latency": "{}s"
   },
   "dashboard": {
     "title": "Teacher Analytics Dashboard",
@@ -223,10 +235,22 @@ static const Map<String,dynamic> _ar = {
   "loading": "جارٍ التحميل...",
   "switch_language": "تغيير اللغة",
   "nav": {
+    "courses": "المقررات",
     "practice": "التدريب",
     "dashboard": "تحليلات المعلم",
     "questions": "ملاحظات الأسئلة",
     "profile": "تقدمي الشخصي"
+  },
+  "courses": {
+    "title": "المقررات المتاحة",
+    "subtitle": "اكتشف بطاقات المراجعة العامة واشترك في المقررات الخاصة بالمعلمين",
+    "filter_all": "جميع المقررات",
+    "filter_public": "بطاقات عامة",
+    "filter_private": "مقررات خاصة",
+    "start_practice": "بدء التدريب",
+    "enrolled": "مشترك",
+    "no_courses": "لا توجد مقررات متاحة حالياً.",
+    "pending_desc": "تم إرسال الطلب. بانتظار موافقة المعلم."
   },
   "practice": {
     "title": "التدريب التكيفي",
@@ -252,7 +276,7 @@ static const Map<String,dynamic> _ar = {
     "target_time": "الوقت المستهدف: {} ثانية",
     "peer_stats": "{} من {} طلاب أجابوا على هذا السؤال",
     "first_try_stat": "{}% حلوا السؤال من أول محاولة",
-    "latency": "{} مللي ثانية"
+    "latency": "{} ثانية"
   },
   "dashboard": {
     "title": "لوحة تحليلات المعلم",

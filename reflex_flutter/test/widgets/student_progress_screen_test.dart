@@ -52,7 +52,7 @@ void main() {
       expect(find.text('18'), findsOneWidget);
 
       // Verify Latency
-      expect(find.text('1420ms'), findsOneWidget);
+      expect(find.text('1.4s'), findsOneWidget);
     });
   });
 }

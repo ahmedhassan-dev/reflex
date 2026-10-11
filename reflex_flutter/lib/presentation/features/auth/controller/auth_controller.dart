@@ -1,7 +1,9 @@
+import "dart:async";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:reflex_client/reflex_client.dart";
+import "package:sentry_flutter/sentry_flutter.dart";
 import "package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart";
 import "../../../../client.dart";
 import "../../../../core/storage/role_preferences.dart";
@@ -151,10 +153,12 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
         );
         _navigateToAppShell(context, role: selectedRole, userName: fallbackName);
       }
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('[AuthController.signInWithGoogle] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       // In headless test environments or offline demo, fallback gracefully
       final typedEmail = emailController.text.trim();
-        final fallbackName = typedEmail.isNotEmpty ? _formatNameFromEmail(typedEmail.split("@").first) : (selectedRole == Role.student ? "Alice (Google)" : "Mr. Hassan (Google)");
+      final fallbackName = typedEmail.isNotEmpty ? _formatNameFromEmail(typedEmail.split("@").first) : (selectedRole == Role.student ? "Alice (Google)" : "Mr. Hassan (Google)");
       if (context.mounted) {
         _navigateToAppShell(context, role: selectedRole, userName: fallbackName);
       }

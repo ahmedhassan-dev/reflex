@@ -93,7 +93,9 @@ class ResultFeedbackWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${result.responseMs}ms ${LocaleKeys.practice_latency.tr(args: [result.responseMs.toString()])}',
+                LocaleKeys.practice_latency.tr(
+                  args: [(result.responseMs / 1000).toStringAsFixed(1)],
+                ),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: isDark ? ReflexColors.textSecondaryDark : ReflexColors.textSecondaryLight,
                 ),

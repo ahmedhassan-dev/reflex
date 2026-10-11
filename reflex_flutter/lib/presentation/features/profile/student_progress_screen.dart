@@ -53,7 +53,7 @@ class _StudentProgressScreenState extends StudentProgressController {
         : (p?.displayName != null && p!.displayName.isNotEmpty ? p.displayName : 'Learner');
     final cleanSolves = p?.cleanFirstTryCount ?? 0;
     final solvedCount = p?.solvedCount ?? 0;
-    final avgSpeedMs = p?.avgResponseMs.round() ?? 0;
+    final avgSpeedSeconds = ((p?.avgResponseMs ?? 0) / 1000).toStringAsFixed(1);
 
     return Scaffold(
       appBar: AppBar(
@@ -164,7 +164,7 @@ class _StudentProgressScreenState extends StudentProgressController {
                 Expanded(
                   child: _MetricCard(
                     title: LocaleKeys.profile_avg_latency.tr(),
-                    value: '${avgSpeedMs}ms',
+                    value: '${avgSpeedSeconds}s',
                     icon: Icons.speed_rounded,
                     color: ReflexColors.chromaticYellow,
                   ),

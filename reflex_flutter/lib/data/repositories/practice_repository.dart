@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:reflex_client/reflex_client.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import '../../core/result.dart';
 import '../../client.dart';
 
@@ -26,7 +29,9 @@ class PracticeRepositoryImpl implements IPracticeRepository {
     try {
       final list = await _client.practice.listCourses();
       return Result.success(list);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[PracticeRepository.listCourses] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -36,7 +41,9 @@ class PracticeRepositoryImpl implements IPracticeRepository {
     try {
       final item = await _client.practice.serveNextCard(courseId);
       return Result.success(item);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[PracticeRepository.serveNextCard] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -46,7 +53,9 @@ class PracticeRepositoryImpl implements IPracticeRepository {
     try {
       final help = await _client.practice.requestHelp(questionId);
       return Result.success(help);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[PracticeRepository.requestHelp] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -64,7 +73,9 @@ class PracticeRepositoryImpl implements IPracticeRepository {
         optionId: optionId,
       );
       return Result.success(result);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[PracticeRepository.submitAnswer] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -74,7 +85,9 @@ class PracticeRepositoryImpl implements IPracticeRepository {
     try {
       final sub = await _client.practice.requestCourseSubscription(courseId);
       return Result.success(sub);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[PracticeRepository.requestCourseSubscription] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -84,7 +97,9 @@ class PracticeRepositoryImpl implements IPracticeRepository {
     try {
       final status = await _client.practice.getCourseSubscriptionStatus(courseId);
       return Result.success(status);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[PracticeRepository.getCourseSubscriptionStatus] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }

@@ -5,6 +5,7 @@ import '../../generated/locale_keys.g.dart';
 import '../core/theme/app_colors.dart';
 import '../features/analytics/analytics_screen.dart';
 import '../features/auth/role_selection_screen.dart';
+import '../features/courses/courses_screen.dart';
 import '../features/demo_clock/widgets/demo_clock_widget.dart';
 import '../features/practice/practice_screen.dart';
 import '../features/profile/student_progress_screen.dart';
@@ -29,6 +30,7 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   late Role _currentRole;
   int _currentIndex = 0;
+  int? _selectedPracticeCourseId;
   bool _showTimeMachine = false;
 
   @override
@@ -58,9 +60,14 @@ class _AppShellState extends State<AppShell> {
         ? LocaleKeys.auth_role_student_badge.tr()
         : LocaleKeys.auth_role_teacher_badge.tr();
 
-    // Students have Practice & My Progress; Teachers have Analytics Dashboard & Question Notes
+    // Students have Courses, Practice & My Progress; Teachers have Analytics Dashboard & Question Notes
     final destinations = isStudent
         ? [
+            NavigationDestination(
+              icon: const Icon(Icons.menu_book_outlined),
+              selectedIcon: const Icon(Icons.menu_book_rounded),
+              label: LocaleKeys.nav_courses.tr(),
+            ),
             NavigationDestination(
               icon: const Icon(Icons.psychology_outlined),
               selectedIcon: const Icon(Icons.psychology_rounded),
@@ -87,8 +94,18 @@ class _AppShellState extends State<AppShell> {
 
     final screens = isStudent
         ? [
+            CoursesScreen(
+              key: ValueKey('courses_student_$_currentIndex'),
+              onStartPractice: (courseId) {
+                setState(() {
+                  _selectedPracticeCourseId = courseId;
+                  _currentIndex = 1;
+                });
+              },
+            ),
             PracticeScreen(
-              key: ValueKey('practice_student_$_currentIndex'),
+              key: ValueKey('practice_student_${_selectedPracticeCourseId ?? 0}_$_currentIndex'),
+              initialCourseId: _selectedPracticeCourseId,
             ),
             StudentProgressScreen(
               key: ValueKey('profile_student_$_currentIndex'),

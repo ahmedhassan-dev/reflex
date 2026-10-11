@@ -44,11 +44,7 @@ class MultipleChoiceWidget extends StatelessWidget {
 
   OptionExplanationView? _findExplanation(int optionId) {
     if (explanations == null) return null;
-    try {
-      return explanations!.firstWhere((e) => e.optionId == optionId);
-    } catch (_) {
-      return null;
-    }
+    return explanations!.where((e) => e.optionId == optionId).firstOrNull;
   }
 }
 

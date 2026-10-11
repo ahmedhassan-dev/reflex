@@ -72,20 +72,24 @@ class AppContainer {
   /// If unauthenticated (e.g. during live demonstration/judging), resolves or creates a demo student.
   Future<Learner> resolveCurrentLearner({
     String? defaultDisplayName,
+    Role defaultRole = Role.student,
   }) async {
     final auth = session.authenticated;
     if (auth != null) {
       return authProvisioningService.ensureLearnerForSession(session);
     }
 
-    final demoAuthId = UuidValue.fromString('00000000-0000-4000-8000-000000000011');
+    final demoAuthId = defaultRole == Role.teacher
+        ? UuidValue.fromString('00000000-0000-4000-8000-000000000022')
+        : UuidValue.fromString('00000000-0000-4000-8000-000000000011');
     final existing = await learnerRepo.findByAuthUserId(demoAuthId);
     if (existing != null) return existing;
 
     return learnerRepo.save(Learner(
       authUserId: demoAuthId,
-      displayName: defaultDisplayName ?? 'Alice (Student)',
-      role: Role.student,
+      displayName: defaultDisplayName ??
+          (defaultRole == Role.teacher ? 'Mr. Hassan (Teacher)' : 'Alice (Student)'),
+      role: defaultRole,
     ));
   }
 }

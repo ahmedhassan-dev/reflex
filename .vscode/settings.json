@@ -5,5 +5,7 @@
   },
   "files.watcherExclude": {
     "**/.fvm": true
-  }
+  },
+  "dart.debugExternalPackageLibraries": false,
+  "dart.debugSdkLibraries": false
 }

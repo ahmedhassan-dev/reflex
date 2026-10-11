@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import '../../../../client.dart';
 import '../greetings_screen.dart';
 
@@ -35,7 +38,9 @@ abstract class GreetingsController extends State<GreetingsScreen> {
         resultMessage = result.message;
         isLoading = false;
       });
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[GreetingsController.callHello] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       if (!mounted) return;
       setState(() {
         errorMessage = '$e';

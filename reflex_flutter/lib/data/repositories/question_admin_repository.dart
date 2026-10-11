@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:reflex_client/reflex_client.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import '../../core/result.dart';
 import '../../client.dart';
 
@@ -36,7 +39,9 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
     try {
       final list = await _client.questionAdmin.listCourses();
       return Result.success(list);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[QuestionAdminRepository.listCourses] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -56,7 +61,9 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
         isPublic: isPublic,
       );
       return Result.success(course);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[QuestionAdminRepository.createCourse] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -69,7 +76,9 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
         isPublic: isPublic,
       );
       return Result.success(course);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[QuestionAdminRepository.updateCourseVisibility] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -79,7 +88,9 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
     try {
       final list = await _client.questionAdmin.listSubscriptions(courseId);
       return Result.success(list);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[QuestionAdminRepository.listSubscriptions] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -95,7 +106,9 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
         status: status,
       );
       return Result.success(sub);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[QuestionAdminRepository.respondToSubscription] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -105,7 +118,9 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
     try {
       final list = await _client.questionAdmin.listQuestions(courseId);
       return Result.success(list);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[QuestionAdminRepository.listQuestions] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -115,7 +130,9 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
     try {
       final question = await _client.questionAdmin.createQuestion(input);
       return Result.success(question);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[QuestionAdminRepository.createQuestion] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -133,7 +150,9 @@ class QuestionAdminRepositoryImpl implements IQuestionAdminRepository {
         helpHint: helpHint,
       );
       return Result.success(updated);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[QuestionAdminRepository.updateTopicNoteAndHint] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }

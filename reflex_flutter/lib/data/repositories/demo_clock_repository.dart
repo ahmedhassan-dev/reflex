@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:reflex_client/reflex_client.dart';
-import '../../core/result.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import '../../client.dart';
+import '../../core/result.dart';
 
 abstract interface class IDemoClockRepository {
   Future<Result<int>> getOffsetDays();
@@ -19,7 +23,9 @@ class DemoClockRepositoryImpl implements IDemoClockRepository {
     try {
       final offset = await _client.demoClock.getOffsetDays();
       return Result.success(offset);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[DemoClockRepository.getOffsetDays] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -29,7 +35,9 @@ class DemoClockRepositoryImpl implements IDemoClockRepository {
     try {
       final newOffset = await _client.demoClock.advanceDays(days);
       return Result.success(newOffset);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[DemoClockRepository.advanceDays] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -39,7 +47,9 @@ class DemoClockRepositoryImpl implements IDemoClockRepository {
     try {
       await _client.demoClock.resetClock();
       return const Result.success(null);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[DemoClockRepository.resetClock] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }

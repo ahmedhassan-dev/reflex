@@ -92,7 +92,7 @@ class StudentCohortTable extends StatelessWidget {
                         ),
                       ),
                     ),
-                    DataCell(Text('${s.avgResponseMs.round()}ms')),
+                    DataCell(Text('${(s.avgResponseMs / 1000).toStringAsFixed(1)}s')),
                   ],
                 ),
             ],

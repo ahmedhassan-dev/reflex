@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:reflex_client/reflex_client.dart';
-import '../../core/result.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import '../../client.dart';
+import '../../core/result.dart';
 
 abstract interface class IAnalyticsRepository {
   Future<Result<List<Course>>> listCourses();
@@ -17,9 +21,11 @@ class AnalyticsRepositoryImpl implements IAnalyticsRepository {
   @override
   Future<Result<List<Course>>> listCourses() async {
     try {
-      final list = await _client.questionAdmin.listCourses();
+      final list = await _client.practice.listCourses();
       return Result.success(list);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[AnalyticsRepository.listCourses] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -29,7 +35,9 @@ class AnalyticsRepositoryImpl implements IAnalyticsRepository {
     try {
       final summary = await _client.analytics.getCohortSummary(courseId);
       return Result.success(summary);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[AnalyticsRepository.getCohortSummary] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }
@@ -39,7 +47,9 @@ class AnalyticsRepositoryImpl implements IAnalyticsRepository {
     try {
       final progress = await _client.analytics.getMyProgress(courseId);
       return Result.success(progress);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[AnalyticsRepository.getMyProgress] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       return Result.failure(e.toString());
     }
   }

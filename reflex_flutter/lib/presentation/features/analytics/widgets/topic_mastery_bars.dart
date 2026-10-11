@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../core/theme/app_colors.dart';
+import 'topic_question_card.dart';
 
 /// Topic mastery breakdown progress bars with embedded question insights.
 class TopicMasteryBars extends StatelessWidget {
@@ -182,7 +183,7 @@ class _TopicBarItemState extends State<_TopicBarItem> {
                           _isExpanded
                               ? LocaleKeys.dashboard_hide_topic_questions.tr()
                               : LocaleKeys.dashboard_view_topic_questions.tr(),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: ReflexColors.primary,
@@ -237,116 +238,13 @@ class _TopicBarItemState extends State<_TopicBarItem> {
                 itemCount: widget.questions.length,
                 separatorBuilder: (context, index) => const SizedBox(height: 8),
                 itemBuilder: (context, idx) {
-                  final q = widget.questions[idx];
-                  return Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: isDark ? ReflexColors.darkSurface : ReflexColors.lightSurface,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: ReflexColors.primary.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                '#${idx + 1}',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: ReflexColors.primary,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                q.prompt,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 6,
-                          children: [
-                            _MetricBadge(
-                              icon: Icons.check_circle_rounded,
-                              label: '${LocaleKeys.dashboard_clean_solves.tr()}: ${q.cleanSolveCount}',
-                              color: ReflexColors.chromaticGreen,
-                            ),
-                            _MetricBadge(
-                              icon: Icons.flag_rounded,
-                              label: '${LocaleKeys.dashboard_first_try_rate.tr()}: ${(q.firstTryRate * 100).round()}%',
-                              color: ReflexColors.primary,
-                            ),
-                            _MetricBadge(
-                              icon: Icons.speed_rounded,
-                              label: '${q.avgResponseMs.round()} ms',
-                              color: ReflexColors.chromaticYellow,
-                            ),
-                            _MetricBadge(
-                              icon: Icons.repeat_rounded,
-                              label: '${LocaleKeys.dashboard_total_attempts.tr()}: ${q.attemptCount}',
-                              color: isDark ? Colors.white70 : Colors.black87,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  return TopicQuestionCard(
+                    question: widget.questions[idx],
+                    index: idx,
                   );
                 },
               ),
           ],
-        ],
-      ),
-    );
-  }
-}
-
-class _MetricBadge extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  const _MetricBadge({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: color),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
         ],
       ),
     );
