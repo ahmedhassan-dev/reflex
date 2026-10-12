@@ -19,31 +19,36 @@ final serverUrl = getServerUrl();
 
 FlutterAuthSessionManager? authSessionManager;
 
-/// Authenticates the client session as the demo teacher (Mr. Hassan)
-/// granting AppScopes.teacher access on the Serverpod backend.
-Future<void> signInDemoTeacher() async {
+Future<void> _signInDemoWith(String token, String uuid, String scope) async {
   await authSessionManager?.updateSignedInUser(
     AuthSuccess(
       authStrategy: 'session',
-      token: 'demo-teacher-token',
-      authUserId: UuidValue.fromString('00000000-0000-4000-8000-000000000022'),
-      scopeNames: {'teacher'},
+      token: token,
+      authUserId: UuidValue.fromString(uuid),
+      scopeNames: {scope},
     ),
   );
 }
 
-/// Authenticates the client session as the demo student (Alice)
-/// granting AppScopes.student access on the Serverpod backend.
-Future<void> signInDemoStudent() async {
-  await authSessionManager?.updateSignedInUser(
-    AuthSuccess(
-      authStrategy: 'session',
-      token: 'demo-student-token',
-      authUserId: UuidValue.fromString('00000000-0000-4000-8000-000000000011'),
-      scopeNames: {'student'},
-    ),
-  );
-}
+/// Authenticates the client session as Teacher Mr. Hassan
+Future<void> signInDemoTeacher() =>
+    _signInDemoWith('demo-teacher-token', '00000000-0000-4000-8000-000000000022', 'teacher');
+
+/// Authenticates the client session as Teacher Dr. Sarah
+Future<void> signInDemoTeacherSarah() =>
+    _signInDemoWith('demo-teacher-sarah-token', '00000000-0000-4000-8000-000000000023', 'teacher');
+
+/// Authenticates the client session as Student Alice
+Future<void> signInDemoStudent() =>
+    _signInDemoWith('demo-student-token', '00000000-0000-4000-8000-000000000011', 'student');
+
+/// Authenticates the client session as Student Bob
+Future<void> signInDemoStudentBob() =>
+    _signInDemoWith('demo-student-bob-token', '00000000-0000-4000-8000-000000000012', 'student');
+
+/// Authenticates the client session as Student Charlie
+Future<void> signInDemoStudentCharlie() =>
+    _signInDemoWith('demo-student-charlie-token', '00000000-0000-4000-8000-000000000013', 'student');
 
 /// Clears the active demo session.
 Future<void> signOutDemo() async {

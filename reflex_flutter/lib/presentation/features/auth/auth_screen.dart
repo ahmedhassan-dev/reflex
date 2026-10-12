@@ -202,7 +202,10 @@ class _AuthScreenState extends AuthController {
                           ),
                           QuickDemoSectionWidget(
                             onEnterAsStudent: () => enterAsStudent(context),
+                            onEnterAsStudentBob: () => enterAsStudentBob(context),
+                            onEnterAsStudentCharlie: () => enterAsStudentCharlie(context),
                             onEnterAsTeacher: () => enterAsTeacher(context),
+                            onEnterAsTeacherSarah: () => enterAsTeacherSarah(context),
                           ),
                         ],
                       );

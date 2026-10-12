@@ -176,20 +176,27 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
 
   void enterAsStudent(BuildContext context) {
     unawaited(signInDemoStudent());
-    _navigateToAppShell(
-      context,
-      role: Role.student,
-      userName: "Alice",
-    );
+    _navigateToAppShell(context, role: Role.student, userName: "Alice");
+  }
+
+  void enterAsStudentBob(BuildContext context) {
+    unawaited(signInDemoStudentBob());
+    _navigateToAppShell(context, role: Role.student, userName: "Bob");
+  }
+
+  void enterAsStudentCharlie(BuildContext context) {
+    unawaited(signInDemoStudentCharlie());
+    _navigateToAppShell(context, role: Role.student, userName: "Charlie");
   }
 
   void enterAsTeacher(BuildContext context) {
     unawaited(signInDemoTeacher());
-    _navigateToAppShell(
-      context,
-      role: Role.teacher,
-      userName: "Mr. Hassan",
-    );
+    _navigateToAppShell(context, role: Role.teacher, userName: "Mr. Hassan");
+  }
+
+  void enterAsTeacherSarah(BuildContext context) {
+    unawaited(signInDemoTeacherSarah());
+    _navigateToAppShell(context, role: Role.teacher, userName: "Dr. Sarah");
   }
 
   void toggleLanguage(BuildContext context) {

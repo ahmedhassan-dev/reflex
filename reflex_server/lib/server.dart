@@ -45,19 +45,16 @@ void run(List<String> args) async {
   // Wrap authentication handler to support seamless developer demo & judging logins
   final defaultAuthHandler = pod.authenticationHandler;
   pod.authenticationHandler = (session, key) async {
-    if (key == 'demo-teacher-token') {
-      return AuthenticationInfo(
-        '00000000-0000-4000-8000-000000000022',
-        {AppScopes.teacher},
-        authId: '00000000-0000-4000-8000-000000000022',
-      );
-    }
-    if (key == 'demo-student-token') {
-      return AuthenticationInfo(
-        '00000000-0000-4000-8000-000000000011',
-        {AppScopes.student},
-        authId: '00000000-0000-4000-8000-000000000011',
-      );
+    final demoAccounts = {
+      'demo-teacher-token': ('00000000-0000-4000-8000-000000000022', {AppScopes.teacher}),
+      'demo-teacher-sarah-token': ('00000000-0000-4000-8000-000000000023', {AppScopes.teacher}),
+      'demo-student-token': ('00000000-0000-4000-8000-000000000011', {AppScopes.student}),
+      'demo-student-bob-token': ('00000000-0000-4000-8000-000000000012', {AppScopes.student}),
+      'demo-student-charlie-token': ('00000000-0000-4000-8000-000000000013', {AppScopes.student}),
+    };
+    final match = demoAccounts[key];
+    if (match != null) {
+      return AuthenticationInfo(match.$1, match.$2, authId: match.$1);
     }
     if (defaultAuthHandler != null) {
       return defaultAuthHandler(session, key);

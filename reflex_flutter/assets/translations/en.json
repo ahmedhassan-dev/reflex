@@ -77,7 +77,9 @@
     "topic_questions_count": "{} Questions",
     "view_topic_questions": "Question Insights for this Topic",
     "hide_topic_questions": "Hide Question Insights",
-    "all_courses": "All Courses"
+    "all_courses": "All Courses",
+    "pending_approval_notice": "{} student(s) waiting for enrollment approval",
+    "students_count": "{} Students"
   },
   "questions_admin": {
     "title": "Question Notes & Hints",
@@ -185,7 +187,10 @@
     "continue_as_teacher": "Enter as Teacher",
     "quick_demo_profiles": "Quick Demo Profiles",
     "demo_student_alice": "Alice (Student)",
+    "demo_student_bob": "Bob (Student)",
+    "demo_student_charlie": "Charlie (Student)",
     "demo_teacher_hassan": "Mr. Hassan (Teacher)",
+    "demo_teacher_sarah": "Dr. Sarah (Teacher)",
     "switch_role": "Switch Role",
     "role_student_badge": "Student",
     "role_teacher_badge": "Teacher",

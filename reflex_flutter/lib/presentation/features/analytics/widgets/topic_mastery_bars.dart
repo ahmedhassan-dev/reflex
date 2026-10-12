@@ -10,10 +10,13 @@ class TopicMasteryBars extends StatelessWidget {
   final List<TopicMastery> masteryList;
   final List<QuestionInsight> questions;
 
+  final int subscribedCount;
+
   const TopicMasteryBars({
     super.key,
     required this.masteryList,
     this.questions = const [],
+    this.subscribedCount = 0,
   });
 
   @override
@@ -42,6 +45,7 @@ class TopicMasteryBars extends StatelessWidget {
           _TopicBarItem(
             item: item,
             questions: questions.where((q) => q.topic == item.topic).toList(),
+            subscribedCount: subscribedCount,
           ),
           const SizedBox(height: 14),
         ],
@@ -53,10 +57,12 @@ class TopicMasteryBars extends StatelessWidget {
 class _TopicBarItem extends StatefulWidget {
   final TopicMastery item;
   final List<QuestionInsight> questions;
+  final int subscribedCount;
 
   const _TopicBarItem({
     required this.item,
     required this.questions,
+    this.subscribedCount = 0,
   });
 
   @override
@@ -77,11 +83,13 @@ class _TopicBarItemState extends State<_TopicBarItem> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final pct = (widget.item.masteryRate * 100).round();
+    final normalizedRate = widget.item.masteryRate > 1.0
+        ? widget.item.masteryRate / 100.0
+        : widget.item.masteryRate;
     Color barColor;
-    if (widget.item.masteryRate >= 0.8) {
+    if (normalizedRate >= 0.8) {
       barColor = ReflexColors.chromaticGreen;
-    } else if (widget.item.masteryRate >= 0.5) {
+    } else if (normalizedRate >= 0.5) {
       barColor = ReflexColors.chromaticYellow;
     } else {
       barColor = ReflexColors.chromaticRed;
@@ -137,13 +145,21 @@ class _TopicBarItemState extends State<_TopicBarItem> {
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: barColor.withValues(alpha: 0.4)),
                       ),
-                      child: Text(
-                        '$pct%',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: barColor,
-                          fontSize: 14,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.people_alt_rounded, size: 14, color: barColor),
+                          const SizedBox(width: 5),
+                          Text(
+                            LocaleKeys.dashboard_students_count
+                                .tr(args: ['${widget.subscribedCount}']),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: barColor,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -152,7 +168,7 @@ class _TopicBarItemState extends State<_TopicBarItem> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
                   child: LinearProgressIndicator(
-                    value: widget.item.masteryRate.clamp(0.0, 1.0),
+                    value: normalizedRate.clamp(0.0, 1.0),
                     minHeight: 8,
                     backgroundColor: isDark
                         ? ReflexColors.darkSurface

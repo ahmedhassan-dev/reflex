@@ -29,12 +29,28 @@ class AuthProvisioningService {
     }
 
     final isTeacher = authInfo.scopes.contains(AppScopes.teacher);
+    final uid = authUserId.uuid;
+    String resolvedName;
+    if (uid == '00000000-0000-4000-8000-000000000022') {
+      resolvedName = 'Mr. Hassan (Teacher)';
+    } else if (uid == '00000000-0000-4000-8000-000000000023') {
+      resolvedName = 'Dr. Sarah (Teacher)';
+    } else if (uid == '00000000-0000-4000-8000-000000000011') {
+      resolvedName = 'Alice (Student)';
+    } else if (uid == '00000000-0000-4000-8000-000000000012') {
+      resolvedName = 'Bob (Student)';
+    } else if (uid == '00000000-0000-4000-8000-000000000013') {
+      resolvedName = 'Charlie (Student)';
+    } else {
+      resolvedName = defaultDisplayName ??
+          (isTeacher
+              ? 'Teacher ${uid.substring(0, 8)}'
+              : 'Student ${uid.substring(0, 8)}');
+    }
+
     final newLearner = Learner(
       authUserId: authUserId,
-      displayName: defaultDisplayName ??
-          (isTeacher
-              ? 'Mr. Hassan (Teacher)'
-              : 'Student ${authUserId.uuid.substring(0, 8)}'),
+      displayName: resolvedName,
       role: isTeacher ? Role.teacher : defaultRole,
     );
 

@@ -5,12 +5,18 @@ import '../../../core/theme/app_colors.dart';
 
 class QuickDemoSectionWidget extends StatelessWidget {
   final VoidCallback onEnterAsStudent;
+  final VoidCallback? onEnterAsStudentBob;
+  final VoidCallback? onEnterAsStudentCharlie;
   final VoidCallback onEnterAsTeacher;
+  final VoidCallback? onEnterAsTeacherSarah;
 
   const QuickDemoSectionWidget({
     super.key,
     required this.onEnterAsStudent,
+    this.onEnterAsStudentBob,
+    this.onEnterAsStudentCharlie,
     required this.onEnterAsTeacher,
+    this.onEnterAsTeacherSarah,
   });
 
   @override
@@ -29,46 +35,104 @@ class QuickDemoSectionWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
+        // Student Demo Accounts Section
         Row(
           children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                key: const Key('btn_quick_student'),
-                icon: const Icon(Icons.school_outlined, size: 18),
-                label: Text(
-                  LocaleKeys.auth_demo_student_alice.tr(),
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: ReflexColors.primary, width: 1.5),
-                  foregroundColor: ReflexColors.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: onEnterAsStudent,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: OutlinedButton.icon(
-                key: const Key('btn_quick_teacher'),
-                icon: const Icon(Icons.co_present_outlined, size: 18),
-                label: Text(
-                  LocaleKeys.auth_demo_teacher_hassan.tr(),
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: ReflexColors.accent, width: 1.5),
-                  foregroundColor: ReflexColors.accent,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: onEnterAsTeacher,
-              ),
+            const Icon(Icons.school_rounded, size: 16, color: ReflexColors.primary),
+            const SizedBox(width: 6),
+            Text(
+              LocaleKeys.auth_role_student.tr(),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: ReflexColors.primary),
             ),
           ],
         ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _buildDemoChip(
+              key: const Key('btn_quick_student'),
+              icon: Icons.person_outline_rounded,
+              label: LocaleKeys.auth_demo_student_alice.tr(),
+              color: ReflexColors.primary,
+              onTap: onEnterAsStudent,
+            ),
+            if (onEnterAsStudentBob != null)
+              _buildDemoChip(
+                key: const Key('btn_quick_student_bob'),
+                icon: Icons.person_outline_rounded,
+                label: LocaleKeys.auth_demo_student_bob.tr(),
+                color: ReflexColors.primary,
+                onTap: onEnterAsStudentBob!,
+              ),
+            if (onEnterAsStudentCharlie != null)
+              _buildDemoChip(
+                key: const Key('btn_quick_student_charlie'),
+                icon: Icons.person_outline_rounded,
+                label: LocaleKeys.auth_demo_student_charlie.tr(),
+                color: ReflexColors.primary,
+                onTap: onEnterAsStudentCharlie!,
+              ),
+          ],
+        ),
+        const SizedBox(height: 18),
+        // Teacher Demo Accounts Section
+        Row(
+          children: [
+            const Icon(Icons.co_present_rounded, size: 16, color: ReflexColors.accent),
+            const SizedBox(width: 6),
+            Text(
+              LocaleKeys.auth_role_teacher.tr(),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: ReflexColors.accent),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _buildDemoChip(
+              key: const Key('btn_quick_teacher'),
+              icon: Icons.badge_outlined,
+              label: LocaleKeys.auth_demo_teacher_hassan.tr(),
+              color: ReflexColors.accent,
+              onTap: onEnterAsTeacher,
+            ),
+            if (onEnterAsTeacherSarah != null)
+              _buildDemoChip(
+                key: const Key('btn_quick_teacher_sarah'),
+                icon: Icons.badge_outlined,
+                label: LocaleKeys.auth_demo_teacher_sarah.tr(),
+                color: ReflexColors.accent,
+                onTap: onEnterAsTeacherSarah!,
+              ),
+          ],
+        ),
       ],
+    );
+  }
+
+  Widget _buildDemoChip({
+    required Key key,
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return ActionChip(
+      key: key,
+      avatar: Icon(icon, size: 16, color: color),
+      label: Text(
+        label,
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color),
+      ),
+      side: BorderSide(color: color.withValues(alpha: 0.5), width: 1.2),
+      backgroundColor: color.withValues(alpha: 0.08),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      onPressed: onTap,
     );
   }
 }

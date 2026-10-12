@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:reflex_client/reflex_client.dart';
@@ -73,9 +74,9 @@ void main() {
 
       // Tab 1: Topic Mastery (embedded Question Insights inside topics!)
       expect(find.text('Physics'), findsWidgets);
-      expect(find.text('85%'), findsOneWidget);
       expect(find.text('Chemistry'), findsOneWidget);
-      expect(find.text('45%'), findsOneWidget);
+      expect(find.byIcon(Icons.people_alt_rounded), findsWidgets);
+      expect(find.text('1 Students'), findsWidgets);
 
       // Verify question insights are embedded directly inside the Topic Mastery tab!
       expect(find.text('What is Newton second law?'), findsOneWidget);

@@ -3,18 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import '../../../../data/repositories/analytics_repository.dart';
+import '../../../../data/repositories/question_admin_repository.dart';
 import '../analytics_screen.dart';
 
 /// Controller for Teacher Analytics Dashboard following arch_demo pattern.
 abstract class AnalyticsController extends State<AnalyticsScreen> {
   late final IAnalyticsRepository analyticsRepo;
+  IQuestionAdminRepository? questionRepo;
 
   // ── State variables ────────────────────────────────────────────────────────
   int courseId = 1;
   List<Course> courses = [];
   Course? selectedCourse;
   CohortSummary? summary;
+  List<CourseSubscriptionView> subscriptions = [];
   bool isLoading = false;
+  bool isLoadingSubscriptions = false;
   String? errorMessage;
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
@@ -22,6 +26,15 @@ abstract class AnalyticsController extends State<AnalyticsScreen> {
   void initState() {
     super.initState();
     analyticsRepo = widget.repositoryOverride ?? AnalyticsRepositoryImpl();
+    if (widget.questionRepositoryOverride != null) {
+      questionRepo = widget.questionRepositoryOverride;
+    } else {
+      try {
+        questionRepo = QuestionAdminRepositoryImpl();
+      } catch (_) {
+        questionRepo = null;
+      }
+    }
     loadCoursesAndSummary();
   }
 
@@ -49,7 +62,10 @@ abstract class AnalyticsController extends State<AnalyticsScreen> {
       unawaited(Sentry.captureException(e, stackTrace: st));
     }
 
-    await loadSummary();
+    await Future.wait([
+      loadSummary(),
+      loadSubscriptions(),
+    ]);
   }
 
   void onSelectCourse(Course course) {
@@ -59,6 +75,7 @@ abstract class AnalyticsController extends State<AnalyticsScreen> {
         courseId = course.id!;
       });
       loadSummary();
+      loadSubscriptions();
     }
   }
 
@@ -81,6 +98,46 @@ abstract class AnalyticsController extends State<AnalyticsScreen> {
         isLoading = false;
         errorMessage = res.error;
       });
+    }
+  }
+
+  Future<void> loadSubscriptions() async {
+    final repo = questionRepo;
+    if (selectedCourse == null || repo == null) return;
+    setState(() => isLoadingSubscriptions = true);
+
+    try {
+      final res = await repo.listSubscriptions(courseId);
+      if (!mounted) return;
+      setState(() {
+        isLoadingSubscriptions = false;
+        if (res.isSuccess) {
+          subscriptions = res.data ?? [];
+        }
+      });
+    } catch (e, st) {
+      debugPrint('[AnalyticsController.loadSubscriptions] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
+      if (mounted) {
+        setState(() => isLoadingSubscriptions = false);
+      }
+    }
+  }
+
+  Future<void> respondToSubscription(int subscriptionId, SubscriptionStatus status) async {
+    final repo = questionRepo;
+    if (repo == null) return;
+    try {
+      final res = await repo.respondToSubscription(subscriptionId, status);
+      if (!mounted) return;
+
+      if (res.isSuccess) {
+        await loadSubscriptions();
+        await loadSummary();
+      }
+    } catch (e, st) {
+      debugPrint('[AnalyticsController.respondToSubscription] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
     }
   }
 }

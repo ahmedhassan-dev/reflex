@@ -93,7 +93,9 @@ class CodegenLoader extends AssetLoader{
     "topic_questions_count": "{} Questions",
     "view_topic_questions": "Question Insights for this Topic",
     "hide_topic_questions": "Hide Question Insights",
-    "all_courses": "All Courses"
+    "all_courses": "All Courses",
+    "pending_approval_notice": "{} student(s) waiting for enrollment approval",
+    "students_count": "{} Students"
   },
   "questions_admin": {
     "title": "Question Notes & Hints",
@@ -201,7 +203,10 @@ class CodegenLoader extends AssetLoader{
     "continue_as_teacher": "Enter as Teacher",
     "quick_demo_profiles": "Quick Demo Profiles",
     "demo_student_alice": "Alice (Student)",
+    "demo_student_bob": "Bob (Student)",
+    "demo_student_charlie": "Charlie (Student)",
     "demo_teacher_hassan": "Mr. Hassan (Teacher)",
+    "demo_teacher_sarah": "Dr. Sarah (Teacher)",
     "switch_role": "Switch Role",
     "role_student_badge": "Student",
     "role_teacher_badge": "Teacher",
@@ -302,7 +307,9 @@ static const Map<String,dynamic> _ar = {
     "topic_questions_count": "{} أسئلة",
     "view_topic_questions": "تحليلات أسئلة هذا الموضوع",
     "hide_topic_questions": "إخفاء تحليلات الأسئلة",
-    "all_courses": "كافة الدورات"
+    "all_courses": "كافة الدورات",
+    "pending_approval_notice": "{} طالب(طلاب) بانتظار الموافقة على التسجيل",
+    "students_count": "{} طلاب"
   },
   "questions_admin": {
     "title": "ملاحظات وتلميحات الأسئلة",
@@ -410,7 +417,10 @@ static const Map<String,dynamic> _ar = {
     "continue_as_teacher": "الدخول كمعلم",
     "quick_demo_profiles": "ملفات تعريف تجريبية سريعة",
     "demo_student_alice": "أليس (طالبة)",
+    "demo_student_bob": "بوب (طالب)",
+    "demo_student_charlie": "تشارلي (طالب)",
     "demo_teacher_hassan": "أ. حسان (معلم)",
+    "demo_teacher_sarah": "د. سارة (معلمة)",
     "switch_role": "تبديل الدور",
     "role_student_badge": "طالب",
     "role_teacher_badge": "معلم",

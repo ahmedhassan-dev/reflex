@@ -78,6 +78,8 @@ abstract class  LocaleKeys {
   static const dashboard_view_topic_questions = 'dashboard.view_topic_questions';
   static const dashboard_hide_topic_questions = 'dashboard.hide_topic_questions';
   static const dashboard_all_courses = 'dashboard.all_courses';
+  static const dashboard_pending_approval_notice = 'dashboard.pending_approval_notice';
+  static const dashboard_students_count = 'dashboard.students_count';
   static const dashboard = 'dashboard';
   static const questions_admin_title = 'questions_admin.title';
   static const questions_admin_select_question = 'questions_admin.select_question';
@@ -180,7 +182,10 @@ abstract class  LocaleKeys {
   static const auth_continue_as_teacher = 'auth.continue_as_teacher';
   static const auth_quick_demo_profiles = 'auth.quick_demo_profiles';
   static const auth_demo_student_alice = 'auth.demo_student_alice';
+  static const auth_demo_student_bob = 'auth.demo_student_bob';
+  static const auth_demo_student_charlie = 'auth.demo_student_charlie';
   static const auth_demo_teacher_hassan = 'auth.demo_teacher_hassan';
+  static const auth_demo_teacher_sarah = 'auth.demo_teacher_sarah';
   static const auth_switch_role = 'auth.switch_role';
   static const auth_role_student_badge = 'auth.role_student_badge';
   static const auth_role_teacher_badge = 'auth.role_teacher_badge';
