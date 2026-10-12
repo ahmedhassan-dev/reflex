@@ -20,11 +20,13 @@ abstract class PracticeItem
   PracticeItem._({
     required this.question,
     required this.kind,
+    this.totalScore,
   });
 
   factory PracticeItem({
     required _iqalp2t8.QuestionView question,
     required _iv8rtx5h.CardKind kind,
+    int? totalScore,
   }) = _PracticeItemImpl;
 
   factory PracticeItem.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -33,6 +35,7 @@ abstract class PracticeItem
         jsonSerialization['question'],
       ),
       kind: _iv8rtx5h.CardKind.fromJson((jsonSerialization['kind'] as String)),
+      totalScore: jsonSerialization['totalScore'] as int?,
     );
   }
 
@@ -40,12 +43,15 @@ abstract class PracticeItem
 
   _iv8rtx5h.CardKind kind;
 
+  int? totalScore;
+
   /// Returns a shallow copy of this [PracticeItem]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
   PracticeItem copyWith({
     _iqalp2t8.QuestionView? question,
     _iv8rtx5h.CardKind? kind,
+    int? totalScore,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -53,6 +59,7 @@ abstract class PracticeItem
       '__className__': 'PracticeItem',
       'question': question.toJson(),
       'kind': kind.toJson(),
+      if (totalScore != null) 'totalScore': totalScore,
     };
   }
 
@@ -62,6 +69,7 @@ abstract class PracticeItem
       '__className__': 'PracticeItem',
       'question': question.toJsonForProtocol(),
       'kind': kind.toJson(),
+      if (totalScore != null) 'totalScore': totalScore,
     };
   }
 
@@ -71,13 +79,17 @@ abstract class PracticeItem
   }
 }
 
+class _Undefined {}
+
 class _PracticeItemImpl extends PracticeItem {
   _PracticeItemImpl({
     required _iqalp2t8.QuestionView question,
     required _iv8rtx5h.CardKind kind,
+    int? totalScore,
   }) : super._(
          question: question,
          kind: kind,
+         totalScore: totalScore,
        );
 
   /// Returns a shallow copy of this [PracticeItem]
@@ -87,10 +99,12 @@ class _PracticeItemImpl extends PracticeItem {
   PracticeItem copyWith({
     _iqalp2t8.QuestionView? question,
     _iv8rtx5h.CardKind? kind,
+    Object? totalScore = _Undefined,
   }) {
     return PracticeItem(
       question: question ?? this.question.copyWith(),
       kind: kind ?? this.kind,
+      totalScore: totalScore is int? ? totalScore : this.totalScore,
     );
   }
 }

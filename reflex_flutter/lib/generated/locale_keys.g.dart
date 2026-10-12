@@ -53,6 +53,8 @@ abstract class  LocaleKeys {
   static const practice_peer_stats = 'practice.peer_stats';
   static const practice_first_try_stat = 'practice.first_try_stat';
   static const practice_latency = 'practice.latency';
+  static const practice_total_score = 'practice.total_score';
+  static const practice_teacher_explanation = 'practice.teacher_explanation';
   static const practice = 'practice';
   static const dashboard_title = 'dashboard.title';
   static const dashboard_refresh = 'dashboard.refresh';

@@ -5,6 +5,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import '../../../../data/repositories/practice_repository.dart';
 import '../practice_screen.dart';
 import '../widgets/help_bottom_sheet.dart';
+import '../widgets/top_explanation_toast.dart';
 
 /// Practice screen controller following the arch_demo State-Controller pattern.
 ///
@@ -31,20 +32,17 @@ abstract class PracticeController extends State<PracticeScreen> {
   final TextEditingController textAnswerController = TextEditingController();
 
   SubmitResult? submitResult;
-  bool isNoteAcknowledged = false;
+  bool isNoteAcknowledged = true;
   bool isDeckComplete = false;
+  OverlayEntry? _toastEntry;
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   @override
   void initState() {
     super.initState();
     textAnswerController.addListener(_onTextChanged);
-    if (widget.initialCourse != null) {
-      selectedCourse = widget.initialCourse;
-      courseId = widget.initialCourse!.id ?? widget.initialCourseId ?? 1;
-    } else if (widget.initialCourseId != null) {
-      courseId = widget.initialCourseId!;
-    }
+    courseId = widget.initialCourse?.id ?? widget.initialCourseId ?? 1;
+    selectedCourse = widget.initialCourse;
     practiceRepo = widget.repositoryOverride ?? PracticeRepositoryImpl();
     initCoursesAndCards();
   }
@@ -71,9 +69,22 @@ abstract class PracticeController extends State<PracticeScreen> {
 
   @override
   void dispose() {
+    dismissExplanationToast();
     textAnswerController.removeListener(_onTextChanged);
     textAnswerController.dispose();
     super.dispose();
+  }
+
+  void showExplanationToast(String explanation) {
+    dismissExplanationToast();
+    _toastEntry = showTopExplanationToast(context, explanation: explanation);
+  }
+
+  void dismissExplanationToast() {
+    if (_toastEntry?.mounted ?? false) {
+      _toastEntry?.remove();
+    }
+    _toastEntry = null;
   }
 
   // ── Course & Access Handling ───────────────────────────────────────────────
@@ -116,13 +127,12 @@ abstract class PracticeController extends State<PracticeScreen> {
       submitResult = null;
       selectedOptionId = null;
       textAnswerController.clear();
-      isNoteAcknowledged = false;
+      isNoteAcknowledged = true;
       isDeckComplete = false;
       subscriptionStatus = null;
       isPrivateAccessRestricted = false;
       errorMessage = null;
     });
-
     await checkAccessAndLoad();
   }
 
@@ -130,25 +140,20 @@ abstract class PracticeController extends State<PracticeScreen> {
     if (selectedCourse != null && (selectedCourse!.isPublic == false)) {
       try {
         final statusRes = await practiceRepo.getCourseSubscriptionStatus(courseId);
-        if (statusRes.isSuccess) {
-          subscriptionStatus = statusRes.data;
-          if (subscriptionStatus != SubscriptionStatus.accepted) {
-            setState(() {
-              isLoading = false;
-              isPrivateAccessRestricted = true;
-            });
-            return;
-          }
+        if (statusRes.isSuccess && statusRes.data != SubscriptionStatus.accepted) {
+          setState(() {
+            isLoading = false;
+            isPrivateAccessRestricted = true;
+            subscriptionStatus = statusRes.data;
+          });
+          return;
         }
       } catch (e, st) {
         debugPrint('[PracticeController.checkAccessAndLoad] error: $e\n$st');
         unawaited(Sentry.captureException(e, stackTrace: st));
       }
     }
-
-    setState(() {
-      isPrivateAccessRestricted = false;
-    });
+    setState(() => isPrivateAccessRestricted = false);
     await loadNextCard();
   }
 
@@ -158,33 +163,29 @@ abstract class PracticeController extends State<PracticeScreen> {
       isRequestingSubscription = true;
       errorMessage = null;
     });
-
     final res = await practiceRepo.requestCourseSubscription(courseId);
     if (!mounted) return;
-
-    if (res.isSuccess) {
-      setState(() {
-        isRequestingSubscription = false;
+    setState(() {
+      isRequestingSubscription = false;
+      if (res.isSuccess) {
         subscriptionStatus = res.data?.status ?? SubscriptionStatus.pending;
         isPrivateAccessRestricted = true;
-      });
-    } else {
-      setState(() {
-        isRequestingSubscription = false;
+      } else {
         errorMessage = res.error;
-      });
-    }
+      }
+    });
   }
 
   // ── Actions ────────────────────────────────────────────────────────────────
   Future<void> loadNextCard() async {
+    dismissExplanationToast();
     setState(() {
       isLoading = true;
       errorMessage = null;
       submitResult = null;
       selectedOptionId = null;
       textAnswerController.clear();
-      isNoteAcknowledged = false;
+      isNoteAcknowledged = true;
       isDeckComplete = false;
     });
 
@@ -246,12 +247,18 @@ abstract class PracticeController extends State<PracticeScreen> {
 
     if (res.isSuccess) {
       final data = res.data!;
-      final hasNote = data.topicNote != null && data.topicNote!.trim().isNotEmpty;
       setState(() {
         isSubmitting = false;
         submitResult = data;
-        isNoteAcknowledged = !hasNote;
+        isNoteAcknowledged = true;
       });
+
+      final note = (data.topicNote?.trim().isNotEmpty ?? false)
+          ? data.topicNote!
+          : data.selectedOptionExplanation;
+      if (note != null && note.trim().isNotEmpty && mounted) {
+        showExplanationToast(note.trim());
+      }
     } else {
       setState(() {
         isSubmitting = false;
@@ -271,26 +278,18 @@ abstract class PracticeController extends State<PracticeScreen> {
     final res = await practiceRepo.requestHelp(currentCard!.question.id);
     if (!mounted) return;
 
-    setState(() {
-      isRequestingHelp = false;
-    });
+    setState(() => isRequestingHelp = false);
 
     if (res.isSuccess && res.data != null) {
       await HelpBottomSheet.show(context, res.data!);
     } else {
-      setState(() {
-        errorMessage = res.error;
-      });
+      setState(() => errorMessage = res.error);
     }
   }
 
   void setNoteAcknowledged(bool acknowledged) {
-    setState(() {
-      isNoteAcknowledged = acknowledged;
-    });
+    setState(() => isNoteAcknowledged = acknowledged);
   }
 
-  Future<void> continueToNextCard() async {
-    await loadNextCard();
-  }
+  Future<void> continueToNextCard() async => loadNextCard();
 }

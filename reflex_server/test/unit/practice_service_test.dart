@@ -184,5 +184,37 @@ void main() {
       final state = await reviewStateRepo.get(42, 1);
       expect(state!.intervalDays, equals(2));
     });
+
+    test('submitAnswer awards 0 points on wrong answer and does not increment totalScore', () async {
+      await service.serveNextCard(learnerId: 42, courseId: 1);
+      final result = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 102);
+
+      expect(result.verdict, equals(AttemptStatus.wrong));
+      expect(result.points, equals(0));
+      expect(result.totalScore, equals(0));
+    });
+
+    test('submitAnswer awards points on 2nd attempt when right after wrong first attempt, but only once', () async {
+      // 1st attempt: wrong -> 0 points
+      await service.serveNextCard(learnerId: 42, courseId: 1);
+      final wrongRes = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 102);
+      expect(wrongRes.points, equals(0));
+      expect(wrongRes.totalScore, equals(0));
+
+      // 2nd attempt: right -> awards 10 points
+      clock.advance(const Duration(days: 1));
+      await service.serveNextCard(learnerId: 42, courseId: 1);
+      final rightRes = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 101);
+      expect(rightRes.points, equals(10));
+      expect(rightRes.totalScore, equals(10));
+
+      // 3rd attempt: right again -> 0 points, totalScore still 10
+      clock.advance(const Duration(days: 30));
+      await service.serveNextCard(learnerId: 42, courseId: 1);
+      final rightAgainRes = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 101);
+      expect(rightAgainRes.points, equals(0));
+      expect(rightAgainRes.totalScore, equals(10));
+    });
   });
 }
+

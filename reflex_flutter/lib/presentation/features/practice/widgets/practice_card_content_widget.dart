@@ -88,7 +88,7 @@ class _PracticeCardContentWidgetState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // ── Top header bar: Topic & Response Timer ─────────────────────────
+        // ── Top header bar: Topic, Total Score & Response Timer ───────────
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -101,6 +101,31 @@ class _PracticeCardContentWidgetState
               side: BorderSide(color: ReflexColors.primary.withValues(alpha: 0.3)),
               padding: const EdgeInsets.symmetric(horizontal: 4),
             ),
+            if (widget.card.totalScore != null || widget.submitResult?.totalScore != null)
+              Container(
+                key: const Key('practice_header_score_badge'),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: ReflexColors.primary.withValues(alpha: isDark ? 0.2 : 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: ReflexColors.primary.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.stars_rounded, color: ReflexColors.primary, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${LocaleKeys.practice_total_score.tr()}: ${widget.submitResult?.totalScore ?? widget.card.totalScore ?? 0}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: ReflexColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ResponseTimerWidget(
               expectedSeconds: q.expectedSeconds,
               isRunning: !isSubmitted,

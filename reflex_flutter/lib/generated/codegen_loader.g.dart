@@ -67,7 +67,9 @@ class CodegenLoader extends AssetLoader{
     "target_time": "Target Time: {}s",
     "peer_stats": "{} of {} students solved this",
     "first_try_stat": "{}% solved on first try",
-    "latency": "{}s"
+    "latency": "{}s",
+    "total_score": "Total Score",
+    "teacher_explanation": "Teacher's Explanation"
   },
   "dashboard": {
     "title": "Teacher Analytics Dashboard",
@@ -281,7 +283,9 @@ static const Map<String,dynamic> _ar = {
     "target_time": "الوقت المستهدف: {} ثانية",
     "peer_stats": "{} من {} طلاب أجابوا على هذا السؤال",
     "first_try_stat": "{}% حلوا السؤال من أول محاولة",
-    "latency": "{} ثانية"
+    "latency": "{} ثانية",
+    "total_score": "النتيجة الإجمالية",
+    "teacher_explanation": "شرح المعلم"
   },
   "dashboard": {
     "title": "لوحة تحليلات المعلم",

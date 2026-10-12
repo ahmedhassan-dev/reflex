@@ -51,7 +51,9 @@
     "target_time": "Target Time: {}s",
     "peer_stats": "{} of {} students solved this",
     "first_try_stat": "{}% solved on first try",
-    "latency": "{}s"
+    "latency": "{}s",
+    "total_score": "Total Score",
+    "teacher_explanation": "Teacher's Explanation"
   },
   "dashboard": {
     "title": "Teacher Analytics Dashboard",

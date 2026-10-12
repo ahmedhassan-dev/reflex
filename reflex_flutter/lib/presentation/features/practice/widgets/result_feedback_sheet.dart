@@ -72,20 +72,58 @@ class ResultFeedbackWidget extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: tierColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(10),
+                  color: result.points > 0
+                      ? tierColor.withValues(alpha: 0.2)
+                      : (isDark ? Colors.white10 : Colors.black12),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '+${result.points} ${LocaleKeys.practice_points.tr()}',
                   style: TextStyle(
-                    color: tierColor,
+                    color: result.points > 0
+                        ? tierColor
+                        : (isDark ? ReflexColors.textMutedDark : ReflexColors.textMutedLight),
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                   ),
                 ),
               ),
+              if (result.totalScore != null) ...[
+                const SizedBox(width: 6),
+                Container(
+                  key: const Key('result_total_score_badge'),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: ReflexColors.primary.withValues(alpha: isDark ? 0.25 : 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: ReflexColors.primary.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.emoji_events_rounded,
+                        color: ReflexColors.primary,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${LocaleKeys.practice_total_score.tr()}: ${result.totalScore}',
+                        style: const TextStyle(
+                          color: ReflexColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 10),

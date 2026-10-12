@@ -9,17 +9,14 @@ void main() {
   });
 
   group('TopicNoteGateWidget tests', () {
-    testWidgets('Continue button is disabled when topic note is present and unacknowledged',
+    testWidgets('Continue button is enabled immediately and advances card without checkbox',
         (tester) async {
       bool continued = false;
-      bool acknowledged = false;
 
       await tester.pumpWidget(
         createLocalizedTestWidget(
           child: TopicNoteGateWidget(
             topicNote: 'Foundational concept note for physics vectors',
-            isAcknowledged: acknowledged,
-            onAcknowledgeChanged: (_) {},
             onContinue: () {
               continued = true;
             },
@@ -31,57 +28,16 @@ void main() {
       final continueButtonFinder = find.byKey(const Key('practice_continue_button'));
       expect(continueButtonFinder, findsOneWidget);
 
+      // Checkbox is removed
+      expect(find.byKey(const Key('note_gate_checkbox')), findsNothing);
+      expect(find.byKey(const Key('note_gate_checkbox_tile')), findsNothing);
+
+      // Button is immediately enabled
       final continueButton = tester.widget<ElevatedButton>(continueButtonFinder);
-      expect(continueButton.onPressed, isNull,
-          reason: 'Button must be strictly disabled before acknowledgment');
-      expect(continued, isFalse);
-    });
-
-    testWidgets('Tapping acknowledge enables Continue button and advances card',
-        (tester) async {
-      bool continued = false;
-      bool acknowledged = false;
-
-      await tester.pumpWidget(
-        createLocalizedTestWidget(
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              return TopicNoteGateWidget(
-                topicNote: 'Essential vector addition principles',
-                isAcknowledged: acknowledged,
-                onAcknowledgeChanged: (val) {
-                  setState(() {
-                    acknowledged = val;
-                  });
-                },
-                onContinue: () {
-                  continued = true;
-                },
-              );
-            },
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Checkbox is initially false
-      final checkboxFinder = find.byKey(const Key('note_gate_checkbox'));
-      expect(checkboxFinder, findsOneWidget);
-      expect(tester.widget<Checkbox>(checkboxFinder).value, isFalse);
-
-      // Tap acknowledge
-      await tester.tap(checkboxFinder);
-      await tester.pumpAndSettle();
-
-      expect(acknowledged, isTrue);
-
-      // Button is now enabled
-      final continueButton =
-          tester.widget<ElevatedButton>(find.byKey(const Key('practice_continue_button')));
       expect(continueButton.onPressed, isNotNull);
 
       // Tap continue
-      await tester.tap(find.byKey(const Key('practice_continue_button')));
+      await tester.tap(continueButtonFinder);
       await tester.pumpAndSettle();
 
       expect(continued, isTrue);
@@ -93,8 +49,6 @@ void main() {
           locale: const Locale('ar'),
           child: TopicNoteGateWidget(
             topicNote: 'شرح مفهوم المتجهات الفيزيائية',
-            isAcknowledged: false,
-            onAcknowledgeChanged: (_) {},
             onContinue: () {},
           ),
         ),

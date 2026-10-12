@@ -4,8 +4,10 @@ fields:
   reason: ResultReason
   reflexTier: ReflexTier
   points: int
+  totalScore: int?
   responseMs: int
   nextDueAt: DateTime
   topicNote: String?
   selectedOptionExplanation: String?
   optionExplanations: List<OptionExplanationView>?
+

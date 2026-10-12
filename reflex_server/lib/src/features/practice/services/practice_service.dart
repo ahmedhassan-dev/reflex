@@ -3,13 +3,11 @@ import 'package:reflex_server/src/features/practice/domain/card_selector.dart';
 import 'package:reflex_server/src/core/clock/clock.dart';
 import 'package:reflex_server/src/core/errors/exceptions.dart';
 import 'package:reflex_server/src/features/practice/domain/grader.dart';
+import 'package:reflex_server/src/features/practice/domain/score_calculator.dart';
 import 'package:reflex_server/src/generated/protocol.dart';
 import 'package:reflex_server/src/data/repositories/interfaces.dart';
 
 /// Core practice orchestrator for student flashcard sessions.
-///
-/// Handles card selection, timing tracking, help hints, grading,
-/// spaced repetition updates, atomic counter deltas, and idempotency.
 class PracticeService {
   final IQuestionRepository questionRepo;
   final IQuestionOptionRepository optionRepo;
@@ -47,7 +45,7 @@ class PracticeService {
       final course = await courseRepo!.findById(courseId);
       if (course != null && course.isPublic == false) {
         final sub = await subscriptionRepo!.findByCourseAndStudent(courseId, learnerId);
-        if (sub == null || sub.status != SubscriptionStatus.accepted) {
+        if (sub?.status != SubscriptionStatus.accepted) {
           throw const CourseAccessDeniedException(
             'This course is private. You must be accepted by the teacher to practice.',
           );
@@ -78,22 +76,14 @@ class PracticeService {
               lapses: 0,
               helpUsed: false,
             ))
-        .copyWith(
-      lastServedAt: now,
-      helpUsed: false,
-    );
+        .copyWith(lastServedAt: now, helpUsed: false);
     await reviewStateRepo.upsert(stateToSave);
 
     // Fetch options for multiple choice
     List<QuestionOptionView>? optionViews;
     if (question.questionType == QuestionType.multipleChoice) {
       final options = await optionRepo.getOptionsForQuestion(question.id!);
-      optionViews = options
-          .map((o) => QuestionOptionView(
-                id: o.id!,
-                text: o.text,
-              ))
-          .toList();
+      optionViews = options.map((o) => QuestionOptionView(id: o.id!, text: o.text)).toList();
     }
 
     // Build QuestionView without secret answers or topicNote
@@ -108,10 +98,13 @@ class PracticeService {
       hasHelpHint: question.helpHint != null && question.helpHint!.trim().isNotEmpty,
     );
 
-    return PracticeItem(
-      question: questionView,
-      kind: selection.kind,
+    final totalScore = await ScoreCalculator.calculateTotalScore(
+      attemptRepo: attemptRepo,
+      questionRepo: questionRepo,
+      learnerId: learnerId,
+      courseId: courseId,
     );
+    return PracticeItem(question: questionView, kind: selection.kind, totalScore: totalScore);
   }
 
   /// Requests a help hint for the currently served card.
@@ -176,11 +169,7 @@ class PracticeService {
 
       optionExplanations = options
           .map((o) => OptionExplanationView(
-                optionId: o.id!,
-                text: o.text,
-                isCorrect: o.isCorrect,
-                explanation: o.explanation,
-              ))
+                optionId: o.id!, text: o.text, isCorrect: o.isCorrect, explanation: o.explanation))
           .toList();
     } else {
       final accepted = await acceptedAnswerRepo.getByQuestionId(questionId);
@@ -236,11 +225,24 @@ class PracticeService {
     // Atomically increment question counters
     await questionRepo.applyCounterDeltas(questionId, outcome.counterDeltas);
 
+    final awardedPoints = ScoreCalculator.calculateAwardedPoints(
+      status: outcome.status,
+      hasLearnerSolvedBefore: hasLearnerSolvedBefore,
+      questionPoints: question.points,
+    );
+    final totalScore = await ScoreCalculator.calculateTotalScore(
+      attemptRepo: attemptRepo,
+      questionRepo: questionRepo,
+      learnerId: learnerId,
+      courseId: question.courseId,
+    );
+
     return SubmitResult(
       verdict: outcome.status,
       reason: outcome.reason,
       reflexTier: outcome.reflexTier,
-      points: question.points,
+      points: awardedPoints,
+      totalScore: totalScore,
       responseMs: responseMs,
       nextDueAt: nextDueAt,
       topicNote: question.topicNote,
@@ -264,9 +266,7 @@ class PracticeService {
 
     final existing = await subscriptionRepo!.findByCourseAndStudent(courseId, learnerId);
     if (existing != null) {
-      if (existing.status == SubscriptionStatus.accepted) {
-        return existing;
-      }
+      if (existing.status == SubscriptionStatus.accepted) return existing;
       final updated = existing.copyWith(
         status: SubscriptionStatus.pending,
         requestedAt: clock.now(),

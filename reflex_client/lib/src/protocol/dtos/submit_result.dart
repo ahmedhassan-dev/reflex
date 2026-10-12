@@ -24,6 +24,7 @@ abstract class SubmitResult
     required this.reason,
     required this.reflexTier,
     required this.points,
+    this.totalScore,
     required this.responseMs,
     required this.nextDueAt,
     this.topicNote,
@@ -36,6 +37,7 @@ abstract class SubmitResult
     required _ih18v6li.ResultReason reason,
     required _in6r2tl6.ReflexTier reflexTier,
     required int points,
+    int? totalScore,
     required int responseMs,
     required DateTime nextDueAt,
     String? topicNote,
@@ -55,6 +57,7 @@ abstract class SubmitResult
         (jsonSerialization['reflexTier'] as String),
       ),
       points: jsonSerialization['points'] as int,
+      totalScore: jsonSerialization['totalScore'] as int?,
       responseMs: jsonSerialization['responseMs'] as int,
       nextDueAt: _isc.DateTimeJsonExtension.fromJson(
         jsonSerialization['nextDueAt'],
@@ -79,6 +82,8 @@ abstract class SubmitResult
 
   int points;
 
+  int? totalScore;
+
   int responseMs;
 
   DateTime nextDueAt;
@@ -97,6 +102,7 @@ abstract class SubmitResult
     _ih18v6li.ResultReason? reason,
     _in6r2tl6.ReflexTier? reflexTier,
     int? points,
+    int? totalScore,
     int? responseMs,
     DateTime? nextDueAt,
     String? topicNote,
@@ -111,6 +117,7 @@ abstract class SubmitResult
       'reason': reason.toJson(),
       'reflexTier': reflexTier.toJson(),
       'points': points,
+      if (totalScore != null) 'totalScore': totalScore,
       'responseMs': responseMs,
       'nextDueAt': nextDueAt.toJson(),
       if (topicNote != null) 'topicNote': topicNote,
@@ -131,6 +138,7 @@ abstract class SubmitResult
       'reason': reason.toJson(),
       'reflexTier': reflexTier.toJson(),
       'points': points,
+      if (totalScore != null) 'totalScore': totalScore,
       'responseMs': responseMs,
       'nextDueAt': nextDueAt.toJson(),
       if (topicNote != null) 'topicNote': topicNote,
@@ -157,6 +165,7 @@ class _SubmitResultImpl extends SubmitResult {
     required _ih18v6li.ResultReason reason,
     required _in6r2tl6.ReflexTier reflexTier,
     required int points,
+    int? totalScore,
     required int responseMs,
     required DateTime nextDueAt,
     String? topicNote,
@@ -167,6 +176,7 @@ class _SubmitResultImpl extends SubmitResult {
          reason: reason,
          reflexTier: reflexTier,
          points: points,
+         totalScore: totalScore,
          responseMs: responseMs,
          nextDueAt: nextDueAt,
          topicNote: topicNote,
@@ -183,6 +193,7 @@ class _SubmitResultImpl extends SubmitResult {
     _ih18v6li.ResultReason? reason,
     _in6r2tl6.ReflexTier? reflexTier,
     int? points,
+    Object? totalScore = _Undefined,
     int? responseMs,
     DateTime? nextDueAt,
     Object? topicNote = _Undefined,
@@ -194,6 +205,7 @@ class _SubmitResultImpl extends SubmitResult {
       reason: reason ?? this.reason,
       reflexTier: reflexTier ?? this.reflexTier,
       points: points ?? this.points,
+      totalScore: totalScore is int? ? totalScore : this.totalScore,
       responseMs: responseMs ?? this.responseMs,
       nextDueAt: nextDueAt ?? this.nextDueAt,
       topicNote: topicNote is String? ? topicNote : this.topicNote,
