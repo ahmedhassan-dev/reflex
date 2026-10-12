@@ -9,6 +9,7 @@ class PracticeCourseSelectorHeader extends StatelessWidget {
   final Course? selectedCourse;
   final int courseId;
   final ValueChanged<Course> onCourseSelected;
+  final bool lockCourse;
 
   const PracticeCourseSelectorHeader({
     super.key,
@@ -16,6 +17,7 @@ class PracticeCourseSelectorHeader extends StatelessWidget {
     required this.selectedCourse,
     required this.courseId,
     required this.onCourseSelected,
+    this.lockCourse = false,
   });
 
   @override
@@ -45,7 +47,7 @@ class PracticeCourseSelectorHeader extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: courses.length > 1
+                child: (!lockCourse && courses.length > 1)
                     ? DropdownButtonHideUnderline(
                         child: DropdownButton<int>(
                           key: const Key('practice_course_selector'),

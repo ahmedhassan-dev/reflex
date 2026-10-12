@@ -30,7 +30,6 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   late Role _currentRole;
   int _currentIndex = 0;
-  int? _selectedPracticeCourseId;
   bool _showTimeMachine = false;
 
   @override
@@ -60,18 +59,13 @@ class _AppShellState extends State<AppShell> {
         ? LocaleKeys.auth_role_student_badge.tr()
         : LocaleKeys.auth_role_teacher_badge.tr();
 
-    // Students have Courses, Practice & My Progress; Teachers have Analytics Dashboard & Question Notes
+    // Students have Courses & My Progress; Teachers have Analytics Dashboard & Question Notes
     final destinations = isStudent
         ? [
             NavigationDestination(
               icon: const Icon(Icons.menu_book_outlined),
               selectedIcon: const Icon(Icons.menu_book_rounded),
               label: LocaleKeys.nav_courses.tr(),
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.psychology_outlined),
-              selectedIcon: const Icon(Icons.psychology_rounded),
-              label: LocaleKeys.nav_practice.tr(),
             ),
             NavigationDestination(
               icon: const Icon(Icons.person_outline_rounded),
@@ -97,15 +91,14 @@ class _AppShellState extends State<AppShell> {
             CoursesScreen(
               key: ValueKey('courses_student_$_currentIndex'),
               onStartPractice: (courseId) {
-                setState(() {
-                  _selectedPracticeCourseId = courseId;
-                  _currentIndex = 1;
-                });
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => PracticeScreen(
+                      initialCourseId: courseId,
+                    ),
+                  ),
+                );
               },
-            ),
-            PracticeScreen(
-              key: ValueKey('practice_student_${_selectedPracticeCourseId ?? 0}_$_currentIndex'),
-              initialCourseId: _selectedPracticeCourseId,
             ),
             StudentProgressScreen(
               key: ValueKey('profile_student_$_currentIndex'),

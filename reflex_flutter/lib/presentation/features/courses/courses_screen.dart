@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../data/repositories/practice_repository.dart';
 import '../../../generated/locale_keys.g.dart';
 import '../../core/theme/app_colors.dart';
+import '../practice/practice_screen.dart';
 import 'controller/courses_controller.dart';
 import 'widgets/course_card_widget.dart';
 
@@ -91,7 +92,19 @@ class _CoursesScreenState extends CoursesController {
                   isRequesting: requestingCourses.contains(course.id),
                   onStartPractice: () {
                     if (course.id != null) {
-                      widget.onStartPractice?.call(course.id!);
+                      if (widget.onStartPractice != null) {
+                        widget.onStartPractice!(course.id!);
+                      } else {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => PracticeScreen(
+                              initialCourseId: course.id,
+                              initialCourse: course,
+                              repositoryOverride: widget.repositoryOverride,
+                            ),
+                          ),
+                        );
+                      }
                     }
                   },
                   onRequestSubscription: () => requestSubscription(course),

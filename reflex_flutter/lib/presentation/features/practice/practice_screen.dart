@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:reflex_client/reflex_client.dart';
 import '../../../../data/repositories/practice_repository.dart';
 import '../../../../generated/locale_keys.g.dart';
 import 'controller/practice_controller.dart';
@@ -15,11 +16,13 @@ import 'widgets/private_course_gate_widget.dart';
 class PracticeScreen extends StatefulWidget {
   final IPracticeRepository? repositoryOverride;
   final int? initialCourseId;
+  final Course? initialCourse;
 
   const PracticeScreen({
     super.key,
     this.repositoryOverride,
     this.initialCourseId,
+    this.initialCourse,
   });
 
   @override
@@ -29,9 +32,13 @@ class PracticeScreen extends StatefulWidget {
 class _PracticeScreenState extends PracticeController {
   @override
   Widget build(BuildContext context) {
+    final pageTitle = selectedCourse?.title ??
+        widget.initialCourse?.title ??
+        LocaleKeys.practice_title.tr();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(LocaleKeys.practice_title.tr()),
+        title: Text(pageTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
@@ -50,6 +57,7 @@ class _PracticeScreenState extends PracticeController {
               selectedCourse: selectedCourse,
               courseId: courseId,
               onCourseSelected: onCourseSelected,
+              lockCourse: widget.initialCourseId != null || widget.initialCourse != null,
             ),
             if (isPrivateAccessRestricted)
               PrivateCourseGateWidget(

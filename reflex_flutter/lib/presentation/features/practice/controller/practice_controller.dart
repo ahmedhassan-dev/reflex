@@ -38,7 +38,10 @@ abstract class PracticeController extends State<PracticeScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.initialCourseId != null) {
+    if (widget.initialCourse != null) {
+      selectedCourse = widget.initialCourse;
+      courseId = widget.initialCourse!.id ?? widget.initialCourseId ?? 1;
+    } else if (widget.initialCourseId != null) {
       courseId = widget.initialCourseId!;
     }
     practiceRepo = widget.repositoryOverride ?? PracticeRepositoryImpl();
@@ -48,15 +51,14 @@ abstract class PracticeController extends State<PracticeScreen> {
   @override
   void didUpdateWidget(covariant PracticeScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.initialCourseId != null &&
-        widget.initialCourseId != oldWidget.initialCourseId &&
-        widget.initialCourseId != courseId) {
-      final found =
-          courses.where((c) => c.id == widget.initialCourseId).firstOrNull;
+    final targetId = widget.initialCourse?.id ?? widget.initialCourseId;
+    final oldTargetId = oldWidget.initialCourse?.id ?? oldWidget.initialCourseId;
+    if (targetId != null && targetId != oldTargetId && targetId != courseId) {
+      final found = courses.where((c) => c.id == targetId).firstOrNull;
       if (found != null) {
         onCourseSelected(found);
       } else {
-        courseId = widget.initialCourseId!;
+        courseId = targetId;
         checkAccessAndLoad();
       }
     }
@@ -79,11 +81,17 @@ abstract class PracticeController extends State<PracticeScreen> {
       final coursesRes = await practiceRepo.listCourses();
       if (coursesRes.isSuccess && (coursesRes.data?.isNotEmpty ?? false)) {
         courses = coursesRes.data!;
-        selectedCourse = courses.firstWhere(
-          (c) => c.id == courseId,
-          orElse: () => courses.first,
-        );
-        courseId = selectedCourse!.id ?? 1;
+        final found = courses.where((c) => c.id == courseId).firstOrNull;
+        if (found != null) {
+          selectedCourse = found;
+          courseId = found.id ?? courseId;
+        } else if (widget.initialCourse != null) {
+          selectedCourse = widget.initialCourse;
+          courseId = widget.initialCourse!.id ?? courseId;
+        } else if (widget.initialCourseId == null && courses.isNotEmpty) {
+          selectedCourse = courses.first;
+          courseId = selectedCourse!.id ?? 1;
+        }
       }
     } catch (e, st) {
       debugPrint('[PracticeController.initCoursesAndCards] error: $e\n$st');
@@ -191,18 +199,13 @@ abstract class PracticeController extends State<PracticeScreen> {
       });
     } else {
       final err = result.error ?? '';
-      if (err.toLowerCase().contains('private') || err.contains('CourseAccessDeniedException')) {
-        setState(() {
-          isLoading = false;
-          isPrivateAccessRestricted = true;
-          errorMessage = err;
-        });
-      } else {
-        setState(() {
-          isLoading = false;
-          errorMessage = err;
-        });
-      }
+      final isDenied = err.toLowerCase().contains('private') ||
+          err.contains('CourseAccessDeniedException');
+      setState(() {
+        isLoading = false;
+        isPrivateAccessRestricted = isDenied;
+        errorMessage = err;
+      });
     }
   }
 
@@ -237,15 +240,11 @@ abstract class PracticeController extends State<PracticeScreen> {
 
     if (res.isSuccess) {
       final data = res.data!;
+      final hasNote = data.topicNote != null && data.topicNote!.trim().isNotEmpty;
       setState(() {
         isSubmitting = false;
         submitResult = data;
-        // If there is no topic note, automatically mark acknowledged
-        if (data.topicNote == null || data.topicNote!.trim().isEmpty) {
-          isNoteAcknowledged = true;
-        } else {
-          isNoteAcknowledged = false;
-        }
+        isNoteAcknowledged = !hasNote;
       });
     } else {
       setState(() {

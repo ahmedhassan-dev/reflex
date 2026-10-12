@@ -41,9 +41,12 @@ class CourseCardWidget extends StatelessWidget {
                 ? ReflexColors.chromaticYellow.withValues(alpha: 0.4)
                 : (isDark ? ReflexColors.darkBorder : ReflexColors.lightBorder)));
 
+    final VoidCallback? cardTapAction = (isPublic || isAccepted)
+        ? onStartPractice
+        : (isPending ? null : onRequestSubscription);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: isDark ? ReflexColors.darkCard : ReflexColors.lightCard,
         borderRadius: BorderRadius.circular(20),
@@ -56,8 +59,15 @@ class CourseCardWidget extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: cardTapAction,
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -132,17 +142,20 @@ class CourseCardWidget extends StatelessWidget {
           const SizedBox(height: 16),
           const Divider(height: 1),
           const SizedBox(height: 14),
-          CourseCardActionWidget(
-            course: course,
-            subscriptionStatus: subscriptionStatus,
-            isRequesting: isRequesting,
-            onStartPractice: onStartPractice,
-            onRequestSubscription: onRequestSubscription,
-            onRefreshStatus: onRefreshStatus,
-          ),
-        ],
+            CourseCardActionWidget(
+              course: course,
+              subscriptionStatus: subscriptionStatus,
+              isRequesting: isRequesting,
+              onStartPractice: onStartPractice,
+              onRequestSubscription: onRequestSubscription,
+              onRefreshStatus: onRefreshStatus,
+            ),
+          ],
+        ),
       ),
-    );
+    ),
+  ),
+);
   }
 
   Widget _buildVisibilityBadge() {
