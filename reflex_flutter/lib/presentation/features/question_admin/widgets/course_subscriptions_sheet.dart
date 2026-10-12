@@ -47,6 +47,34 @@ class CourseSubscriptionsSheet extends StatefulWidget {
 }
 
 class _CourseSubscriptionsSheetState extends State<CourseSubscriptionsSheet> {
+  late List<CourseSubscriptionView> _subs;
+
+  @override
+  void initState() {
+    super.initState();
+    _subs = List.from(widget.subscriptions);
+  }
+
+  @override
+  void didUpdateWidget(covariant CourseSubscriptionsSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.subscriptions != widget.subscriptions) {
+      _subs = List.from(widget.subscriptions);
+    }
+  }
+
+  Future<void> _respond(int id, SubscriptionStatus status) async {
+    await widget.onRespondToSubscription(id, status);
+    if (mounted) {
+      setState(() {
+        final idx = _subs.indexWhere((s) => s.id == id);
+        if (idx != -1) {
+          _subs[idx] = _subs[idx].copyWith(status: status);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -77,13 +105,11 @@ class _CourseSubscriptionsSheetState extends State<CourseSubscriptionsSheet> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.people_alt_rounded,
-                      color: ReflexColors.primary),
+                  const Icon(Icons.people_alt_rounded, color: ReflexColors.primary),
                   const SizedBox(width: 8),
                   Text(
                     LocaleKeys.subscriptions_title.tr(),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 18),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                 ],
               ),
@@ -103,7 +129,7 @@ class _CourseSubscriptionsSheetState extends State<CourseSubscriptionsSheet> {
           Expanded(
             child: widget.isLoadingSubscriptions
                 ? const Center(child: CircularProgressIndicator())
-                : widget.subscriptions.isEmpty
+                : _subs.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -123,11 +149,11 @@ class _CourseSubscriptionsSheetState extends State<CourseSubscriptionsSheet> {
                         ),
                       )
                     : ListView.separated(
-                        itemCount: widget.subscriptions.length,
+                        itemCount: _subs.length,
                         separatorBuilder: (context, index) =>
                             const SizedBox(height: 10),
                         itemBuilder: (context, index) {
-                          final sub = widget.subscriptions[index];
+                          final sub = _subs[index];
                           final isPending =
                               sub.status == SubscriptionStatus.pending;
                           final isAccepted =
@@ -194,56 +220,29 @@ class _CourseSubscriptionsSheetState extends State<CourseSubscriptionsSheet> {
                                     if (!isAccepted)
                                       ElevatedButton.icon(
                                         key: Key('btn_accept_sub_${sub.id}'),
-                                        icon: const Icon(
-                                            Icons.check_circle_rounded,
-                                            size: 16),
-                                        label: Text(LocaleKeys
-                                            .subscriptions_accept_action
-                                            .tr()),
+                                        icon: const Icon(Icons.check_circle_rounded, size: 16),
+                                        label: Text(LocaleKeys.subscriptions_accept_action.tr()),
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              ReflexColors.chromaticGreen,
+                                          backgroundColor: ReflexColors.chromaticGreen,
                                           foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 14, vertical: 8),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8)),
+                                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                         ),
-                                        onPressed: () async {
-                                          await widget.onRespondToSubscription(
-                                              sub.id,
-                                              SubscriptionStatus.accepted);
-                                          setState(() {});
-                                        },
+                                        onPressed: () => _respond(sub.id, SubscriptionStatus.accepted),
                                       ),
-                                    if (!isAccepted && !isRejected)
-                                      const SizedBox(width: 8),
+                                    if (!isAccepted && !isRejected) const SizedBox(width: 8),
                                     if (!isRejected)
                                       OutlinedButton.icon(
                                         key: Key('btn_reject_sub_${sub.id}'),
-                                        icon: const Icon(Icons.cancel_outlined,
-                                            size: 16),
-                                        label: Text(LocaleKeys
-                                            .subscriptions_reject_action
-                                            .tr()),
+                                        icon: const Icon(Icons.cancel_outlined, size: 16),
+                                        label: Text(LocaleKeys.subscriptions_reject_action.tr()),
                                         style: OutlinedButton.styleFrom(
-                                          foregroundColor:
-                                              ReflexColors.chromaticRed,
-                                          side: const BorderSide(
-                                              color: ReflexColors.chromaticRed),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 14, vertical: 8),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8)),
+                                          foregroundColor: ReflexColors.chromaticRed,
+                                          side: const BorderSide(color: ReflexColors.chromaticRed),
+                                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                         ),
-                                        onPressed: () async {
-                                          await widget.onRespondToSubscription(
-                                              sub.id,
-                                              SubscriptionStatus.rejected);
-                                          setState(() {});
-                                        },
+                                        onPressed: () => _respond(sub.id, SubscriptionStatus.rejected),
                                       ),
                                   ],
                                 ),
@@ -259,31 +258,21 @@ class _CourseSubscriptionsSheetState extends State<CourseSubscriptionsSheet> {
   }
 
   Widget _buildSubscriptionStatusChip(SubscriptionStatus status) {
-    switch (status) {
-      case SubscriptionStatus.accepted:
-        return Chip(
-          label: Text(LocaleKeys.subscriptions_status_accepted.tr(),
-              style: const TextStyle(fontSize: 11, color: Colors.white)),
-          backgroundColor: ReflexColors.chromaticGreen,
-          visualDensity: VisualDensity.compact,
-          padding: EdgeInsets.zero,
-        );
-      case SubscriptionStatus.rejected:
-        return Chip(
-          label: Text(LocaleKeys.subscriptions_status_rejected.tr(),
-              style: const TextStyle(fontSize: 11, color: Colors.white)),
-          backgroundColor: ReflexColors.chromaticRed,
-          visualDensity: VisualDensity.compact,
-          padding: EdgeInsets.zero,
-        );
-      case SubscriptionStatus.pending:
-        return Chip(
-          label: Text(LocaleKeys.subscriptions_status_pending.tr(),
-              style: const TextStyle(fontSize: 11, color: Colors.white)),
-          backgroundColor: ReflexColors.chromaticYellow,
-          visualDensity: VisualDensity.compact,
-          padding: EdgeInsets.zero,
-        );
-    }
+    final color = status == SubscriptionStatus.accepted
+        ? ReflexColors.chromaticGreen
+        : (status == SubscriptionStatus.rejected
+            ? ReflexColors.chromaticRed
+            : ReflexColors.chromaticYellow);
+    final label = status == SubscriptionStatus.accepted
+        ? LocaleKeys.subscriptions_status_accepted.tr()
+        : (status == SubscriptionStatus.rejected
+            ? LocaleKeys.subscriptions_status_rejected.tr()
+            : LocaleKeys.subscriptions_status_pending.tr());
+    return Chip(
+      label: Text(label, style: const TextStyle(fontSize: 11, color: Colors.white)),
+      backgroundColor: color,
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+    );
   }
 }

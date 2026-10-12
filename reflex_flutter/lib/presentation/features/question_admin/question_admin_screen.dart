@@ -44,7 +44,9 @@ class _QuestionAdminScreenState extends QuestionAdminController {
     );
   }
 
-  void _openSubscriptionsSheet() {
+  Future<void> _openSubscriptionsSheet() async {
+    await loadSubscriptions();
+    if (!mounted) return;
     CourseSubscriptionsSheet.show(
       context,
       selectedCourse: selectedCourse,
