@@ -38,6 +38,7 @@ abstract class PracticeController extends State<PracticeScreen> {
   @override
   void initState() {
     super.initState();
+    textAnswerController.addListener(_onTextChanged);
     if (widget.initialCourse != null) {
       selectedCourse = widget.initialCourse;
       courseId = widget.initialCourse!.id ?? widget.initialCourseId ?? 1;
@@ -46,6 +47,10 @@ abstract class PracticeController extends State<PracticeScreen> {
     }
     practiceRepo = widget.repositoryOverride ?? PracticeRepositoryImpl();
     initCoursesAndCards();
+  }
+
+  void _onTextChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
@@ -66,6 +71,7 @@ abstract class PracticeController extends State<PracticeScreen> {
 
   @override
   void dispose() {
+    textAnswerController.removeListener(_onTextChanged);
     textAnswerController.dispose();
     super.dispose();
   }

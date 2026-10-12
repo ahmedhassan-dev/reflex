@@ -9,7 +9,7 @@ import 'response_timer_widget.dart';
 import 'result_feedback_sheet.dart';
 import 'topic_note_gate_widget.dart';
 
-class PracticeCardContentWidget extends StatelessWidget {
+class PracticeCardContentWidget extends StatefulWidget {
   final PracticeItem card;
   final SubmitResult? submitResult;
   final bool isSubmitting;
@@ -42,12 +42,48 @@ class PracticeCardContentWidget extends StatelessWidget {
   });
 
   @override
+  State<PracticeCardContentWidget> createState() =>
+      _PracticeCardContentWidgetState();
+}
+
+class _PracticeCardContentWidgetState
+    extends State<PracticeCardContentWidget> {
+  @override
+  void initState() {
+    super.initState();
+    widget.textAnswerController.addListener(_onTextChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant PracticeCardContentWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.textAnswerController != widget.textAnswerController) {
+      oldWidget.textAnswerController.removeListener(_onTextChanged);
+      widget.textAnswerController.addListener(_onTextChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.textAnswerController.removeListener(_onTextChanged);
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final q = card.question;
+    final q = widget.card.question;
     final isMcq = q.questionType == QuestionType.multipleChoice;
-    final isSubmitted = submitResult != null;
+    final isSubmitted = widget.submitResult != null;
+    final hasText = widget.textAnswerController.text.trim().isNotEmpty;
+    final canSubmit = !widget.isSubmitting &&
+        !isSubmitted &&
+        ((isMcq && widget.selectedOptionId != null) || (!isMcq && hasText));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -75,7 +111,7 @@ class PracticeCardContentWidget extends StatelessWidget {
 
         // ── Main Question Card with Chromatic Aura ─────────────────────────
         ChromaticAuraCard(
-          tier: submitResult?.reflexTier,
+          tier: widget.submitResult?.reflexTier,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -92,20 +128,19 @@ class PracticeCardContentWidget extends StatelessWidget {
               if (isMcq && q.options != null) ...[
                 MultipleChoiceWidget(
                   options: q.options!,
-                  selectedOptionId: selectedOptionId,
-                  onOptionSelected: onSelectOption,
+                  selectedOptionId: widget.selectedOptionId,
+                  onOptionSelected: widget.onSelectOption,
                   isSubmitted: isSubmitted,
-                  explanations: submitResult?.optionExplanations,
+                  explanations: widget.submitResult?.optionExplanations,
                 ),
               ] else ...[
                 TextField(
-                  controller: textAnswerController,
+                  key: const Key('practice_text_input'),
+                  controller: widget.textAnswerController,
                   enabled: !isSubmitted,
+                  onChanged: (_) => _onTextChanged(),
                   onSubmitted: (_) {
-                    final canSubmitNow = !isSubmitting &&
-                        !isSubmitted &&
-                        textAnswerController.text.trim().isNotEmpty;
-                    if (canSubmitNow) onSubmitAnswer();
+                    if (canSubmit) widget.onSubmitAnswer();
                   },
                   decoration: InputDecoration(
                     hintText: LocaleKeys.practice_enter_answer_hint.tr(),
@@ -125,8 +160,8 @@ class PracticeCardContentWidget extends StatelessWidget {
               if (q.hasHelpHint) ...[
                 OutlinedButton.icon(
                   key: const Key('practice_help_button'),
-                  onPressed: isRequestingHelp ? null : onRequestHelp,
-                  icon: isRequestingHelp
+                  onPressed: widget.isRequestingHelp ? null : widget.onRequestHelp,
+                  icon: widget.isRequestingHelp
                       ? const SizedBox(
                           width: 16,
                           height: 16,
@@ -140,8 +175,7 @@ class PracticeCardContentWidget extends StatelessWidget {
                   ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: ReflexColors.chromaticYellow),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -150,42 +184,35 @@ class PracticeCardContentWidget extends StatelessWidget {
                 const SizedBox(width: 12),
               ],
               Expanded(
-                child: ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: textAnswerController,
-                  builder: (context, textValue, _) {
-                    final hasText = textValue.text.trim().isNotEmpty;
-                    final canSubmit = !isSubmitting &&
-                        !isSubmitted &&
-                        ((isMcq && selectedOptionId != null) ||
-                            (!isMcq && hasText));
-
-                    return ElevatedButton(
-                      key: const Key('practice_submit_button'),
-                      onPressed: canSubmit ? onSubmitAnswer : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ReflexColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                child: ElevatedButton(
+                  key: const Key('practice_submit_button'),
+                  onPressed: canSubmit ? widget.onSubmitAnswer : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ReflexColors.primary,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor:
+                        isDark ? Colors.grey[800] : Colors.grey[300],
+                    disabledForegroundColor:
+                        isDark ? Colors.grey[500] : Colors.grey[500],
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: widget.isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          LocaleKeys.practice_submit.tr(),
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                      ),
-                      child: isSubmitting
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text(
-                              LocaleKeys.practice_submit.tr(),
-                              style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                    );
-                  },
                 ),
               ),
             ],
@@ -193,21 +220,21 @@ class PracticeCardContentWidget extends StatelessWidget {
         ],
 
         // ── Post-submission feedback & Topic Note Gate ─────────────────────
-        if (isSubmitted && submitResult != null) ...[
-          ResultFeedbackWidget(result: submitResult!),
+        if (isSubmitted && widget.submitResult != null) ...[
+          ResultFeedbackWidget(result: widget.submitResult!),
           const SizedBox(height: 16),
           TopicNoteGateWidget(
-            topicNote: submitResult!.topicNote,
-            isAcknowledged: isNoteAcknowledged,
-            onAcknowledgeChanged: onAcknowledgeNote,
-            onContinue: onContinue,
+            topicNote: widget.submitResult!.topicNote,
+            isAcknowledged: widget.isNoteAcknowledged,
+            onAcknowledgeChanged: widget.onAcknowledgeNote,
+            onContinue: widget.onContinue,
           ),
         ],
 
-        if (errorMessage != null) ...[
+        if (widget.errorMessage != null) ...[
           const SizedBox(height: 12),
           Text(
-            errorMessage!,
+            widget.errorMessage!,
             style: TextStyle(
               color: theme.colorScheme.error,
               fontSize: 13,
