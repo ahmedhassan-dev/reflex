@@ -105,6 +105,67 @@ void main() {
       expect(submitResult.verdict, isA<AttemptStatus>());
     });
 
+    test('when student answers wrong then 0 points awarded, then awards points on 2nd attempt right, then 0 on subsequent solves', () async {
+      final session = sessionBuilder.build();
+      final seeded = await seedTestData(session);
+
+      // Student starts practice
+      final initialCard = await endpoints.practice.serveNextCard(sessionBuilder, seeded.course.id!);
+      expect(initialCard!.totalScore, equals(0));
+
+      // 1. Submit incorrect option (position 2 is '10')
+      final wrongOption = (await QuestionOption.db.findFirstRow(
+        session,
+        where: (t) => t.questionId.equals(seeded.question.id!) & t.isCorrect.equals(false),
+      ))!;
+      final wrongRes = await endpoints.practice.submitAnswer(
+        sessionBuilder,
+        seeded.question.id!,
+        optionId: wrongOption.id,
+      );
+      expect(wrongRes.verdict, equals(AttemptStatus.wrong));
+      expect(wrongRes.points, equals(0));
+      expect(wrongRes.totalScore, equals(0));
+
+      // Advance clock by 1 day so review card becomes due
+      await endpoints.demoClock.advanceDays(sessionBuilder, 1);
+
+      // 2. Request next card again (now due)
+      final secondCard = await endpoints.practice.serveNextCard(sessionBuilder, seeded.course.id!);
+      expect(secondCard, isNotNull);
+
+      // 3. Submit correct option (position 1 is '12')
+      final correctOption = (await QuestionOption.db.findFirstRow(
+        session,
+        where: (t) => t.questionId.equals(seeded.question.id!) & t.isCorrect.equals(true),
+      ))!;
+      final correctRes = await endpoints.practice.submitAnswer(
+        sessionBuilder,
+        seeded.question.id!,
+        optionId: correctOption.id,
+      );
+      expect(correctRes.verdict, equals(AttemptStatus.valid));
+      expect(correctRes.points, equals(10));
+      expect(correctRes.totalScore, equals(10));
+
+      // Advance clock by 30 days so card becomes due again
+      await endpoints.demoClock.advanceDays(sessionBuilder, 30);
+
+      // 4. Request next card again and solve correctly a second time
+      final thirdCard = await endpoints.practice.serveNextCard(sessionBuilder, seeded.course.id!);
+      expect(thirdCard, isNotNull);
+      final repeatRes = await endpoints.practice.submitAnswer(
+        sessionBuilder,
+        seeded.question.id!,
+        optionId: correctOption.id,
+      );
+      expect(repeatRes.verdict, equals(AttemptStatus.valid));
+      expect(repeatRes.points, equals(0), reason: 'Score must be added only one time');
+      expect(repeatRes.totalScore, equals(10));
+
+      await endpoints.demoClock.resetClock(sessionBuilder);
+    });
+
     test('when unauthenticated or student calls QuestionAdminEndpoint then access is denied', () async {
       final session = sessionBuilder.build();
       final seeded = await seedTestData(session);
