@@ -21,6 +21,7 @@ abstract class StudentProgress
     required this.cleanFirstTryCount,
     required this.avgResponseMs,
     this.studyStreakDays,
+    this.totalScore,
   });
 
   factory StudentProgress({
@@ -30,6 +31,7 @@ abstract class StudentProgress
     required int cleanFirstTryCount,
     required double avgResponseMs,
     int? studyStreakDays,
+    int? totalScore,
   }) = _StudentProgressImpl;
 
   factory StudentProgress.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -40,6 +42,7 @@ abstract class StudentProgress
       cleanFirstTryCount: jsonSerialization['cleanFirstTryCount'] as int,
       avgResponseMs: (jsonSerialization['avgResponseMs'] as num).toDouble(),
       studyStreakDays: jsonSerialization['studyStreakDays'] as int?,
+      totalScore: jsonSerialization['totalScore'] as int?,
     );
   }
 
@@ -55,6 +58,8 @@ abstract class StudentProgress
 
   int? studyStreakDays;
 
+  int? totalScore;
+
   /// Returns a shallow copy of this [StudentProgress]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
@@ -65,6 +70,7 @@ abstract class StudentProgress
     int? cleanFirstTryCount,
     double? avgResponseMs,
     int? studyStreakDays,
+    int? totalScore,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -76,6 +82,7 @@ abstract class StudentProgress
       'cleanFirstTryCount': cleanFirstTryCount,
       'avgResponseMs': avgResponseMs,
       if (studyStreakDays != null) 'studyStreakDays': studyStreakDays,
+      if (totalScore != null) 'totalScore': totalScore,
     };
   }
 
@@ -89,6 +96,7 @@ abstract class StudentProgress
       'cleanFirstTryCount': cleanFirstTryCount,
       'avgResponseMs': avgResponseMs,
       if (studyStreakDays != null) 'studyStreakDays': studyStreakDays,
+      if (totalScore != null) 'totalScore': totalScore,
     };
   }
 
@@ -108,6 +116,7 @@ class _StudentProgressImpl extends StudentProgress {
     required int cleanFirstTryCount,
     required double avgResponseMs,
     int? studyStreakDays,
+    int? totalScore,
   }) : super._(
          learnerId: learnerId,
          displayName: displayName,
@@ -115,6 +124,7 @@ class _StudentProgressImpl extends StudentProgress {
          cleanFirstTryCount: cleanFirstTryCount,
          avgResponseMs: avgResponseMs,
          studyStreakDays: studyStreakDays,
+         totalScore: totalScore,
        );
 
   /// Returns a shallow copy of this [StudentProgress]
@@ -128,6 +138,7 @@ class _StudentProgressImpl extends StudentProgress {
     int? cleanFirstTryCount,
     double? avgResponseMs,
     Object? studyStreakDays = _Undefined,
+    Object? totalScore = _Undefined,
   }) {
     return StudentProgress(
       learnerId: learnerId ?? this.learnerId,
@@ -138,6 +149,7 @@ class _StudentProgressImpl extends StudentProgress {
       studyStreakDays: studyStreakDays is int?
           ? studyStreakDays
           : this.studyStreakDays,
+      totalScore: totalScore is int? ? totalScore : this.totalScore,
     );
   }
 }

@@ -30,6 +30,7 @@ void main() {
         cleanFirstTryCount: 14,
         avgResponseMs: 1420.0,
         studyStreakDays: 5,
+        totalScore: 45,
       );
 
       final sampleCourses = [
@@ -65,6 +66,11 @@ void main() {
 
       // Verify dynamic study streak
       expect(find.text('5 days'), findsOneWidget);
+
+      // Verify total score badge in student header bar
+      expect(find.byKey(const Key('student_progress_total_score_badge')),
+          findsOneWidget);
+      expect(find.text('45'), findsOneWidget);
 
       // Verify course selector is visible
       expect(find.byKey(const Key('student_progress_course_selector')),

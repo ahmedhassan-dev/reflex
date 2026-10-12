@@ -196,9 +196,11 @@ void main() {
 
       final progressAlice = await service.getStudentProgress(learnerId: 1, courseId: 1);
       expect(progressAlice.studyStreakDays, equals(2));
+      expect(progressAlice.totalScore, isNotNull);
 
       final progressBob = await service.getStudentProgress(learnerId: 2, courseId: 1);
       expect(progressBob.studyStreakDays, equals(1));
+      expect(progressBob.totalScore, isNotNull);
     });
 
     test('resets studyStreakDays to 0 when last practice was before yesterday', () async {

@@ -9,7 +9,7 @@ OverlayEntry? showTopExplanationToast(
   BuildContext context, {
   required String explanation,
   String? title,
-  Duration duration = const Duration(seconds: 8),
+  Duration? duration,
 }) {
   final overlay = Overlay.maybeOf(context);
   if (overlay == null) return null;
@@ -36,13 +36,13 @@ OverlayEntry? showTopExplanationToast(
 class _TopExplanationToastWidget extends StatefulWidget {
   final String title;
   final String explanation;
-  final Duration duration;
+  final Duration? duration;
   final VoidCallback onDismiss;
 
   const _TopExplanationToastWidget({
     required this.title,
     required this.explanation,
-    required this.duration,
+    this.duration,
     required this.onDismiss,
   });
 
@@ -80,7 +80,9 @@ class _TopExplanationToastWidgetState extends State<_TopExplanationToastWidget>
 
     _animController.forward();
 
-    _autoDismissTimer = Timer(widget.duration, _dismiss);
+    if (widget.duration != null) {
+      _autoDismissTimer = Timer(widget.duration!, _dismiss);
+    }
   }
 
   void _dismiss() {

@@ -232,6 +232,8 @@ abstract class PracticeController extends State<PracticeScreen> {
     if (isMcq && selectedOptionId == null) return;
     if (!isMcq && textAns.isEmpty) return;
 
+    dismissExplanationToast();
+
     setState(() {
       isSubmitting = true;
       errorMessage = null;

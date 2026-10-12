@@ -83,5 +83,43 @@ void main() {
       );
       expect(directionality, TextDirection.rtl);
     });
+
+    testWidgets('toast persists indefinitely without auto-dismissing until closed manually',
+        (tester) async {
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: Builder(
+            builder: (context) {
+              return ElevatedButton(
+                key: const Key('trigger_persist_toast_btn'),
+                onPressed: () {
+                  showTopExplanationToast(
+                    context,
+                    explanation: 'Persistent explanation note.',
+                  );
+                },
+                child: const Text('Show'),
+              );
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('trigger_persist_toast_btn')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('top_explanation_toast')), findsOneWidget);
+
+      // Fast-forward 15 seconds to ensure it does not auto-dismiss
+      await tester.pump(const Duration(seconds: 15));
+      expect(find.byKey(const Key('top_explanation_toast')), findsOneWidget);
+
+      // Dismiss manually
+      await tester.tap(find.byKey(const Key('top_explanation_toast_close_button')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('top_explanation_toast')), findsNothing);
+    });
   });
 }

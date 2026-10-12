@@ -6,3 +6,4 @@ fields:
   cleanFirstTryCount: int
   avgResponseMs: double
   studyStreakDays: int?
+  totalScore: int?

@@ -1,4 +1,5 @@
 import 'package:reflex_server/src/core/clock/clock.dart';
+import 'package:reflex_server/src/features/practice/domain/score_calculator.dart';
 import 'package:reflex_server/src/generated/protocol.dart';
 import 'package:reflex_server/src/data/repositories/interfaces.dart';
 
@@ -87,6 +88,13 @@ class CohortStatsService {
 
       final streak = _calculateStreakDays(sAttempts, clock.now());
 
+      final totalScore = await ScoreCalculator.calculateTotalScore(
+        attemptRepo: attemptRepo,
+        questionRepo: questionRepo,
+        learnerId: student.id!,
+        courseId: courseId,
+      );
+
       studentProgressList.add(StudentProgress(
         learnerId: student.id!,
         displayName: student.displayName,
@@ -94,6 +102,7 @@ class CohortStatsService {
         cleanFirstTryCount: cleanFirstTryCount,
         avgResponseMs: double.parse(avgLatency.toStringAsFixed(1)),
         studyStreakDays: streak,
+        totalScore: totalScore,
       ));
     }
 
@@ -155,6 +164,13 @@ class CohortStatsService {
 
     final streak = _calculateStreakDays(attempts, clock.now());
 
+    final totalScore = await ScoreCalculator.calculateTotalScore(
+      attemptRepo: attemptRepo,
+      questionRepo: questionRepo,
+      learnerId: learnerId,
+      courseId: courseId,
+    );
+
     return StudentProgress(
       learnerId: learnerId,
       displayName: learner?.displayName ?? 'Student',
@@ -162,6 +178,7 @@ class CohortStatsService {
       cleanFirstTryCount: cleanFirstTryCount,
       avgResponseMs: double.parse(avgLatency.toStringAsFixed(1)),
       studyStreakDays: streak,
+      totalScore: totalScore,
     );
   }
 

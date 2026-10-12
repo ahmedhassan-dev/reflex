@@ -126,6 +126,52 @@ class _StudentProgressScreenState extends StudentProgressController {
                       ],
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  Container(
+                    key: const Key('student_progress_total_score_badge'),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.stars_rounded,
+                              color: ReflexColors.chromaticYellow,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${p?.totalScore ?? 0}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          LocaleKeys.practice_total_score.tr(),
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
