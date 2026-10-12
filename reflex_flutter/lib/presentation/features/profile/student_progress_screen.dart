@@ -4,6 +4,8 @@ import '../../../../data/repositories/analytics_repository.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../core/theme/app_colors.dart';
 import 'controller/student_progress_controller.dart';
+import 'widgets/metric_card_widget.dart';
+import 'widgets/student_course_selector_widget.dart';
 
 /// Student self-progress and mastery metrics profile screen.
 class StudentProgressScreen extends StatefulWidget {
@@ -39,7 +41,7 @@ class _StudentProgressScreenState extends StudentProgressController {
             Text(errorMessage!, style: TextStyle(color: theme.colorScheme.error)),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: loadProgress,
+              onPressed: loadCoursesAndProgress,
               child: Text(LocaleKeys.retry.tr()),
             ),
           ],
@@ -54,6 +56,7 @@ class _StudentProgressScreenState extends StudentProgressController {
     final cleanSolves = p?.cleanFirstTryCount ?? 0;
     final solvedCount = p?.solvedCount ?? 0;
     final avgSpeedSeconds = ((p?.avgResponseMs ?? 0) / 1000).toStringAsFixed(1);
+    final streakDays = p?.studyStreakDays ?? 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -67,7 +70,7 @@ class _StudentProgressScreenState extends StudentProgressController {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: loadProgress,
+        onRefresh: loadCoursesAndProgress,
         child: ListView(
           padding: const EdgeInsetsDirectional.all(20),
           children: [
@@ -126,7 +129,14 @@ class _StudentProgressScreenState extends StudentProgressController {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+
+            // ── Course Selector ──────────────────────────────────────────────
+            StudentCourseSelectorWidget(
+              courses: courses,
+              selectedCourse: selectedCourse,
+              onCourseSelected: selectCourse,
+            ),
 
             // ── Key Metrics Grid ─────────────────────────────────────────────
             Text(
@@ -140,7 +150,7 @@ class _StudentProgressScreenState extends StudentProgressController {
             Row(
               children: [
                 Expanded(
-                  child: _MetricCard(
+                  child: MetricCardWidget(
                     title: LocaleKeys.profile_clean_first_try.tr(),
                     value: '$cleanSolves',
                     icon: Icons.verified_rounded,
@@ -149,7 +159,7 @@ class _StudentProgressScreenState extends StudentProgressController {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _MetricCard(
+                  child: MetricCardWidget(
                     title: LocaleKeys.profile_cards_mastered.tr(),
                     value: '$solvedCount',
                     icon: Icons.check_circle_outline_rounded,
@@ -162,7 +172,7 @@ class _StudentProgressScreenState extends StudentProgressController {
             Row(
               children: [
                 Expanded(
-                  child: _MetricCard(
+                  child: MetricCardWidget(
                     title: LocaleKeys.profile_avg_latency.tr(),
                     value: '${avgSpeedSeconds}s',
                     icon: Icons.speed_rounded,
@@ -171,9 +181,9 @@ class _StudentProgressScreenState extends StudentProgressController {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _MetricCard(
+                  child: MetricCardWidget(
                     title: LocaleKeys.profile_study_streak.tr(),
-                    value: '1 ${LocaleKeys.profile_days.tr()}',
+                    value: '$streakDays ${LocaleKeys.profile_days.tr()}',
                     icon: Icons.local_fire_department_rounded,
                     color: Colors.deepOrange,
                   ),
@@ -182,67 +192,6 @@ class _StudentProgressScreenState extends StudentProgressController {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _MetricCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-
-  const _MetricCard({
-    required this.title,
-    required this.value,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Container(
-      padding: const EdgeInsetsDirectional.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? ReflexColors.darkCard : ReflexColors.lightCard,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isDark ? ReflexColors.darkBorder : ReflexColors.lightBorder,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: isDark ? 0.2 : 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: isDark ? ReflexColors.textSecondaryDark : ReflexColors.textSecondaryLight,
-              fontSize: 12,
-            ),
-          ),
-        ],
       ),
     );
   }

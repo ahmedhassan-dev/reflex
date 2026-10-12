@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:test/test.dart';
 import 'package:reflex_server/src/generated/protocol.dart';
+import 'package:reflex_server/src/core/clock/clock.dart';
 import 'package:reflex_server/src/features/analytics/services/cohort_stats_service.dart';
 import '../fakes/fake_repositories.dart';
 
@@ -11,6 +12,7 @@ void main() {
     late FakeAttemptRepository attemptRepo;
     late FakeReviewStateRepository reviewStateRepo;
     late CohortStatsService service;
+    final now = DateTime.utc(2026, 10, 10);
 
     setUp(() async {
       learnerRepo = FakeLearnerRepository();
@@ -23,6 +25,7 @@ void main() {
         questionRepo: questionRepo,
         attemptRepo: attemptRepo,
         reviewStateRepo: reviewStateRepo,
+        clock: FakeClock(now),
       );
 
       // Learners
@@ -75,7 +78,6 @@ void main() {
       ));
 
       // Attempts for Course 1
-      final now = DateTime.utc(2026, 10, 10);
       await attemptRepo.insert(Attempt(
         learnerId: 1,
         questionId: 1,
@@ -176,6 +178,40 @@ void main() {
       expect(summary.questions, isEmpty);
       expect(summary.students, isEmpty);
       expect(summary.mastery, isEmpty);
+    });
+
+    test('calculates studyStreakDays dynamically across consecutive calendar days', () async {
+      await attemptRepo.insert(Attempt(
+        learnerId: 1,
+        questionId: 1,
+        status: AttemptStatus.valid,
+        responseMs: 4000,
+        usedHelp: false,
+        isFirstAttempt: true,
+        underExpectedTime: true,
+        isClean: true,
+        reflexTier: ReflexTier.greenMastered,
+        createdAt: DateTime.utc(2026, 10, 9),
+      ));
+
+      final progressAlice = await service.getStudentProgress(learnerId: 1, courseId: 1);
+      expect(progressAlice.studyStreakDays, equals(2));
+
+      final progressBob = await service.getStudentProgress(learnerId: 2, courseId: 1);
+      expect(progressBob.studyStreakDays, equals(1));
+    });
+
+    test('resets studyStreakDays to 0 when last practice was before yesterday', () async {
+      final brokenService = CohortStatsService(
+        learnerRepo: learnerRepo,
+        questionRepo: questionRepo,
+        attemptRepo: attemptRepo,
+        reviewStateRepo: reviewStateRepo,
+        clock: FakeClock(DateTime.utc(2026, 10, 15)),
+      );
+
+      final progress = await brokenService.getStudentProgress(learnerId: 1, courseId: 1);
+      expect(progress.studyStreakDays, equals(0));
     });
   });
 }

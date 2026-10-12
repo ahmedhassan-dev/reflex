@@ -5,3 +5,4 @@ fields:
   solvedCount: int
   cleanFirstTryCount: int
   avgResponseMs: double
+  studyStreakDays: int?

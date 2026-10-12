@@ -7,14 +7,16 @@ class AnalyticsEndpoint extends Endpoint {
   /// Returns aggregated cohort metrics for teacher dashboard and question analytics.
   Future<CohortSummary> getCohortSummary(Session session, int courseId) async {
     final container = AppContainer(session);
-    return container.cohortStatsService.getCohortSummary(courseId: courseId);
+    final stats = await container.getCohortStatsService();
+    return stats.getCohortSummary(courseId: courseId);
   }
 
   /// Returns progress metrics for the currently active student.
   Future<StudentProgress> getMyProgress(Session session, int courseId) async {
     final container = AppContainer(session);
     final learner = await container.resolveCurrentLearner();
-    return container.cohortStatsService.getStudentProgress(
+    final stats = await container.getCohortStatsService();
+    return stats.getStudentProgress(
       learnerId: learner.id!,
       courseId: courseId,
     );

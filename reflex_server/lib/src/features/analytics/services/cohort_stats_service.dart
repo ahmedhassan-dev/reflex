@@ -1,3 +1,4 @@
+import 'package:reflex_server/src/core/clock/clock.dart';
 import 'package:reflex_server/src/generated/protocol.dart';
 import 'package:reflex_server/src/data/repositories/interfaces.dart';
 
@@ -7,12 +8,14 @@ class CohortStatsService {
   final IQuestionRepository questionRepo;
   final IAttemptRepository attemptRepo;
   final IReviewStateRepository reviewStateRepo;
+  final Clock clock;
 
   CohortStatsService({
     required this.learnerRepo,
     required this.questionRepo,
     required this.attemptRepo,
     required this.reviewStateRepo,
+    this.clock = const SystemClock(),
   });
 
   /// Computes full cohort analytics for a teacher dashboard.
@@ -82,12 +85,15 @@ class CohortStatsService {
           ? 0.0
           : sAttempts.map((a) => a.responseMs).reduce((a, b) => a + b) / sAttempts.length;
 
+      final streak = _calculateStreakDays(sAttempts, clock.now());
+
       studentProgressList.add(StudentProgress(
         learnerId: student.id!,
         displayName: student.displayName,
         solvedCount: solvedQuestionIds.length,
         cleanFirstTryCount: cleanFirstTryCount,
         avgResponseMs: double.parse(avgLatency.toStringAsFixed(1)),
+        studyStreakDays: streak,
       ));
     }
 
@@ -147,12 +153,48 @@ class CohortStatsService {
         ? 0.0
         : courseAttempts.map((a) => a.responseMs).reduce((a, b) => a + b) / courseAttempts.length;
 
+    final streak = _calculateStreakDays(attempts, clock.now());
+
     return StudentProgress(
       learnerId: learnerId,
       displayName: learner?.displayName ?? 'Student',
       solvedCount: solvedQuestionIds.length,
       cleanFirstTryCount: cleanFirstTryCount,
       avgResponseMs: double.parse(avgLatency.toStringAsFixed(1)),
+      studyStreakDays: streak,
     );
+  }
+
+  /// Calculates consecutive calendar day study streak up to [referenceNow].
+  int _calculateStreakDays(List<Attempt> attempts, DateTime referenceNow) {
+    if (attempts.isEmpty) return 0;
+
+    final dates = attempts
+        .map((a) => DateTime.utc(a.createdAt.year, a.createdAt.month, a.createdAt.day))
+        .toSet()
+        .toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    final today = DateTime.utc(referenceNow.year, referenceNow.month, referenceNow.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    final mostRecent = dates.first;
+    if (mostRecent.isBefore(yesterday)) {
+      return 0;
+    }
+
+    var streak = 0;
+    var expectedDate = mostRecent;
+
+    for (final date in dates) {
+      if (date == expectedDate) {
+        streak++;
+        expectedDate = expectedDate.subtract(const Duration(days: 1));
+      } else if (date.isBefore(expectedDate)) {
+        break;
+      }
+    }
+
+    return streak;
   }
 }

@@ -47,6 +47,17 @@ class AppContainer {
     );
   }
 
+  Future<CohortStatsService> getCohortStatsService() async {
+    final clock = await getEffectiveClock();
+    return CohortStatsService(
+      learnerRepo: learnerRepo,
+      questionRepo: questionRepo,
+      attemptRepo: attemptRepo,
+      reviewStateRepo: reviewStateRepo,
+      clock: clock,
+    );
+  }
+
   CohortStatsService get cohortStatsService => CohortStatsService(
         learnerRepo: learnerRepo,
         questionRepo: questionRepo,
