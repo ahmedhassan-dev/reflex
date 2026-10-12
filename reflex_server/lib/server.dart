@@ -7,6 +7,7 @@ import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 
 import 'src/cache_busting.dart';
 import 'src/core/config/env_loader.dart';
+import 'src/features/auth/config/scopes.dart';
 import 'src/generated/serverpod.dart';
 import 'src/web/routes/app_config_route.dart';
 
@@ -40,6 +41,29 @@ void run(List<String> args) async {
       GoogleIdpConfigFromPasswords(),
     ],
   );
+
+  // Wrap authentication handler to support seamless developer demo & judging logins
+  final defaultAuthHandler = pod.authenticationHandler;
+  pod.authenticationHandler = (session, key) async {
+    if (key == 'demo-teacher-token') {
+      return AuthenticationInfo(
+        '00000000-0000-4000-8000-000000000022',
+        {AppScopes.teacher},
+        authId: '00000000-0000-4000-8000-000000000022',
+      );
+    }
+    if (key == 'demo-student-token') {
+      return AuthenticationInfo(
+        '00000000-0000-4000-8000-000000000011',
+        {AppScopes.student},
+        authId: '00000000-0000-4000-8000-000000000011',
+      );
+    }
+    if (defaultAuthHandler != null) {
+      return defaultAuthHandler(session, key);
+    }
+    return null;
+  };
 
   // Serve all files in the web/static relative directory under /web.
   // These are used by the default web page.

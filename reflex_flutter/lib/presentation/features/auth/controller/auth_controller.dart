@@ -175,6 +175,7 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
   }
 
   void enterAsStudent(BuildContext context) {
+    unawaited(signInDemoStudent());
     _navigateToAppShell(
       context,
       role: Role.student,
@@ -183,6 +184,7 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
   }
 
   void enterAsTeacher(BuildContext context) {
+    unawaited(signInDemoTeacher());
     _navigateToAppShell(
       context,
       role: Role.teacher,
@@ -199,6 +201,7 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
   }
 
   void switchToRoleSelection(BuildContext context) {
+    unawaited(signOutDemo());
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => RoleSelectionScreen(initialRole: selectedRole),

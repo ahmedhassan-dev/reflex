@@ -6,7 +6,7 @@ import 'package:reflex_server/src/generated/protocol.dart';
 /// Endpoint allowing teachers to inspect questions, create courses/questions, update topic notes, and manage hints.
 class QuestionAdminEndpoint extends Endpoint {
   @override
-  bool get requireLogin => false;
+  bool get requireLogin => true;
 
   @override
   Set<Scope> get requiredScopes => {AppScopes.teacher};

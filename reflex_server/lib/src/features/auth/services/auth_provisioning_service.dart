@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:reflex_server/src/core/errors/exceptions.dart';
+import 'package:reflex_server/src/features/auth/config/scopes.dart';
 import 'package:reflex_server/src/generated/protocol.dart';
 import 'package:reflex_server/src/data/repositories/interfaces.dart';
 
@@ -27,10 +28,14 @@ class AuthProvisioningService {
       return existing;
     }
 
+    final isTeacher = authInfo.scopes.contains(AppScopes.teacher);
     final newLearner = Learner(
       authUserId: authUserId,
-      displayName: defaultDisplayName ?? 'Student ${authUserId.uuid.substring(0, 8)}',
-      role: defaultRole,
+      displayName: defaultDisplayName ??
+          (isTeacher
+              ? 'Mr. Hassan (Teacher)'
+              : 'Student ${authUserId.uuid.substring(0, 8)}'),
+      role: isTeacher ? Role.teacher : defaultRole,
     );
 
     return learnerRepo.save(newLearner);

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
+import '../../client.dart';
 import '../../generated/locale_keys.g.dart';
 import '../core/theme/app_colors.dart';
 import '../features/analytics/analytics_screen.dart';
@@ -36,6 +38,15 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     _currentRole = widget.initialRole;
+    _syncDemoAuthToken(_currentRole);
+  }
+
+  void _syncDemoAuthToken(Role role) {
+    if (role == Role.teacher) {
+      unawaited(signInDemoTeacher());
+    } else {
+      unawaited(signInDemoStudent());
+    }
   }
 
   void _onClockShifted() {
@@ -44,6 +55,7 @@ class _AppShellState extends State<AppShell> {
   }
 
   void _switchToAuthScreen() {
+    unawaited(signOutDemo());
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => RoleSelectionScreen(initialRole: _currentRole),

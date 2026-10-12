@@ -17,6 +17,39 @@ import "package:serverpod_flutter/serverpod_flutter.dart";
 // defaults to http://$localhost:8080/ if not found.
 final serverUrl = getServerUrl();
 
+FlutterAuthSessionManager? authSessionManager;
+
+/// Authenticates the client session as the demo teacher (Mr. Hassan)
+/// granting AppScopes.teacher access on the Serverpod backend.
+Future<void> signInDemoTeacher() async {
+  await authSessionManager?.updateSignedInUser(
+    AuthSuccess(
+      authStrategy: 'session',
+      token: 'demo-teacher-token',
+      authUserId: UuidValue.fromString('00000000-0000-4000-8000-000000000022'),
+      scopeNames: {'teacher'},
+    ),
+  );
+}
+
+/// Authenticates the client session as the demo student (Alice)
+/// granting AppScopes.student access on the Serverpod backend.
+Future<void> signInDemoStudent() async {
+  await authSessionManager?.updateSignedInUser(
+    AuthSuccess(
+      authStrategy: 'session',
+      token: 'demo-student-token',
+      authUserId: UuidValue.fromString('00000000-0000-4000-8000-000000000011'),
+      scopeNames: {'student'},
+    ),
+  );
+}
+
+/// Clears the active demo session.
+Future<void> signOutDemo() async {
+  await authSessionManager?.updateSignedInUser(null);
+}
+
 /// Sets up a global client object that can be used to talk to the server from
 /// anywhere in our app. The client is generated from your server code
 /// and is set up to connect to a Serverpod running on a local server on
@@ -27,9 +60,10 @@ final serverUrl = getServerUrl();
 late final Client client;
 
 Future<void> initializeClient() async {
+  final manager = authSessionManager = FlutterAuthSessionManager();
   client = Client(await serverUrl)
     ..connectivityMonitor = FlutterConnectivityMonitor()
-    ..authSessionManager = FlutterAuthSessionManager();
+    ..authSessionManager = manager;
   unawaited(client.auth.initialize());
 
   const googleClientId = String.fromEnvironment("GOOGLE_CLIENT_ID", defaultValue: "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com");
