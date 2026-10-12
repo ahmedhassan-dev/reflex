@@ -49,11 +49,6 @@ class PracticeCardContentWidget extends StatelessWidget {
     final isMcq = q.questionType == QuestionType.multipleChoice;
     final isSubmitted = submitResult != null;
 
-    final canSubmit = !isSubmitting &&
-        !isSubmitted &&
-        ((isMcq && selectedOptionId != null) ||
-            (!isMcq && textAnswerController.text.trim().isNotEmpty));
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -107,7 +102,10 @@ class PracticeCardContentWidget extends StatelessWidget {
                   controller: textAnswerController,
                   enabled: !isSubmitted,
                   onSubmitted: (_) {
-                    if (canSubmit) onSubmitAnswer();
+                    final canSubmitNow = !isSubmitting &&
+                        !isSubmitted &&
+                        textAnswerController.text.trim().isNotEmpty;
+                    if (canSubmitNow) onSubmitAnswer();
                   },
                   decoration: InputDecoration(
                     hintText: LocaleKeys.practice_enter_answer_hint.tr(),
@@ -152,31 +150,42 @@ class PracticeCardContentWidget extends StatelessWidget {
                 const SizedBox(width: 12),
               ],
               Expanded(
-                child: ElevatedButton(
-                  key: const Key('practice_submit_button'),
-                  onPressed: canSubmit ? onSubmitAnswer : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ReflexColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: isSubmitting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          LocaleKeys.practice_submit.tr(),
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                child: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: textAnswerController,
+                  builder: (context, textValue, _) {
+                    final hasText = textValue.text.trim().isNotEmpty;
+                    final canSubmit = !isSubmitting &&
+                        !isSubmitted &&
+                        ((isMcq && selectedOptionId != null) ||
+                            (!isMcq && hasText));
+
+                    return ElevatedButton(
+                      key: const Key('practice_submit_button'),
+                      onPressed: canSubmit ? onSubmitAnswer : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ReflexColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
+                      ),
+                      child: isSubmitting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              LocaleKeys.practice_submit.tr(),
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                    );
+                  },
                 ),
               ),
             ],

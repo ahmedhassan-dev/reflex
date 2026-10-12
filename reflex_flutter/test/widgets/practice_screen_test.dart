@@ -134,5 +134,54 @@ void main() {
       verify(() => mockRepo.requestCourseSubscription(2)).called(1);
       expect(find.byKey(const Key('btn_refresh_subscription_status')), findsOneWidget);
     });
+
+    testWidgets('text input question enables submit button reactively upon typing', (tester) async {
+      final sampleTextCard = PracticeItem(
+        kind: CardKind.review,
+        question: QuestionView(
+          id: 101,
+          prompt: 'Solve for x: 3x + 15 = 45. What is the value of x?',
+          topic: 'Algebra',
+          questionType: QuestionType.textInput,
+          points: 10,
+          expectedSeconds: 15,
+          hasHelpHint: true,
+        ),
+      );
+
+      when(() => mockRepo.serveNextCard(any()))
+          .thenAnswer((_) async => Result.success(sampleTextCard));
+
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: PracticeScreen(
+            repositoryOverride: mockRepo,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Submit button should initially be disabled
+      final submitButtonFinder = find.byKey(const Key('practice_submit_button'));
+      expect(submitButtonFinder, findsOneWidget);
+      final initialButton = tester.widget<ElevatedButton>(submitButtonFinder);
+      expect(initialButton.onPressed, isNull);
+
+      // Enter text into the text field
+      final textFieldFinder = find.byType(TextField);
+      expect(textFieldFinder, findsOneWidget);
+      await tester.enterText(textFieldFinder, '10');
+      await tester.pump();
+
+      // Submit button should now be enabled WITHOUT tapping need hint
+      final enabledButton = tester.widget<ElevatedButton>(submitButtonFinder);
+      expect(enabledButton.onPressed, isNotNull);
+
+      // Clearing the text field should disable it again
+      await tester.enterText(textFieldFinder, '   ');
+      await tester.pump();
+      final disabledButton = tester.widget<ElevatedButton>(submitButtonFinder);
+      expect(disabledButton.onPressed, isNull);
+    });
   });
 }
