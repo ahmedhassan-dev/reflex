@@ -49,15 +49,27 @@ reflex/
 
 ---
 
+## ☁️ Live Cloud Deployment (Serverpod Cloud)
+
+Reflex is deployed and running on **Serverpod Cloud**:
+
+| Service | Public URL | Description |
+| :--- | :--- | :--- |
+| **Web App** | [https://reflex.serverpod.space/](https://reflex.serverpod.space/) | Deployed Flutter Web client |
+| **API Server** | [https://reflex.api.serverpod.space/](https://reflex.api.serverpod.space/) | Live Serverpod backend API |
+| **Insights** | [https://reflex.insights.serverpod.space/](https://reflex.insights.serverpod.space/) | Serverpod Insights dashboard |
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - **FVM** (Flutter Version Management) with Flutter `3.47.6` / Dart `3.13.5`.
-- **Docker** & **Docker Compose** (for PostgreSQL database).
+- **Docker** & **Docker Compose** (for local PostgreSQL database).
 - **Serverpod CLI** (`serverpod_cli 4.0.4`).
 
-### 1. Start the PostgreSQL Database
+### 1. Start the Local PostgreSQL Database
 
 ```bash
 cd reflex_server
@@ -74,18 +86,75 @@ cd reflex_server
 dart run bin/seed.dart
 ```
 
-### 3. Run the Server
+### 3. Run the Server Locally
 
 ```bash
 cd reflex_server
 dart run bin/main.dart
 ```
 
-### 4. Run the Flutter Client
+---
+
+## 📱 Running & Building the Flutter Client
+
+### Web & Desktop
 
 ```bash
 cd reflex_flutter
+
+# Web (Chrome)
 fvm flutter run -d chrome
+
+# macOS Desktop
+fvm flutter run -d macos
+```
+
+### Android (Emulator & Physical Devices)
+
+#### Running in Development:
+```bash
+# Connect to local Serverpod backend via emulator (reverse port forwarding):
+adb reverse tcp:8080 tcp:8080
+fvm flutter run -d android
+
+# Connect to Serverpod Cloud backend:
+fvm flutter run -d android --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+```
+
+#### Running in Release Mode on Physical Device:
+```bash
+# Run optimized release build directly on connected Android device:
+fvm flutter run -d RMX2040 --release --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+```
+
+#### Building Release APK & App Bundle:
+```bash
+# Build Release APK connecting to Serverpod Cloud:
+fvm flutter build apk --release --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+
+# Build App Bundle (.aab) for Google Play:
+fvm flutter build appbundle --release --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+```
+> The generated APK will be located at `reflex_flutter/build/app/outputs/flutter-apk/app-release.apk`.
+
+### iOS (Simulator & Physical Devices)
+
+#### Running in Development:
+```bash
+# Run on iOS Simulator (connects to local backend at http://localhost:8080):
+fvm flutter run -d ios
+
+# Run on iOS Simulator connected to Serverpod Cloud:
+fvm flutter run -d ios --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+```
+
+#### Building Release for iOS:
+```bash
+# Build iOS release bundle (without code signing):
+fvm flutter build ios --release --no-codesign --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+
+# Build IPA archive for TestFlight / App Store:
+fvm flutter build ipa --release --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
 ```
 
 ---

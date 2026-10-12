@@ -128,8 +128,14 @@ fvm flutter test
 
 ---
 
-## 🚀 Running the App
+## 🚀 Running & Building the App
 
+### Cloud Endpoints (Serverpod Cloud)
+- **Web:** [https://reflex.serverpod.space/](https://reflex.serverpod.space/)
+- **API:** [https://reflex.api.serverpod.space/](https://reflex.api.serverpod.space/)
+- **Insights:** [https://reflex.insights.serverpod.space/](https://reflex.insights.serverpod.space/)
+
+### Web & Desktop
 ```bash
 # Run on Chrome
 fvm flutter run -d chrome
@@ -137,3 +143,52 @@ fvm flutter run -d chrome
 # Run on macOS Desktop
 fvm flutter run -d macos
 ```
+
+### Android (Emulator & Physical Devices)
+
+#### Running in Development:
+```bash
+# Connect to local Serverpod backend via emulator:
+adb reverse tcp:8080 tcp:8080
+fvm flutter run -d android
+
+# Connect to Serverpod Cloud backend:
+fvm flutter run -d RMX2040 --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+```
+
+#### Running in Release Mode on Physical Device:
+```bash
+# Run optimized release build directly on connected Android device:
+fvm flutter run -d RMX2040 --release --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+```
+
+#### Building Release APK & App Bundle:
+```bash
+# Build Release APK connecting to Serverpod Cloud:
+fvm flutter build apk --release --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+
+# Build App Bundle (.aab) for Google Play:
+fvm flutter build appbundle --release --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+```
+> The built APK is saved to `build/app/outputs/flutter-apk/app-release.apk`.
+
+### iOS (Simulator & Physical Devices)
+
+#### Running in Development:
+```bash
+# Run on iOS Simulator (connects to local backend at http://localhost:8080):
+fvm flutter run -d ios
+
+# Run on iOS Simulator connected to Serverpod Cloud:
+fvm flutter run -d ios --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+```
+
+#### Building Release for iOS:
+```bash
+# Build iOS release bundle (without code signing):
+fvm flutter build ios --release --no-codesign --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+
+# Build IPA archive for TestFlight / App Store:
+fvm flutter build ipa --release --dart-define=SERVER_URL=https://reflex.api.serverpod.space/
+```
+
