@@ -172,6 +172,11 @@ abstract class  LocaleKeys {
   static const profile_total_attempts = 'profile.total_attempts';
   static const profile_summary_title = 'profile.summary_title';
   static const profile_summary_subtitle = 'profile.summary_subtitle';
+  static const profile_change_avatar = 'profile.change_avatar';
+  static const profile_choose_avatar_title = 'profile.choose_avatar_title';
+  static const profile_avatar_updated = 'profile.avatar_updated';
+  static const profile_save_avatar = 'profile.save_avatar';
+  static const profile_avatar_color = 'profile.avatar_color';
   static const profile = 'profile';
   static const auth_welcome_title = 'auth.welcome_title';
   static const auth_welcome_subtitle = 'auth.welcome_subtitle';
@@ -207,6 +212,12 @@ abstract class  LocaleKeys {
   static const auth_sign_in_with_apple = 'auth.sign_in_with_apple';
   static const auth_or_divider = 'auth.or_divider';
   static const auth_demo_hint = 'auth.demo_hint';
+  static const auth_invalid_credentials = 'auth.invalid_credentials';
+  static const auth_enter_email_password = 'auth.enter_email_password';
+  static const auth_password_too_short = 'auth.password_too_short';
+  static const auth_google_unconfigured = 'auth.google_unconfigured';
+  static const auth_google_signin_failed = 'auth.google_signin_failed';
+  static const auth_registration_failed = 'auth.registration_failed';
   static const auth = 'auth';
 
 }

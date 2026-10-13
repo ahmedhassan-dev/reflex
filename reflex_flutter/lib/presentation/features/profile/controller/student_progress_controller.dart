@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
+import '../../../../core/storage/avatar_preferences.dart';
 import '../../../../data/repositories/analytics_repository.dart';
 import '../student_progress_screen.dart';
 
@@ -14,12 +15,37 @@ abstract class StudentProgressController extends State<StudentProgressScreen> {
   bool isLoading = false;
   String? errorMessage;
 
+  String avatarId = 'student';
+  int avatarColorValue = 0xFF10B981;
+
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   @override
   void initState() {
     super.initState();
     analyticsRepo = widget.repositoryOverride ?? AnalyticsRepositoryImpl();
+    _loadSavedAvatar();
     loadCoursesAndProgress();
+  }
+
+  Future<void> _loadSavedAvatar() async {
+    final savedId = await AvatarPreferences.getSavedAvatarId();
+    final savedColor = await AvatarPreferences.getSavedAvatarColor();
+    if (mounted && (savedId != null || savedColor != null)) {
+      setState(() {
+        if (savedId != null) avatarId = savedId;
+        if (savedColor != null) avatarColorValue = savedColor;
+      });
+    }
+  }
+
+  Future<void> changeAvatar(String newId, int newColor) async {
+    await AvatarPreferences.saveAvatar(newId, newColor);
+    if (mounted) {
+      setState(() {
+        avatarId = newId;
+        avatarColorValue = newColor;
+      });
+    }
   }
 
   // ── Actions ────────────────────────────────────────────────────────────────

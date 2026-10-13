@@ -9,6 +9,7 @@ class SignInFormWidget extends StatelessWidget {
   final TextEditingController passwordController;
   final Role selectedRole;
   final Color roleColor;
+  final bool isLoading;
   final VoidCallback onSignIn;
   final VoidCallback onGoogleSignIn;
   final VoidCallback onAppleSignIn;
@@ -19,6 +20,7 @@ class SignInFormWidget extends StatelessWidget {
     required this.passwordController,
     required this.selectedRole,
     required this.roleColor,
+    this.isLoading = false,
     required this.onSignIn,
     required this.onGoogleSignIn,
     required this.onAppleSignIn,
@@ -55,19 +57,30 @@ class SignInFormWidget extends StatelessWidget {
           height: 50,
           child: ElevatedButton.icon(
             key: const Key('btn_submit_signin'),
-            icon: const Icon(Icons.login_rounded),
-            label: Text(
-              selectedRole == Role.student
-                  ? LocaleKeys.auth_continue_as_student.tr()
-                  : LocaleKeys.auth_continue_as_teacher.tr(),
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
+            icon: isLoading
+                ? const SizedBox.shrink()
+                : const Icon(Icons.login_rounded),
+            label: isLoading
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text(
+                    selectedRole == Role.student
+                        ? LocaleKeys.auth_continue_as_student.tr()
+                        : LocaleKeys.auth_continue_as_teacher.tr(),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
             style: ElevatedButton.styleFrom(
               backgroundColor: roleColor,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            onPressed: onSignIn,
+            onPressed: isLoading ? null : onSignIn,
           ),
         ),
         const SizedBox(height: 16),

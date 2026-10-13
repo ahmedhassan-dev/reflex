@@ -18,8 +18,10 @@ import "package:serverpod_flutter/serverpod_flutter.dart";
 final serverUrl = getServerUrl();
 
 FlutterAuthSessionManager? authSessionManager;
+bool isDemoUserActive = false;
 
 Future<void> _signInDemoWith(String token, String uuid, String scope) async {
+  isDemoUserActive = true;
   await authSessionManager?.updateSignedInUser(
     AuthSuccess(
       authStrategy: 'session',
@@ -52,6 +54,7 @@ Future<void> signInDemoStudentCharlie() =>
 
 /// Clears the active demo session.
 Future<void> signOutDemo() async {
+  isDemoUserActive = false;
   await authSessionManager?.updateSignedInUser(null);
 }
 

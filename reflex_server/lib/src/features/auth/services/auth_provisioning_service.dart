@@ -24,7 +24,35 @@ class AuthProvisioningService {
 
     final authUserId = UuidValue.fromString(authInfo.userIdentifier);
     final existing = await learnerRepo.findByAuthUserId(authUserId);
+
+    // Attempt to resolve real full name from Serverpod auth user profile
+    String? profileFullName;
+    try {
+      final rows = await session.db.unsafeQuery(
+        'SELECT "fullName", "userName", "email" FROM "serverpod_auth_core_profile" WHERE "authUserId" = \'$authUserId\' LIMIT 1;',
+      );
+      if (rows.isNotEmpty) {
+        final row = rows.first;
+        final fn = row[0]?.toString();
+        final un = row[1]?.toString();
+        final em = row[2]?.toString();
+        if (fn != null && fn.trim().isNotEmpty) {
+          profileFullName = fn.trim();
+        } else if (un != null && un.trim().isNotEmpty) {
+          profileFullName = un.trim();
+        } else if (em != null && em.trim().isNotEmpty) {
+          profileFullName = em.split('@').first;
+        }
+      }
+    } catch (_) {}
+
     if (existing != null) {
+      if (profileFullName != null &&
+          (existing.displayName.startsWith('Student ') ||
+              existing.displayName.startsWith('Teacher '))) {
+        existing.displayName = profileFullName;
+        return learnerRepo.save(existing);
+      }
       return existing;
     }
 
@@ -42,7 +70,8 @@ class AuthProvisioningService {
     } else if (uid == '00000000-0000-4000-8000-000000000013') {
       resolvedName = 'Charlie (Student)';
     } else {
-      resolvedName = defaultDisplayName ??
+      resolvedName = profileFullName ??
+          defaultDisplayName ??
           (isTeacher
               ? 'Teacher ${uid.substring(0, 8)}'
               : 'Student ${uid.substring(0, 8)}');

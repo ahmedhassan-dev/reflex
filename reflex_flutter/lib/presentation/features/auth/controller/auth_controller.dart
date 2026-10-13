@@ -7,6 +7,7 @@ import "package:sentry_flutter/sentry_flutter.dart";
 import "package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart";
 import "../../../../client.dart";
 import "../../../../core/storage/role_preferences.dart";
+import "../../../../generated/locale_keys.g.dart";
 import "../../../shell/app_shell.dart";
 import "../auth_screen.dart";
 import "../role_selection_screen.dart";
@@ -40,11 +41,6 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
     super.dispose();
   }
 
-  String _formatNameFromEmail(String raw) {
-    final parts = raw.split(RegExp(r"[._-]")).where((p) => p.isNotEmpty);
-    if (parts.isEmpty) return raw;
-    return parts.map((p) => p[0].toUpperCase() + (p.length > 1 ? p.substring(1) : "")).join(" ");
-  }
 
   void selectRole(Role role) {
     if (selectedRole != role) {
@@ -56,23 +52,100 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
     }
   }
 
-  void signInWithEmail(BuildContext context) {
+  Future<void> signInWithEmail(BuildContext context) async {
     final email = emailController.text.trim();
-    final name = email.isNotEmpty
-        ? _formatNameFromEmail(email.split("@").first)
-        : (selectedRole == Role.student ? "Alice" : "Mr. Hassan");
-    _navigateToAppShell(context, role: selectedRole, userName: name);
+    final password = passwordController.text;
+    if (email.isEmpty || password.isEmpty) {
+      setState(() {
+        errorMessage = LocaleKeys.auth_enter_email_password.tr();
+      });
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      final authSuccess = await client.emailIdp.login(
+        email: email,
+        password: password,
+      );
+      await authSessionManager?.updateSignedInUser(authSuccess);
+
+      if (context.mounted) {
+        _navigateToAppShell(context, role: selectedRole, userName: null);
+      }
+    } catch (e, st) {
+      debugPrint('[AuthController.signInWithEmail] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
+      if (mounted) {
+        setState(() {
+          errorMessage = LocaleKeys.auth_invalid_credentials.tr();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
 
-  void signUpWithEmail(BuildContext context) {
-    final typedName = nameController.text.trim();
+  Future<void> signUpWithEmail(BuildContext context) async {
     final email = emailController.text.trim();
-    final name = typedName.isNotEmpty
-        ? typedName
-        : (email.isNotEmpty
-            ? _formatNameFromEmail(email.split("@").first)
-            : (selectedRole == Role.student ? "New Student" : "New Teacher"));
-    _navigateToAppShell(context, role: selectedRole, userName: name);
+    final password = passwordController.text;
+    if (email.isEmpty || password.isEmpty) {
+      setState(() {
+        errorMessage = LocaleKeys.auth_enter_email_password.tr();
+      });
+      return;
+    }
+    if (password.length < 8) {
+      setState(() {
+        errorMessage = LocaleKeys.auth_password_too_short.tr();
+      });
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      await client.emailIdp.startRegistration(email: email);
+      if (mounted) {
+        setState(() {
+          errorMessage = null;
+        });
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                context.locale.languageCode == "ar"
+                    ? "تم إرسال كود التحقق إلى بريدك الإلكتروني."
+                    : "Verification code sent to your email.",
+              ),
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e, st) {
+      debugPrint('[AuthController.signUpWithEmail] error: $e\n$st');
+      unawaited(Sentry.captureException(e, stackTrace: st));
+      if (mounted) {
+        setState(() {
+          errorMessage = '${LocaleKeys.auth_registration_failed.tr()}: $e';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
 
   Future<void> signInWithGoogle(BuildContext context) async {
@@ -94,23 +167,10 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
               redirectUri: redirectUri,
             );
           } else {
-            // Google OAuth is unconfigured in development/web mode.
-            // Notify user and proceed seamlessly with demo profile.
-            final typedEmail = emailController.text.trim();
-        final fallbackName = typedEmail.isNotEmpty ? _formatNameFromEmail(typedEmail.split("@").first) : (selectedRole == Role.student ? "Alice (Google)" : "Mr. Hassan (Google)");
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    context.locale.languageCode == "ar"
-                        ? "لم يتم تهيئة GOOGLE_CLIENT_ID للويب بعد. تم الدخول بحساب تجريبي."
-                        : "GOOGLE_CLIENT_ID not configured for Web yet. Signed in with demo profile.",
-                  ),
-                  duration: const Duration(seconds: 3),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-              _navigateToAppShell(context, role: selectedRole, userName: fallbackName);
+            if (mounted) {
+              setState(() {
+                errorMessage = LocaleKeys.auth_google_unconfigured.tr();
+              });
             }
             return;
           }
@@ -120,12 +180,8 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
       final googleController = GoogleAuthController(
         client: client,
         onAuthenticated: () {
-          final typedEmail = emailController.text.trim();
-          final name = typedEmail.isNotEmpty
-              ? _formatNameFromEmail(typedEmail.split("@").first)
-              : (selectedRole == Role.student ? "Alice" : "Mr. Hassan");
           if (context.mounted) {
-            _navigateToAppShell(context, role: selectedRole, userName: name);
+            _navigateToAppShell(context, role: selectedRole, userName: null);
           }
         },
         onError: (err) {
@@ -137,30 +193,42 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
 
       await googleController.signIn();
 
-      if (googleController.error != null && context.mounted) {
-        final typedEmail = emailController.text.trim();
-        final fallbackName = typedEmail.isNotEmpty ? _formatNameFromEmail(typedEmail.split("@").first) : (selectedRole == Role.student ? "Alice (Google)" : "Mr. Hassan (Google)");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              context.locale.languageCode == "ar"
-                  ? "تعذر إتمام الدخول عبر Google. تم الدخول بالملف التجريبي."
-                  : "Google Sign-In could not complete. Signed in with demo profile.",
+      if (googleController.error != null && mounted) {
+        setState(() {
+          errorMessage = googleController.error.toString();
+        });
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${LocaleKeys.auth_google_signin_failed.tr()}: ${googleController.error}',
+              ),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
             ),
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-        _navigateToAppShell(context, role: selectedRole, userName: fallbackName);
+          );
+        }
       }
     } catch (e, st) {
       debugPrint('[AuthController.signInWithGoogle] error: $e\n$st');
       unawaited(Sentry.captureException(e, stackTrace: st));
-      // In headless test environments or offline demo, fallback gracefully
-      final typedEmail = emailController.text.trim();
-      final fallbackName = typedEmail.isNotEmpty ? _formatNameFromEmail(typedEmail.split("@").first) : (selectedRole == Role.student ? "Alice (Google)" : "Mr. Hassan (Google)");
-      if (context.mounted) {
-        _navigateToAppShell(context, role: selectedRole, userName: fallbackName);
+      if (mounted) {
+        setState(() {
+          errorMessage = '${LocaleKeys.auth_google_signin_failed.tr()}: $e';
+        });
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${LocaleKeys.auth_google_signin_failed.tr()}: $e',
+              ),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     } finally {
       if (mounted) {
@@ -219,7 +287,7 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
   void _navigateToAppShell(
     BuildContext context, {
     required Role role,
-    required String userName,
+    String? userName,
   }) {
     RolePreferences.saveRole(role);
     Navigator.of(context).pushReplacement(

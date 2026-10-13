@@ -137,7 +137,50 @@ class _AuthScreenState extends AuthController {
                     roleColor: roleColor,
                     onSwitchRole: () => switchToRoleSelection(context),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
+
+                  // Prominent Error Banner
+                  if (errorMessage != null) ...[
+                    Container(
+                      key: const Key('auth_error_banner'),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.error.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            color: Theme.of(context).colorScheme.error,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              errorMessage!,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onErrorContainer,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded, size: 16),
+                            color: Theme.of(context).colorScheme.onErrorContainer,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () => setState(() => errorMessage = null),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
 
                   // Authentication Tabs (Sign In, Sign Up, Quick Demo)
                   Container(
@@ -186,6 +229,7 @@ class _AuthScreenState extends AuthController {
                             passwordController: passwordController,
                             selectedRole: selectedRole,
                             roleColor: roleColor,
+                            isLoading: isLoading,
                             onSignIn: () => signInWithEmail(context),
                             onGoogleSignIn: () => signInWithGoogle(context),
                             onAppleSignIn: () => signInWithApple(context),
@@ -196,6 +240,7 @@ class _AuthScreenState extends AuthController {
                             passwordController: passwordController,
                             selectedRole: selectedRole,
                             roleColor: roleColor,
+                            isLoading: isLoading,
                             onSignUp: () => signUpWithEmail(context),
                             onGoogleSignIn: () => signInWithGoogle(context),
                             onAppleSignIn: () => signInWithApple(context),

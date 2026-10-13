@@ -10,6 +10,7 @@ class SignUpFormWidget extends StatelessWidget {
   final TextEditingController passwordController;
   final Role selectedRole;
   final Color roleColor;
+  final bool isLoading;
   final VoidCallback onSignUp;
   final VoidCallback onGoogleSignIn;
   final VoidCallback onAppleSignIn;
@@ -21,6 +22,7 @@ class SignUpFormWidget extends StatelessWidget {
     required this.passwordController,
     required this.selectedRole,
     required this.roleColor,
+    this.isLoading = false,
     required this.onSignUp,
     required this.onGoogleSignIn,
     required this.onAppleSignIn,
@@ -67,17 +69,28 @@ class SignUpFormWidget extends StatelessWidget {
           height: 50,
           child: ElevatedButton.icon(
             key: const Key('btn_submit_signup'),
-            icon: const Icon(Icons.check_circle_outline_rounded),
-            label: Text(
-              '${LocaleKeys.auth_create_account.tr()} (${selectedRole == Role.student ? LocaleKeys.auth_role_student.tr() : LocaleKeys.auth_role_teacher.tr()})',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
+            icon: isLoading
+                ? const SizedBox.shrink()
+                : const Icon(Icons.check_circle_outline_rounded),
+            label: isLoading
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text(
+                    '${LocaleKeys.auth_create_account.tr()} (${selectedRole == Role.student ? LocaleKeys.auth_role_student.tr() : LocaleKeys.auth_role_teacher.tr()})',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
             style: ElevatedButton.styleFrom(
               backgroundColor: roleColor,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            onPressed: onSignUp,
+            onPressed: isLoading ? null : onSignUp,
           ),
         ),
         const SizedBox(height: 16),

@@ -129,5 +129,50 @@ void main() {
       verify(() => mockRepo.getMyProgress(2)).called(1);
       expect(find.text('10'), findsOneWidget);
     });
+
+    testWidgets('tapping avatar opens AvatarSelectorModal and allows changing avatar',
+        (tester) async {
+      final sampleProgress = StudentProgress(
+        learnerId: 101,
+        displayName: 'Amira Tariq',
+        solvedCount: 18,
+        cleanFirstTryCount: 14,
+        avgResponseMs: 1420.0,
+      );
+
+      when(() => mockRepo.listCourses())
+          .thenAnswer((_) async => Result.success([]));
+      when(() => mockRepo.getMyProgress(any()))
+          .thenAnswer((_) async => Result.success(sampleProgress));
+
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: StudentProgressScreen(
+            repositoryOverride: mockRepo,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify avatar change button exists
+      expect(find.byKey(const Key('btn_change_avatar')), findsOneWidget);
+
+      // Tap avatar to open selection sheet
+      await tester.tap(find.byKey(const Key('btn_change_avatar')));
+      await tester.pumpAndSettle();
+
+      // Verify preset option is visible
+      expect(find.byKey(const Key('btn_avatar_rocket')), findsOneWidget);
+
+      // Select rocket preset and save
+      await tester.tap(find.byKey(const Key('btn_avatar_rocket')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('btn_save_avatar')));
+      await tester.pumpAndSettle();
+
+      // Bottom sheet dismissed
+      expect(find.byKey(const Key('btn_save_avatar')), findsNothing);
+    });
   });
 }

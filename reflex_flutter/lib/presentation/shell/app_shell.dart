@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import '../../client.dart';
 import '../../generated/locale_keys.g.dart';
 import '../core/theme/app_colors.dart';
@@ -12,6 +13,7 @@ import '../features/demo_clock/widgets/demo_clock_widget.dart';
 import '../features/practice/practice_screen.dart';
 import '../features/profile/student_progress_screen.dart';
 import '../features/question_admin/question_admin_screen.dart';
+import 'widgets/app_drawer_widget.dart';
 
 /// App shell providing role-tailored navigation for Students and Teachers,
 /// collapsible Demo Clock time machine, and smooth role switching.
@@ -42,6 +44,10 @@ class _AppShellState extends State<AppShell> {
   }
 
   void _syncDemoAuthToken(Role role) {
+    if (!isDemoUserActive && client.auth.isAuthenticated) {
+      // User is authenticated with a real account; do not overwrite with demo tokens.
+      return;
+    }
     if (role == Role.teacher) {
       unawaited(signInDemoTeacher());
     } else {
@@ -70,6 +76,7 @@ class _AppShellState extends State<AppShell> {
     final roleBadgeText = isStudent
         ? LocaleKeys.auth_role_student_badge.tr()
         : LocaleKeys.auth_role_teacher_badge.tr();
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     // Students have Courses & My Progress; Teachers have Analytics Dashboard & Question Notes
     final destinations = isStudent
@@ -129,6 +136,17 @@ class _AppShellState extends State<AppShell> {
     final safeIndex = _currentIndex < screens.length ? _currentIndex : 0;
 
     return Scaffold(
+      drawer: isMobile
+          ? AppDrawerWidget(
+              currentRole: _currentRole,
+              userName: widget.userName,
+              showTimeMachine: _showTimeMachine,
+              onToggleTimeMachine: (val) {
+                setState(() => _showTimeMachine = val);
+              },
+              onSignOut: _switchToAuthScreen,
+            )
+          : null,
       appBar: AppBar(
         title: Row(
           children: [
@@ -185,41 +203,57 @@ class _AppShellState extends State<AppShell> {
             ),
           ],
         ),
-        actions: [
-          // Switch Role button
-          IconButton(
-            key: const Key('btn_switch_role'),
-            icon: const Icon(Icons.swap_horiz_rounded),
-            tooltip: LocaleKeys.auth_switch_role.tr(),
-            onPressed: _switchToAuthScreen,
-          ),
-          // Time Machine toggle button
-          IconButton(
-            icon: Icon(
-              Icons.access_time_filled_rounded,
-              color: _showTimeMachine ? ReflexColors.accent : null,
-            ),
-            tooltip: LocaleKeys.demo_clock_title.tr(),
-            onPressed: () {
-              setState(() {
-                _showTimeMachine = !_showTimeMachine;
-              });
-            },
-          ),
-          // Language toggle button
-          IconButton(
-            icon: const Icon(Icons.language_rounded),
-            tooltip: LocaleKeys.switch_language.tr(),
-            onPressed: () {
-              if (context.locale.languageCode == 'en') {
-                context.setLocale(const Locale('ar'));
-              } else {
-                context.setLocale(const Locale('en'));
-              }
-            },
-          ),
-          const SizedBox(width: 4),
-        ],
+        actions: isMobile
+            ? [
+                IconButton(
+                  icon: Icon(
+                    Icons.access_time_filled_rounded,
+                    color: _showTimeMachine ? ReflexColors.accent : null,
+                  ),
+                  tooltip: LocaleKeys.demo_clock_title.tr(),
+                  onPressed: () {
+                    setState(() {
+                      _showTimeMachine = !_showTimeMachine;
+                    });
+                  },
+                ),
+                const SizedBox(width: 4),
+              ]
+            : [
+                // Switch Role button
+                IconButton(
+                  key: const Key('btn_switch_role'),
+                  icon: const Icon(Icons.swap_horiz_rounded),
+                  tooltip: LocaleKeys.auth_switch_role.tr(),
+                  onPressed: _switchToAuthScreen,
+                ),
+                // Time Machine toggle button
+                IconButton(
+                  icon: Icon(
+                    Icons.access_time_filled_rounded,
+                    color: _showTimeMachine ? ReflexColors.accent : null,
+                  ),
+                  tooltip: LocaleKeys.demo_clock_title.tr(),
+                  onPressed: () {
+                    setState(() {
+                      _showTimeMachine = !_showTimeMachine;
+                    });
+                  },
+                ),
+                // Language toggle button
+                IconButton(
+                  icon: const Icon(Icons.language_rounded),
+                  tooltip: LocaleKeys.switch_language.tr(),
+                  onPressed: () {
+                    if (context.locale.languageCode == 'en') {
+                      context.setLocale(const Locale('ar'));
+                    } else {
+                      context.setLocale(const Locale('en'));
+                    }
+                  },
+                ),
+                const SizedBox(width: 4),
+              ],
       ),
       body: Column(
         children: [
