@@ -174,5 +174,33 @@ void main() {
       // Bottom sheet dismissed
       expect(find.byKey(const Key('btn_save_avatar')), findsNothing);
     });
+
+    testWidgets('tapping camera badge exists for photo upload', (tester) async {
+      final sampleProgress = StudentProgress(
+        learnerId: 101,
+        displayName: 'Amira Tariq',
+        solvedCount: 18,
+        cleanFirstTryCount: 14,
+        avgResponseMs: 1420.0,
+      );
+
+      when(() => mockRepo.listCourses())
+          .thenAnswer((_) async => Result.success([]));
+      when(() => mockRepo.getMyProgress(any()))
+          .thenAnswer((_) async => Result.success(sampleProgress));
+
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: StudentProgressScreen(
+            repositoryOverride: mockRepo,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify camera badge exists
+      expect(find.byKey(const Key('btn_edit_profile_image')), findsOneWidget);
+      expect(find.byIcon(Icons.camera_alt_rounded), findsOneWidget);
+    });
   });
 }

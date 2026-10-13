@@ -20,11 +20,13 @@ import 'widgets/app_drawer_widget.dart';
 class AppShell extends StatefulWidget {
   final Role initialRole;
   final String? userName;
+  final String? userImageUrl;
 
   const AppShell({
     super.key,
     this.initialRole = Role.student,
     this.userName,
+    this.userImageUrl,
   });
 
   @override
@@ -35,12 +37,27 @@ class _AppShellState extends State<AppShell> {
   late Role _currentRole;
   int _currentIndex = 0;
   bool _showTimeMachine = false;
+  String? _userName;
+  String? _userImageUrl;
 
   @override
   void initState() {
     super.initState();
     _currentRole = widget.initialRole;
+    _userName = widget.userName;
+    _userImageUrl = widget.userImageUrl;
     _syncDemoAuthToken(_currentRole);
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    final profile = await fetchCurrentUserProfile();
+    if (mounted && (profile.name != null || profile.imageUrl != null)) {
+      setState(() {
+        if (profile.name != null) _userName = profile.name;
+        if (profile.imageUrl != null) _userImageUrl = profile.imageUrl;
+      });
+    }
   }
 
   void _syncDemoAuthToken(Role role) {
@@ -109,28 +126,18 @@ class _AppShellState extends State<AppShell> {
         ? [
             CoursesScreen(
               key: ValueKey('courses_student_$_currentIndex'),
-              onStartPractice: (courseId) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => PracticeScreen(
-                      initialCourseId: courseId,
-                    ),
-                  ),
-                );
-              },
+              onStartPractice: (courseId) => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => PracticeScreen(initialCourseId: courseId)),
+              ),
             ),
             StudentProgressScreen(
               key: ValueKey('profile_student_$_currentIndex'),
-              userName: widget.userName,
+              userName: _userName,
             ),
           ]
         : [
-            AnalyticsScreen(
-              key: ValueKey('analytics_teacher_$_currentIndex'),
-            ),
-            QuestionAdminScreen(
-              key: ValueKey('admin_teacher_$_currentIndex'),
-            ),
+            AnalyticsScreen(key: ValueKey('analytics_teacher_$_currentIndex')),
+            QuestionAdminScreen(key: ValueKey('admin_teacher_$_currentIndex')),
           ];
 
     final safeIndex = _currentIndex < screens.length ? _currentIndex : 0;
@@ -139,11 +146,10 @@ class _AppShellState extends State<AppShell> {
       drawer: isMobile
           ? AppDrawerWidget(
               currentRole: _currentRole,
-              userName: widget.userName,
+              userName: _userName,
+              userImageUrl: _userImageUrl,
               showTimeMachine: _showTimeMachine,
-              onToggleTimeMachine: (val) {
-                setState(() => _showTimeMachine = val);
-              },
+              onToggleTimeMachine: (val) => setState(() => _showTimeMachine = val),
               onSignOut: _switchToAuthScreen,
             )
           : null,
@@ -182,15 +188,24 @@ class _AppShellState extends State<AppShell> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    isStudent ? Icons.school_rounded : Icons.co_present_rounded,
-                    size: 14,
-                    color: roleColor,
-                  ),
-                  const SizedBox(width: 4),
+                  if (_userImageUrl != null && _userImageUrl!.isNotEmpty) ...[
+                    CircleAvatar(
+                      radius: 8,
+                      backgroundImage: NetworkImage(_userImageUrl!),
+                      onBackgroundImageError: (error, stackTrace) {},
+                    ),
+                    const SizedBox(width: 4),
+                  ] else ...[
+                    Icon(
+                      isStudent ? Icons.school_rounded : Icons.co_present_rounded,
+                      size: 14,
+                      color: roleColor,
+                    ),
+                    const SizedBox(width: 4),
+                  ],
                   Text(
-                    widget.userName != null
-                        ? '${widget.userName} ($roleBadgeText)'
+                    _userName != null
+                        ? '$_userName ($roleBadgeText)'
                         : roleBadgeText,
                     style: TextStyle(
                       fontSize: 11,
@@ -211,75 +226,48 @@ class _AppShellState extends State<AppShell> {
                     color: _showTimeMachine ? ReflexColors.accent : null,
                   ),
                   tooltip: LocaleKeys.demo_clock_title.tr(),
-                  onPressed: () {
-                    setState(() {
-                      _showTimeMachine = !_showTimeMachine;
-                    });
-                  },
+                  onPressed: () => setState(() => _showTimeMachine = !_showTimeMachine),
                 ),
                 const SizedBox(width: 4),
               ]
             : [
-                // Switch Role button
                 IconButton(
                   key: const Key('btn_switch_role'),
                   icon: const Icon(Icons.swap_horiz_rounded),
                   tooltip: LocaleKeys.auth_switch_role.tr(),
                   onPressed: _switchToAuthScreen,
                 ),
-                // Time Machine toggle button
                 IconButton(
                   icon: Icon(
                     Icons.access_time_filled_rounded,
                     color: _showTimeMachine ? ReflexColors.accent : null,
                   ),
                   tooltip: LocaleKeys.demo_clock_title.tr(),
-                  onPressed: () {
-                    setState(() {
-                      _showTimeMachine = !_showTimeMachine;
-                    });
-                  },
+                  onPressed: () => setState(() => _showTimeMachine = !_showTimeMachine),
                 ),
-                // Language toggle button
                 IconButton(
                   icon: const Icon(Icons.language_rounded),
                   tooltip: LocaleKeys.switch_language.tr(),
-                  onPressed: () {
-                    if (context.locale.languageCode == 'en') {
-                      context.setLocale(const Locale('ar'));
-                    } else {
-                      context.setLocale(const Locale('en'));
-                    }
-                  },
+                  onPressed: () => context.setLocale(
+                    Locale(context.locale.languageCode == 'en' ? 'ar' : 'en'),
+                  ),
                 ),
                 const SizedBox(width: 4),
               ],
       ),
       body: Column(
         children: [
-          if (_showTimeMachine) ...[
+          if (_showTimeMachine)
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(16, 4, 16, 12),
-              child: DemoClockWidget(
-                onClockShifted: _onClockShifted,
-              ),
+              child: DemoClockWidget(onClockShifted: _onClockShifted),
             ),
-          ],
-          Expanded(
-            child: IndexedStack(
-              index: safeIndex,
-              children: screens,
-            ),
-          ),
+          Expanded(child: IndexedStack(index: safeIndex, children: screens)),
         ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: safeIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onDestinationSelected: (index) => setState(() => _currentIndex = index),
         destinations: destinations,
       ),
     );

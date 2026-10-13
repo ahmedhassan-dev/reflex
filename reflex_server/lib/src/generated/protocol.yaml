@@ -16,6 +16,12 @@ googleIdp:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
+userProfile:
+  - removeUserImage:
+  - setUserImage:
+  - changeUserName:
+  - changeFullName:
+  - get:
 demoClock:
   - getOffsetDays:
   - setOffsetDays:

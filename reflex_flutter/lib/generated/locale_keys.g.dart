@@ -177,6 +177,14 @@ abstract class  LocaleKeys {
   static const profile_avatar_updated = 'profile.avatar_updated';
   static const profile_save_avatar = 'profile.save_avatar';
   static const profile_avatar_color = 'profile.avatar_color';
+  static const profile_upload_image = 'profile.upload_image';
+  static const profile_choose_from_gallery = 'profile.choose_from_gallery';
+  static const profile_take_photo = 'profile.take_photo';
+  static const profile_remove_image = 'profile.remove_image';
+  static const profile_image_updated = 'profile.image_updated';
+  static const profile_image_removed = 'profile.image_removed';
+  static const profile_image_upload_failed = 'profile.image_upload_failed';
+  static const profile_image_authenticated_only = 'profile.image_authenticated_only';
   static const profile = 'profile';
   static const auth_welcome_title = 'auth.welcome_title';
   static const auth_welcome_subtitle = 'auth.welcome_subtitle';

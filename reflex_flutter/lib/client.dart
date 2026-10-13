@@ -20,6 +20,9 @@ final serverUrl = getServerUrl();
 FlutterAuthSessionManager? authSessionManager;
 bool isDemoUserActive = false;
 
+/// Safely checks whether the user is authenticated, without throwing in tests.
+bool get isUserAuthenticated => authSessionManager?.isAuthenticated ?? false;
+
 Future<void> _signInDemoWith(String token, String uuid, String scope) async {
   isDemoUserActive = true;
   await authSessionManager?.updateSignedInUser(
@@ -52,10 +55,32 @@ Future<void> signInDemoStudentBob() =>
 Future<void> signInDemoStudentCharlie() =>
     _signInDemoWith('demo-student-charlie-token', '00000000-0000-4000-8000-000000000013', 'student');
 
-/// Clears the active demo session.
+/// Clears the active demo session or signs out authenticated user.
 Future<void> signOutDemo() async {
   isDemoUserActive = false;
-  await authSessionManager?.updateSignedInUser(null);
+  try {
+    await client.auth.signOutDevice();
+  } catch (_) {
+    await authSessionManager?.updateSignedInUser(null);
+  }
+}
+
+/// Fetches profile information (full name and public image URL) for the active authenticated user.
+Future<({String? name, String? imageUrl})> fetchCurrentUserProfile() async {
+  if (isDemoUserActive || !isUserAuthenticated) {
+    return (name: null, imageUrl: null);
+  }
+  try {
+    final profile = await client.userProfile.get();
+    final name = profile.fullName?.isNotEmpty == true
+        ? profile.fullName
+        : (profile.userName?.isNotEmpty == true ? profile.userName : profile.email);
+    final imageUrl = profile.imageUrl?.toString();
+    return (name: name, imageUrl: imageUrl);
+  } catch (e) {
+    debugPrint('[UserProfile] Error fetching profile: $e');
+    return (name: null, imageUrl: null);
+  }
 }
 
 /// Sets up a global client object that can be used to talk to the server from
@@ -72,7 +97,7 @@ Future<void> initializeClient() async {
   client = Client(await serverUrl)
     ..connectivityMonitor = FlutterConnectivityMonitor()
     ..authSessionManager = manager;
-  unawaited(client.auth.initialize());
+  await client.auth.initialize();
 
   const googleClientId = String.fromEnvironment("GOOGLE_CLIENT_ID", defaultValue: "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com");
   if (googleClientId.isNotEmpty) {

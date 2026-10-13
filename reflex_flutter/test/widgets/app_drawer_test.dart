@@ -74,5 +74,36 @@ void main() {
 
       expect(signedOut, isTrue);
     });
+
+    testWidgets('renders profile image when userImageUrl is provided',
+        (tester) async {
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: Scaffold(
+            drawer: AppDrawerWidget(
+              currentRole: Role.student,
+              userName: 'Amira',
+              userImageUrl: 'https://example.com/avatar.jpg',
+              showTimeMachine: false,
+              onToggleTimeMachine: (_) {},
+              onSignOut: () {},
+            ),
+            body: Builder(
+              builder: (ctx) => ElevatedButton(
+                onPressed: () => Scaffold.of(ctx).openDrawer(),
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CircleAvatar), findsOneWidget);
+      expect(find.text('Amira (Student)'), findsOneWidget);
+    });
   });
 }

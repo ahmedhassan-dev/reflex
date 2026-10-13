@@ -180,7 +180,15 @@
     "choose_avatar_title": "اختر صورتك الرمزية",
     "avatar_updated": "تم تحديث الصورة الرمزية بنجاح!",
     "save_avatar": "حفظ الصورة الرمزية",
-    "avatar_color": "لون الخلفية"
+    "avatar_color": "لون الخلفية",
+    "upload_image": "رفع صورة شخصية",
+    "choose_from_gallery": "اختيار من المعرض",
+    "take_photo": "التقاط صورة",
+    "remove_image": "إزالة الصورة",
+    "image_updated": "تم تحديث الصورة الشخصية بنجاح!",
+    "image_removed": "تمت إزالة الصورة الشخصية.",
+    "image_upload_failed": "فشل رفع الصورة الشخصية. يرجى المحاولة مرة أخرى.",
+    "image_authenticated_only": "رفع الصور متاح فقط للحسابات المسجلة."
   },
   "auth": {
     "welcome_title": "مرحباً بك في ريفلكس",

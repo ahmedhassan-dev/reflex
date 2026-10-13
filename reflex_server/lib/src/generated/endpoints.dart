@@ -10,6 +10,7 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'dart:typed_data' as _idt;
 import 'package:reflex_server/src/generated/dtos/create_question_input.dart'
     as _i27r3xjl;
 import 'package:reflex_server/src/generated/enums/subscription_status.dart'
@@ -23,6 +24,7 @@ import '../features/analytics/endpoints/analytics_endpoint.dart' as _iq2m74g2;
 import '../features/auth/endpoints/email_idp_endpoint.dart' as _ikefcyg2;
 import '../features/auth/endpoints/google_idp_endpoint.dart' as _i9fjg688;
 import '../features/auth/endpoints/jwt_refresh_endpoint.dart' as _ifvnvxal;
+import '../features/auth/endpoints/user_profile_endpoint.dart' as _ixcbvcae;
 import '../features/demo_clock/endpoints/demo_clock_endpoint.dart' as _ibqt6ryp;
 import '../features/greetings/endpoints/greeting_endpoint.dart' as _imxylvdf;
 import '../features/practice/endpoints/practice_endpoint.dart' as _izjuq0o1;
@@ -55,6 +57,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'jwtRefresh',
+          null,
+        ),
+      'userProfile': _ixcbvcae.UserProfileEndpoint()
+        ..initialize(
+          server,
+          'userProfile',
           null,
         ),
       'demoClock': _ibqt6ryp.DemoClockEndpoint()
@@ -401,6 +409,94 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         refreshToken: params['refreshToken'],
                       ),
+        ),
+      },
+    );
+    connectors['userProfile'] = _is.EndpointConnector(
+      name: 'userProfile',
+      endpoint: endpoints['userProfile']!,
+      methodConnectors: {
+        'removeUserImage': _is.MethodConnector(
+          name: 'removeUserImage',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
+                      .removeUserImage(session),
+        ),
+        'setUserImage': _is.MethodConnector(
+          name: 'setUserImage',
+          params: {
+            'image': _is.ParameterDescription(
+              name: 'image',
+              type: _is.getType<_idt.ByteData>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
+                      .setUserImage(
+                        session,
+                        params['image'],
+                      ),
+        ),
+        'changeUserName': _is.MethodConnector(
+          name: 'changeUserName',
+          params: {
+            'userName': _is.ParameterDescription(
+              name: 'userName',
+              type: _is.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
+                      .changeUserName(
+                        session,
+                        params['userName'],
+                      ),
+        ),
+        'changeFullName': _is.MethodConnector(
+          name: 'changeFullName',
+          params: {
+            'fullName': _is.ParameterDescription(
+              name: 'fullName',
+              type: _is.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
+                      .changeFullName(
+                        session,
+                        params['fullName'],
+                      ),
+        ),
+        'get': _is.MethodConnector(
+          name: 'get',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
+                      .get(session),
         ),
       },
     );

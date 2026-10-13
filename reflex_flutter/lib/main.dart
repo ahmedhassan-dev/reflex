@@ -10,6 +10,7 @@ import 'package:reflex_client/reflex_client.dart';
 import 'presentation/core/theme/app_theme.dart';
 import 'presentation/features/auth/auth_screen.dart';
 import 'presentation/features/auth/role_selection_screen.dart';
+import 'presentation/shell/app_shell.dart';
 
 Future<void> main() async {
   await SentryFlutter.init(
@@ -46,6 +47,7 @@ class ReflexApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveRole = initialRole ?? Role.student;
     return MaterialApp(
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
@@ -54,9 +56,11 @@ class ReflexApp extends StatelessWidget {
       theme: ReflexTheme.light,
       darkTheme: ReflexTheme.dark,
       themeMode: ThemeMode.system,
-      home: initialRole != null
-          ? AuthScreen(initialRole: initialRole)
-          : const RoleSelectionScreen(),
+      home: isUserAuthenticated
+          ? AppShell(initialRole: effectiveRole)
+          : (initialRole != null
+              ? AuthScreen(initialRole: initialRole)
+              : const RoleSelectionScreen()),
     );
   }
 }

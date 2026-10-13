@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
+import 'dart:typed_data' as _idt;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:reflex_client/src/protocol/course.dart' as _irm1rqva;
 import 'package:reflex_client/src/protocol/course_subscription.dart'
@@ -346,6 +347,64 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
+/// By extending [UserProfileEditBaseEndpoint], user profile endpoints
+/// (including uploading user image to Serverpod storage and removing it)
+/// are exposed on the server.
+/// {@category Endpoint}
+class EndpointUserProfile extends _iacc.EndpointUserProfileEditBase {
+  EndpointUserProfile(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'userProfile';
+
+  /// Removes the user's uploaded image, setting it to null.
+  ///
+  /// The client should handle displaying a placeholder for users without images.
+  @override
+  _ida.Future<_iacc.UserProfileModel> removeUserImage() =>
+      caller.callServerEndpoint<_iacc.UserProfileModel>(
+        'userProfile',
+        'removeUserImage',
+        {},
+      );
+
+  /// Sets a new user image for the signed in user.
+  @override
+  _ida.Future<_iacc.UserProfileModel> setUserImage(_idt.ByteData image) =>
+      caller.callServerEndpoint<_iacc.UserProfileModel>(
+        'userProfile',
+        'setUserImage',
+        {'image': image},
+      );
+
+  /// Changes the name of a user.
+  @override
+  _ida.Future<_iacc.UserProfileModel> changeUserName(String? userName) =>
+      caller.callServerEndpoint<_iacc.UserProfileModel>(
+        'userProfile',
+        'changeUserName',
+        {'userName': userName},
+      );
+
+  /// Changes the full name of a user.
+  @override
+  _ida.Future<_iacc.UserProfileModel> changeFullName(String? fullName) =>
+      caller.callServerEndpoint<_iacc.UserProfileModel>(
+        'userProfile',
+        'changeFullName',
+        {'fullName': fullName},
+      );
+
+  /// Returns the user profile of the current user.
+  @override
+  _ida.Future<_iacc.UserProfileModel> get() =>
+      caller.callServerEndpoint<_iacc.UserProfileModel>(
+        'userProfile',
+        'get',
+        {},
+      );
+}
+
 /// Endpoint managing simulated time advancement for live demonstrations and testing.
 /// {@category Endpoint}
 class EndpointDemoClock extends _isc.EndpointRef {
@@ -611,6 +670,7 @@ class Client extends _isc.ServerpodClientShared {
     emailIdp = EndpointEmailIdp(this);
     googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    userProfile = EndpointUserProfile(this);
     demoClock = EndpointDemoClock(this);
     greeting = EndpointGreeting(this);
     practice = EndpointPractice(this);
@@ -625,6 +685,8 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointGoogleIdp googleIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointUserProfile userProfile;
 
   late final EndpointDemoClock demoClock;
 
@@ -642,6 +704,7 @@ class Client extends _isc.ServerpodClientShared {
     'emailIdp': emailIdp,
     'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
+    'userProfile': userProfile,
     'demoClock': demoClock,
     'greeting': greeting,
     'practice': practice,

@@ -180,7 +180,15 @@
     "choose_avatar_title": "Choose Your Avatar",
     "avatar_updated": "Avatar updated successfully!",
     "save_avatar": "Save Avatar",
-    "avatar_color": "Avatar Color"
+    "avatar_color": "Avatar Color",
+    "upload_image": "Upload Profile Photo",
+    "choose_from_gallery": "Choose from Gallery",
+    "take_photo": "Take Photo",
+    "remove_image": "Remove Photo",
+    "image_updated": "Profile photo updated successfully!",
+    "image_removed": "Profile photo removed.",
+    "image_upload_failed": "Failed to upload photo. Please try again.",
+    "image_authenticated_only": "Photo upload is available for registered accounts."
   },
   "auth": {
     "welcome_title": "Welcome to Reflex",

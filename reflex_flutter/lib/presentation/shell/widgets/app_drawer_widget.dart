@@ -9,6 +9,7 @@ import '../../core/theme/app_colors.dart';
 class AppDrawerWidget extends StatelessWidget {
   final Role currentRole;
   final String? userName;
+  final String? userImageUrl;
   final bool showTimeMachine;
   final ValueChanged<bool> onToggleTimeMachine;
   final VoidCallback onSignOut;
@@ -17,6 +18,7 @@ class AppDrawerWidget extends StatelessWidget {
     super.key,
     required this.currentRole,
     this.userName,
+    this.userImageUrl,
     required this.showTimeMachine,
     required this.onToggleTimeMachine,
     required this.onSignOut,
@@ -87,12 +89,21 @@ class AppDrawerWidget extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          isStudent ? Icons.school_rounded : Icons.co_present_rounded,
-                          size: 14,
-                          color: roleColor,
-                        ),
-                        const SizedBox(width: 6),
+                        if (userImageUrl != null && userImageUrl!.isNotEmpty) ...[
+                          CircleAvatar(
+                            radius: 10,
+                            backgroundImage: NetworkImage(userImageUrl!),
+                            onBackgroundImageError: (error, stackTrace) {},
+                          ),
+                          const SizedBox(width: 6),
+                        ] else ...[
+                          Icon(
+                            isStudent ? Icons.school_rounded : Icons.co_present_rounded,
+                            size: 14,
+                            color: roleColor,
+                          ),
+                          const SizedBox(width: 6),
+                        ],
                         Text(
                           userName != null
                               ? '$userName ($roleBadgeText)'

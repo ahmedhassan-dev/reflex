@@ -191,7 +191,20 @@ class CodegenLoader extends AssetLoader{
     "avg_latency": "Average Speed",
     "total_attempts": "Total Attempts",
     "summary_title": "Mastery Milestones",
-    "summary_subtitle": "Keep answering accurately and under the target time to build instant recall!"
+    "summary_subtitle": "Keep answering accurately and under the target time to build instant recall!",
+    "change_avatar": "Change Avatar",
+    "choose_avatar_title": "Choose Your Avatar",
+    "avatar_updated": "Avatar updated successfully!",
+    "save_avatar": "Save Avatar",
+    "avatar_color": "Avatar Color",
+    "upload_image": "Upload Profile Photo",
+    "choose_from_gallery": "Choose from Gallery",
+    "take_photo": "Take Photo",
+    "remove_image": "Remove Photo",
+    "image_updated": "Profile photo updated successfully!",
+    "image_removed": "Profile photo removed.",
+    "image_upload_failed": "Failed to upload photo. Please try again.",
+    "image_authenticated_only": "Photo upload is available for registered accounts."
   },
   "auth": {
     "welcome_title": "Welcome to Reflex",
@@ -227,7 +240,13 @@ class CodegenLoader extends AssetLoader{
     "sign_in_with_google": "Sign in with Google",
     "sign_in_with_apple": "Sign in with Apple",
     "or_divider": "OR",
-    "demo_hint": "Fast-track access to pre-seeded hackathon teacher & student environments."
+    "demo_hint": "Fast-track access to pre-seeded hackathon teacher & student environments.",
+    "invalid_credentials": "Incorrect email or password. Please try again.",
+    "enter_email_password": "Please enter both email and password.",
+    "password_too_short": "Password must be at least 8 characters.",
+    "google_unconfigured": "Google Sign-In is not configured for this domain.",
+    "google_signin_failed": "Google Sign-In failed to authenticate.",
+    "registration_failed": "Registration failed. Please check your details and try again."
   }
 };
 static const Map<String,dynamic> _ar = {
@@ -407,7 +426,20 @@ static const Map<String,dynamic> _ar = {
     "avg_latency": "متوسط السرعة",
     "total_attempts": "إجمالي المحاولات",
     "summary_title": "محطات الإتقان",
-    "summary_subtitle": "استمر في الإجابة بدقة وتحت الوقت المستهدف لبناء استجابة ذهنية سريعة!"
+    "summary_subtitle": "استمر في الإجابة بدقة وتحت الوقت المستهدف لبناء استجابة ذهنية سريعة!",
+    "change_avatar": "تغيير الصورة الرمزية",
+    "choose_avatar_title": "اختر صورتك الرمزية",
+    "avatar_updated": "تم تحديث الصورة الرمزية بنجاح!",
+    "save_avatar": "حفظ الصورة الرمزية",
+    "avatar_color": "لون الخلفية",
+    "upload_image": "رفع صورة شخصية",
+    "choose_from_gallery": "اختيار من المعرض",
+    "take_photo": "التقاط صورة",
+    "remove_image": "إزالة الصورة",
+    "image_updated": "تم تحديث الصورة الشخصية بنجاح!",
+    "image_removed": "تمت إزالة الصورة الشخصية.",
+    "image_upload_failed": "فشل رفع الصورة الشخصية. يرجى المحاولة مرة أخرى.",
+    "image_authenticated_only": "رفع الصور متاح فقط للحسابات المسجلة."
   },
   "auth": {
     "welcome_title": "مرحباً بك في ريفلكس",
@@ -443,7 +475,13 @@ static const Map<String,dynamic> _ar = {
     "sign_in_with_google": "تسجيل الدخول عبر Google",
     "sign_in_with_apple": "تسجيل الدخول عبر Apple",
     "or_divider": "أو",
-    "demo_hint": "دخول فوري بملفات المعلم والطلاب الجاهزة للعرض السريع."
+    "demo_hint": "دخول فوري بملفات المعلم والطلاب الجاهزة للعرض السريع.",
+    "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.",
+    "enter_email_password": "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
+    "password_too_short": "يجب ألا تقل كلمة المرور عن 8 خانات.",
+    "google_unconfigured": "تسجيل الدخول عبر Google غير مهيأ لهذا النطاق.",
+    "google_signin_failed": "تعذر تسجيل الدخول عبر Google.",
+    "registration_failed": "فشل إنشاء الحساب. تحقق من البيانات وحاول مجدداً."
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": _en, "ar": _ar};

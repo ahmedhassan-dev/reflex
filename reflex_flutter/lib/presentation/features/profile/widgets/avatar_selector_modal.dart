@@ -8,12 +8,14 @@ class AvatarSelectorModal extends StatefulWidget {
   final String currentAvatarId;
   final int currentColorValue;
   final void Function(String avatarId, int colorValue) onAvatarSaved;
+  final VoidCallback? onUploadPhoto;
 
   const AvatarSelectorModal({
     super.key,
     required this.currentAvatarId,
     required this.currentColorValue,
     required this.onAvatarSaved,
+    this.onUploadPhoto,
   });
 
   static Future<void> show(
@@ -21,6 +23,7 @@ class AvatarSelectorModal extends StatefulWidget {
     required String currentAvatarId,
     required int currentColorValue,
     required void Function(String avatarId, int colorValue) onAvatarSaved,
+    VoidCallback? onUploadPhoto,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -30,6 +33,7 @@ class AvatarSelectorModal extends StatefulWidget {
         currentAvatarId: currentAvatarId,
         currentColorValue: currentColorValue,
         onAvatarSaved: onAvatarSaved,
+        onUploadPhoto: onUploadPhoto,
       ),
     );
   }
@@ -116,7 +120,20 @@ class _AvatarSelectorModalState extends State<AvatarSelectorModal> {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
+
+          if (widget.onUploadPhoto != null) ...[
+            OutlinedButton.icon(
+              key: const Key('btn_modal_upload_photo'),
+              icon: const Icon(Icons.photo_library_rounded, size: 18),
+              label: Text(LocaleKeys.profile_upload_image.tr()),
+              onPressed: () {
+                Navigator.of(context).pop();
+                widget.onUploadPhoto!();
+              },
+            ),
+            const SizedBox(height: 14),
+          ],
 
           // Avatar Icon Presets Grid
           Wrap(

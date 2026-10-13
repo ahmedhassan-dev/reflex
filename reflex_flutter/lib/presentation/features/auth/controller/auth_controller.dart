@@ -30,6 +30,13 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
     if (widget.initialRole != null) {
       selectedRole = widget.initialRole!;
     }
+    if (isUserAuthenticated) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _navigateToAppShell(role: selectedRole, userName: null);
+        }
+      });
+    }
   }
 
   @override
@@ -53,6 +60,10 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
   }
 
   Future<void> signInWithEmail(BuildContext context) async {
+    if (isUserAuthenticated) {
+      _navigateToAppShell(role: selectedRole, userName: null);
+      return;
+    }
     final email = emailController.text.trim();
     final password = passwordController.text;
     if (email.isEmpty || password.isEmpty) {
@@ -74,12 +85,14 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
       );
       await authSessionManager?.updateSignedInUser(authSuccess);
 
-      if (context.mounted) {
-        _navigateToAppShell(context, role: selectedRole, userName: null);
-      }
+      _navigateToAppShell(role: selectedRole, userName: null);
     } catch (e, st) {
       debugPrint('[AuthController.signInWithEmail] error: $e\n$st');
       unawaited(Sentry.captureException(e, stackTrace: st));
+      if (e.toString().contains('SignInWhileAuthenticatedException')) {
+        _navigateToAppShell(role: selectedRole, userName: null);
+        return;
+      }
       if (mounted) {
         setState(() {
           errorMessage = LocaleKeys.auth_invalid_credentials.tr();
@@ -96,15 +109,11 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
     final email = emailController.text.trim();
     final password = passwordController.text;
     if (email.isEmpty || password.isEmpty) {
-      setState(() {
-        errorMessage = LocaleKeys.auth_enter_email_password.tr();
-      });
+      setState(() => errorMessage = LocaleKeys.auth_enter_email_password.tr());
       return;
     }
     if (password.length < 8) {
-      setState(() {
-        errorMessage = LocaleKeys.auth_password_too_short.tr();
-      });
+      setState(() => errorMessage = LocaleKeys.auth_password_too_short.tr());
       return;
     }
 
@@ -115,78 +124,69 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
 
     try {
       await client.emailIdp.startRegistration(email: email);
-      if (mounted) {
-        setState(() {
-          errorMessage = null;
-        });
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                context.locale.languageCode == "ar"
-                    ? "تم إرسال كود التحقق إلى بريدك الإلكتروني."
-                    : "Verification code sent to your email.",
-              ),
-              duration: const Duration(seconds: 4),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
+      if (mounted) setState(() => errorMessage = null);
+      if (context.mounted) {
+        final msg = context.locale.languageCode == "ar"
+            ? "تم إرسال كود التحقق إلى بريدك الإلكتروني."
+            : "Verification code sent to your email.";
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
+        );
       }
     } catch (e, st) {
       debugPrint('[AuthController.signUpWithEmail] error: $e\n$st');
       unawaited(Sentry.captureException(e, stackTrace: st));
       if (mounted) {
-        setState(() {
-          errorMessage = '${LocaleKeys.auth_registration_failed.tr()}: $e';
-        });
+        setState(() => errorMessage = '${LocaleKeys.auth_registration_failed.tr()}: $e');
       }
     } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
   Future<void> signInWithGoogle(BuildContext context) async {
     if (isLoading) return;
+    if (isUserAuthenticated) {
+      _navigateToAppShell(role: selectedRole, userName: null);
+      return;
+    }
     setState(() {
       isLoading = true;
       errorMessage = null;
     });
 
-    const googleClientId = String.fromEnvironment("GOOGLE_CLIENT_ID", defaultValue: "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com");
+    const googleClientId = String.fromEnvironment(
+      "GOOGLE_CLIENT_ID",
+      defaultValue: "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com",
+    );
 
     try {
-      if (kIsWeb) {
-        if (!GoogleWebSignInService.instance.isInitialized) {
-          if (googleClientId.isNotEmpty) {
-            final redirectUri = Uri.base.resolve("auth.html").toString();
-            await GoogleWebSignInService.instance.ensureInitialized(
-              clientId: googleClientId,
-              redirectUri: redirectUri,
-            );
-          } else {
-            if (mounted) {
-              setState(() {
-                errorMessage = LocaleKeys.auth_google_unconfigured.tr();
-              });
-            }
-            return;
-          }
+      if (kIsWeb && !GoogleWebSignInService.instance.isInitialized) {
+        if (googleClientId.isNotEmpty) {
+          final redirectUri = Uri.base.resolve("auth.html").toString();
+          await GoogleWebSignInService.instance.ensureInitialized(
+            clientId: googleClientId,
+            redirectUri: redirectUri,
+          );
+        } else {
+          if (mounted) setState(() => errorMessage = LocaleKeys.auth_google_unconfigured.tr());
+          return;
         }
       }
 
       final googleController = GoogleAuthController(
         client: client,
         onAuthenticated: () {
-          if (context.mounted) {
-            _navigateToAppShell(context, role: selectedRole, userName: null);
-          }
+          _navigateToAppShell(role: selectedRole, userName: null);
         },
         onError: (err) {
           if (mounted) {
-            setState(() => errorMessage = err.toString());
+            final errStr = err.toString();
+            if (errStr.contains('SignInWhileAuthenticatedException')) {
+              _navigateToAppShell(role: selectedRole, userName: null);
+            } else {
+              setState(() => errorMessage = errStr);
+            }
           }
         },
       );
@@ -194,85 +194,74 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
       await googleController.signIn();
 
       if (googleController.error != null && mounted) {
-        setState(() {
-          errorMessage = googleController.error.toString();
-        });
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '${LocaleKeys.auth_google_signin_failed.tr()}: ${googleController.error}',
-              ),
-              backgroundColor: Theme.of(context).colorScheme.error,
-              duration: const Duration(seconds: 4),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+        final errStr = googleController.error.toString();
+        if (errStr.contains('SignInWhileAuthenticatedException')) {
+          _navigateToAppShell(role: selectedRole, userName: null);
+          return;
         }
+        _showError('${LocaleKeys.auth_google_signin_failed.tr()}: $errStr');
       }
     } catch (e, st) {
       debugPrint('[AuthController.signInWithGoogle] error: $e\n$st');
       unawaited(Sentry.captureException(e, stackTrace: st));
       if (mounted) {
-        setState(() {
-          errorMessage = '${LocaleKeys.auth_google_signin_failed.tr()}: $e';
-        });
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '${LocaleKeys.auth_google_signin_failed.tr()}: $e',
-              ),
-              backgroundColor: Theme.of(context).colorScheme.error,
-              duration: const Duration(seconds: 4),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+        if (e.toString().contains('SignInWhileAuthenticatedException')) {
+          _navigateToAppShell(role: selectedRole, userName: null);
+          return;
         }
+        _showError('${LocaleKeys.auth_google_signin_failed.tr()}: $e');
       }
     } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
+      if (mounted) setState(() => isLoading = false);
     }
+  }
+
+  void _showError(String msg) {
+    if (!mounted) return;
+    setState(() => errorMessage = msg);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   void signInWithApple(BuildContext context) {
     final name = selectedRole == Role.student ? "Apple Student" : "Apple Teacher";
-    _navigateToAppShell(context, role: selectedRole, userName: name);
+    _navigateToAppShell(role: selectedRole, userName: name);
   }
 
   void enterAsStudent(BuildContext context) {
     unawaited(signInDemoStudent());
-    _navigateToAppShell(context, role: Role.student, userName: "Alice");
+    _navigateToAppShell(role: Role.student, userName: "Alice");
   }
 
   void enterAsStudentBob(BuildContext context) {
     unawaited(signInDemoStudentBob());
-    _navigateToAppShell(context, role: Role.student, userName: "Bob");
+    _navigateToAppShell(role: Role.student, userName: "Bob");
   }
 
   void enterAsStudentCharlie(BuildContext context) {
     unawaited(signInDemoStudentCharlie());
-    _navigateToAppShell(context, role: Role.student, userName: "Charlie");
+    _navigateToAppShell(role: Role.student, userName: "Charlie");
   }
 
   void enterAsTeacher(BuildContext context) {
     unawaited(signInDemoTeacher());
-    _navigateToAppShell(context, role: Role.teacher, userName: "Mr. Hassan");
+    _navigateToAppShell(role: Role.teacher, userName: "Mr. Hassan");
   }
 
   void enterAsTeacherSarah(BuildContext context) {
     unawaited(signInDemoTeacherSarah());
-    _navigateToAppShell(context, role: Role.teacher, userName: "Dr. Sarah");
+    _navigateToAppShell(role: Role.teacher, userName: "Dr. Sarah");
   }
 
   void toggleLanguage(BuildContext context) {
-    if (context.locale.languageCode == "en") {
-      context.setLocale(const Locale("ar"));
-    } else {
-      context.setLocale(const Locale("en"));
-    }
+    final newLocale = context.locale.languageCode == "en" ? const Locale("ar") : const Locale("en");
+    context.setLocale(newLocale);
   }
 
   void switchToRoleSelection(BuildContext context) {
@@ -284,18 +273,12 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
     );
   }
 
-  void _navigateToAppShell(
-    BuildContext context, {
-    required Role role,
-    String? userName,
-  }) {
+  void _navigateToAppShell({required Role role, String? userName}) {
+    if (!mounted) return;
     RolePreferences.saveRole(role);
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => AppShell(
-          initialRole: role,
-          userName: userName,
-        ),
+        builder: (_) => AppShell(initialRole: role, userName: userName),
       ),
     );
   }
