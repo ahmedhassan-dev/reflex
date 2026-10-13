@@ -159,6 +159,10 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
       "GOOGLE_CLIENT_ID",
       defaultValue: "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com",
     );
+    const googleServerClientId = String.fromEnvironment(
+      "GOOGLE_SERVER_CLIENT_ID",
+      defaultValue: "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com",
+    );
 
     try {
       if (kIsWeb && !GoogleWebSignInService.instance.isInitialized) {
@@ -172,6 +176,11 @@ abstract class AuthController extends State<AuthScreen> with SingleTickerProvide
           if (mounted) setState(() => errorMessage = LocaleKeys.auth_google_unconfigured.tr());
           return;
         }
+      } else if (!kIsWeb) {
+        await client.auth.initializeGoogleSignIn(
+          clientId: googleClientId,
+          serverClientId: googleServerClientId,
+        );
       }
 
       final googleController = GoogleAuthController(

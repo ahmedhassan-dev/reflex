@@ -100,16 +100,19 @@ Future<void> initializeClient() async {
   await client.auth.initialize();
 
   const googleClientId = String.fromEnvironment("GOOGLE_CLIENT_ID", defaultValue: "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com");
-  if (googleClientId.isNotEmpty) {
+  const googleServerClientId = String.fromEnvironment("GOOGLE_SERVER_CLIENT_ID", defaultValue: "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com");
+  if (googleClientId.isNotEmpty || googleServerClientId.isNotEmpty) {
     try {
       if (kIsWeb) {
         await client.auth.initializeGoogleSignIn(
           clientId: googleClientId,
+          serverClientId: googleServerClientId,
           redirectUri: Uri.base.resolve("auth.html").toString(),
         );
       } else {
         await client.auth.initializeGoogleSignIn(
           clientId: googleClientId,
+          serverClientId: googleServerClientId,
         );
       }
     } catch (e, st) {

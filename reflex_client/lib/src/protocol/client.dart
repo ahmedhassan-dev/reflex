@@ -630,13 +630,13 @@ class EndpointQuestionAdmin extends _isc.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    serverpod_auth_idp = _iaic.Caller(client);
     serverpod_auth_core = _iacc.Caller(client);
+    serverpod_auth_idp = _iaic.Caller(client);
   }
 
-  late final _iaic.Caller serverpod_auth_idp;
-
   late final _iacc.Caller serverpod_auth_core;
+
+  late final _iaic.Caller serverpod_auth_idp;
 }
 
 class Client extends _isc.ServerpodClientShared {
@@ -713,7 +713,7 @@ class Client extends _isc.ServerpodClientShared {
 
   @override
   Map<String, _isc.ModuleEndpointCaller> get moduleLookup => {
-    'serverpod_auth_idp': modules.serverpod_auth_idp,
     'serverpod_auth_core': modules.serverpod_auth_core,
+    'serverpod_auth_idp': modules.serverpod_auth_idp,
   };
 }
