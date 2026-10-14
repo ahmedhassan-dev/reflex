@@ -1,7 +1,7 @@
 class: ReviewState
 table: review_state
 fields:
-  learnerId: int
+  profileId: int
   questionId: int
   dueAt: DateTime
   intervalDays: int
@@ -10,6 +10,6 @@ fields:
   lastServedAt: DateTime?
   lastResult: AttemptStatus?
 indexes:
-  review_state_learner_q_idx:
-    fields: learnerId, questionId
+  review_state_profile_q_idx:
+    fields: profileId, questionId
     unique: true

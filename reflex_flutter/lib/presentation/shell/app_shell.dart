@@ -2,13 +2,13 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
-import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import '../../client.dart';
 import '../../core/services/firebase_messaging_service.dart';
 import '../../generated/locale_keys.g.dart';
 import '../core/theme/app_colors.dart';
 import '../core/widgets/reflex_logo.dart';
 import '../features/analytics/analytics_screen.dart';
+import '../features/auth/auth_screen.dart';
 import '../features/auth/role_selection_screen.dart';
 import '../features/courses/courses_screen.dart';
 import '../features/demo_clock/widgets/demo_clock_widget.dart';
@@ -61,13 +61,13 @@ class _AppShellState extends State<AppShell> {
         if (profile.imageUrl != null) _userImageUrl = profile.imageUrl;
       });
     }
-    if (client.auth.isAuthenticated && !isDemoUserActive) {
+    if (isUserAuthenticated && !isDemoUserActive) {
       unawaited(FirebaseMessagingService.syncWithServer());
     }
   }
 
   void _syncDemoAuthToken(Role role) {
-    if (!isDemoUserActive && client.auth.isAuthenticated) {
+    if (!isDemoUserActive && isUserAuthenticated) {
       // User is authenticated with a real account; do not overwrite with demo tokens.
       return;
     }
@@ -92,7 +92,7 @@ class _AppShellState extends State<AppShell> {
       MaterialPageRoute(
         builder: (_) => clearRole
             ? const RoleSelectionScreen()
-            : RoleSelectionScreen(initialRole: _currentRole),
+            : AuthScreen(initialRole: _currentRole),
       ),
       (route) => false,
     );
@@ -182,45 +182,50 @@ class _AppShellState extends State<AppShell> {
             ),
             const SizedBox(width: 10),
             // Persona Badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: roleColor.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: roleColor.withValues(alpha: 0.4),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (_userImageUrl != null && _userImageUrl!.isNotEmpty) ...[
-                    CircleAvatar(
-                      radius: 8,
-                      backgroundImage: NetworkImage(_userImageUrl!),
-                      onBackgroundImageError: (error, stackTrace) {},
-                    ),
-                    const SizedBox(width: 4),
-                  ] else ...[
-                    Icon(
-                      isStudent ? Icons.school_rounded : Icons.co_present_rounded,
-                      size: 14,
-                      color: roleColor,
-                    ),
-                    const SizedBox(width: 4),
-                  ],
-                  Text(
-                    _userName != null
-                        ? '$_userName ($roleBadgeText)'
-                        : roleBadgeText,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: roleColor,
-                    ),
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: roleColor.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: roleColor.withValues(alpha: 0.4),
+                    width: 1,
                   ),
-                ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_userImageUrl != null && _userImageUrl!.isNotEmpty) ...[
+                      CircleAvatar(
+                        radius: 8,
+                        backgroundImage: NetworkImage(_userImageUrl!),
+                        onBackgroundImageError: (error, stackTrace) {},
+                      ),
+                      const SizedBox(width: 4),
+                    ] else ...[
+                      Icon(
+                        isStudent ? Icons.school_rounded : Icons.co_present_rounded,
+                        size: 14,
+                        color: roleColor,
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                    Flexible(
+                      child: Text(
+                        _userName != null
+                            ? '$_userName ($roleBadgeText)'
+                            : roleBadgeText,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: roleColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

@@ -17,7 +17,7 @@ abstract class ReviewState
     implements _is.TableRow<int?>, _is.ProtocolSerialization {
   ReviewState._({
     this.id,
-    required this.learnerId,
+    required this.profileId,
     required this.questionId,
     required this.dueAt,
     required this.intervalDays,
@@ -29,7 +29,7 @@ abstract class ReviewState
 
   factory ReviewState({
     int? id,
-    required int learnerId,
+    required int profileId,
     required int questionId,
     required DateTime dueAt,
     required int intervalDays,
@@ -42,7 +42,7 @@ abstract class ReviewState
   factory ReviewState.fromJson(Map<String, dynamic> jsonSerialization) {
     return ReviewState(
       id: jsonSerialization['id'] as int?,
-      learnerId: jsonSerialization['learnerId'] as int,
+      profileId: jsonSerialization['profileId'] as int,
       questionId: jsonSerialization['questionId'] as int,
       dueAt: _is.DateTimeJsonExtension.fromJson(jsonSerialization['dueAt']),
       intervalDays: jsonSerialization['intervalDays'] as int,
@@ -68,7 +68,7 @@ abstract class ReviewState
   @override
   int? id;
 
-  int learnerId;
+  int profileId;
 
   int questionId;
 
@@ -92,7 +92,7 @@ abstract class ReviewState
   @_is.useResult
   ReviewState copyWith({
     int? id,
-    int? learnerId,
+    int? profileId,
     int? questionId,
     DateTime? dueAt,
     int? intervalDays,
@@ -106,7 +106,7 @@ abstract class ReviewState
     return {
       '__className__': 'ReviewState',
       if (id != null) 'id': id,
-      'learnerId': learnerId,
+      'profileId': profileId,
       'questionId': questionId,
       'dueAt': dueAt.toJson(),
       'intervalDays': intervalDays,
@@ -122,7 +122,7 @@ abstract class ReviewState
     return {
       '__className__': 'ReviewState',
       if (id != null) 'id': id,
-      'learnerId': learnerId,
+      'profileId': profileId,
       'questionId': questionId,
       'dueAt': dueAt.toJson(),
       'intervalDays': intervalDays,
@@ -166,7 +166,7 @@ class _Undefined {}
 class _ReviewStateImpl extends ReviewState {
   _ReviewStateImpl({
     int? id,
-    required int learnerId,
+    required int profileId,
     required int questionId,
     required DateTime dueAt,
     required int intervalDays,
@@ -176,7 +176,7 @@ class _ReviewStateImpl extends ReviewState {
     _ir7impgi.AttemptStatus? lastResult,
   }) : super._(
          id: id,
-         learnerId: learnerId,
+         profileId: profileId,
          questionId: questionId,
          dueAt: dueAt,
          intervalDays: intervalDays,
@@ -192,7 +192,7 @@ class _ReviewStateImpl extends ReviewState {
   @override
   ReviewState copyWith({
     Object? id = _Undefined,
-    int? learnerId,
+    int? profileId,
     int? questionId,
     DateTime? dueAt,
     int? intervalDays,
@@ -203,7 +203,7 @@ class _ReviewStateImpl extends ReviewState {
   }) {
     return ReviewState(
       id: id is int? ? id : this.id,
-      learnerId: learnerId ?? this.learnerId,
+      profileId: profileId ?? this.profileId,
       questionId: questionId ?? this.questionId,
       dueAt: dueAt ?? this.dueAt,
       intervalDays: intervalDays ?? this.intervalDays,
@@ -222,8 +222,8 @@ class _ReviewStateImpl extends ReviewState {
 class ReviewStateUpdateTable extends _is.UpdateTable<ReviewStateTable> {
   ReviewStateUpdateTable(super.table);
 
-  _is.ColumnValue<int, int> learnerId(int value) => _is.ColumnValue(
-    table.learnerId,
+  _is.ColumnValue<int, int> profileId(int value) => _is.ColumnValue(
+    table.profileId,
     value,
   );
 
@@ -269,8 +269,8 @@ class ReviewStateUpdateTable extends _is.UpdateTable<ReviewStateTable> {
 class ReviewStateTable extends _is.Table<int?> {
   ReviewStateTable({super.tableRelation}) : super(tableName: 'review_state') {
     updateTable = ReviewStateUpdateTable(this);
-    learnerId = _is.ColumnInt(
-      'learnerId',
+    profileId = _is.ColumnInt(
+      'profileId',
       this,
     );
     questionId = _is.ColumnInt(
@@ -306,7 +306,7 @@ class ReviewStateTable extends _is.Table<int?> {
 
   late final ReviewStateUpdateTable updateTable;
 
-  late final _is.ColumnInt learnerId;
+  late final _is.ColumnInt profileId;
 
   late final _is.ColumnInt questionId;
 
@@ -325,7 +325,7 @@ class ReviewStateTable extends _is.Table<int?> {
   @override
   List<_is.Column> get columns => [
     id,
-    learnerId,
+    profileId,
     questionId,
     dueAt,
     intervalDays,

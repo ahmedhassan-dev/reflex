@@ -13,11 +13,11 @@ class PracticeEndpoint extends Endpoint {
   /// Serves the next card due for spaced repetition review or the next unattempted card.
   Future<PracticeItem?> serveNextCard(Session session, int courseId) async {
     final container = AppContainer(session);
-    final learner = await container.resolveCurrentLearner();
+    final profile = await container.resolveCurrentProfile();
     final practiceService = await container.getPracticeService();
 
     return practiceService.serveNextCard(
-      learnerId: learner.id!,
+      profileId: profile.id!,
       courseId: courseId,
     );
   }
@@ -25,11 +25,11 @@ class PracticeEndpoint extends Endpoint {
   /// Requests a help hint for the currently served card.
   Future<HelpResult> requestHelp(Session session, int questionId) async {
     final container = AppContainer(session);
-    final learner = await container.resolveCurrentLearner();
+    final profile = await container.resolveCurrentProfile();
     final practiceService = await container.getPracticeService();
 
     return practiceService.requestHelp(
-      learnerId: learner.id!,
+      profileId: profile.id!,
       questionId: questionId,
     );
   }
@@ -42,11 +42,11 @@ class PracticeEndpoint extends Endpoint {
     int? optionId,
   }) async {
     final container = AppContainer(session);
-    final learner = await container.resolveCurrentLearner();
+    final profile = await container.resolveCurrentProfile();
     final practiceService = await container.getPracticeService();
 
     return practiceService.submitAnswer(
-      learnerId: learner.id!,
+      profileId: profile.id!,
       questionId: questionId,
       textAnswer: textAnswer,
       optionId: optionId,
@@ -59,24 +59,24 @@ class PracticeEndpoint extends Endpoint {
     int courseId,
   ) async {
     final container = AppContainer(session);
-    final learner = await container.resolveCurrentLearner();
+    final profile = await container.resolveCurrentProfile();
     final practiceService = await container.getPracticeService();
     return practiceService.requestSubscription(
-      learnerId: learner.id!,
+      profileId: profile.id!,
       courseId: courseId,
     );
   }
 
-  /// Checks subscription status of active learner for a course.
+  /// Checks subscription status of active profile for a course.
   Future<SubscriptionStatus?> getCourseSubscriptionStatus(
     Session session,
     int courseId,
   ) async {
     final container = AppContainer(session);
-    final learner = await container.resolveCurrentLearner();
+    final profile = await container.resolveCurrentProfile();
     final practiceService = await container.getPracticeService();
     return practiceService.getSubscriptionStatus(
-      learnerId: learner.id!,
+      profileId: profile.id!,
       courseId: courseId,
     );
   }

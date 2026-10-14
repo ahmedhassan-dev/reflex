@@ -73,14 +73,14 @@ void main() {
       final score0 = await ScoreCalculator.calculateTotalScore(
         attemptRepo: attemptRepo,
         questionRepo: questionRepo,
-        learnerId: 1,
+        profileId: 1,
         courseId: 1,
       );
       expect(score0, equals(0));
 
       // Wrong attempt on Q1 -> still 0
       await attemptRepo.insert(Attempt(
-        learnerId: 1,
+        profileId: 1,
         questionId: 1,
         status: AttemptStatus.wrong,
         responseMs: 1200,
@@ -94,14 +94,14 @@ void main() {
       final scoreAfterWrong = await ScoreCalculator.calculateTotalScore(
         attemptRepo: attemptRepo,
         questionRepo: questionRepo,
-        learnerId: 1,
+        profileId: 1,
         courseId: 1,
       );
       expect(scoreAfterWrong, equals(0));
 
       // Correct attempt on Q1 -> 10
       await attemptRepo.insert(Attempt(
-        learnerId: 1,
+        profileId: 1,
         questionId: 1,
         status: AttemptStatus.valid,
         responseMs: 1100,
@@ -115,14 +115,14 @@ void main() {
       final scoreAfterFirstCorrect = await ScoreCalculator.calculateTotalScore(
         attemptRepo: attemptRepo,
         questionRepo: questionRepo,
-        learnerId: 1,
+        profileId: 1,
         courseId: 1,
       );
       expect(scoreAfterFirstCorrect, equals(10));
 
       // Another correct attempt on Q1 -> still 10 (points added only once)
       await attemptRepo.insert(Attempt(
-        learnerId: 1,
+        profileId: 1,
         questionId: 1,
         status: AttemptStatus.valid,
         responseMs: 800,
@@ -136,14 +136,14 @@ void main() {
       final scoreAfterSecondCorrect = await ScoreCalculator.calculateTotalScore(
         attemptRepo: attemptRepo,
         questionRepo: questionRepo,
-        learnerId: 1,
+        profileId: 1,
         courseId: 1,
       );
       expect(scoreAfterSecondCorrect, equals(10));
 
       // Correct attempt on Q2 -> 10 + 20 = 30
       await attemptRepo.insert(Attempt(
-        learnerId: 1,
+        profileId: 1,
         questionId: 2,
         status: AttemptStatus.valid,
         responseMs: 900,
@@ -157,7 +157,7 @@ void main() {
       final scoreAfterQ2 = await ScoreCalculator.calculateTotalScore(
         attemptRepo: attemptRepo,
         questionRepo: questionRepo,
-        learnerId: 1,
+        profileId: 1,
         courseId: 1,
       );
       expect(scoreAfterQ2, equals(30));

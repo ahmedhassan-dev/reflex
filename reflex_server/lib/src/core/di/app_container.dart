@@ -14,7 +14,7 @@ class AppContainer {
 
   AppContainer(this.session);
 
-  ServerpodLearnerRepository get learnerRepo => ServerpodLearnerRepository(session);
+  ServerpodProfileRepository get profileRepo => ServerpodProfileRepository(session);
   ServerpodCourseRepository get courseRepo => ServerpodCourseRepository(session);
   ServerpodQuestionRepository get questionRepo => ServerpodQuestionRepository(session);
   ServerpodQuestionOptionRepository get optionRepo => ServerpodQuestionOptionRepository(session);
@@ -50,7 +50,7 @@ class AppContainer {
   Future<CohortStatsService> getCohortStatsService() async {
     final clock = await getEffectiveClock();
     return CohortStatsService(
-      learnerRepo: learnerRepo,
+      profileRepo: profileRepo,
       questionRepo: questionRepo,
       attemptRepo: attemptRepo,
       reviewStateRepo: reviewStateRepo,
@@ -59,7 +59,7 @@ class AppContainer {
   }
 
   CohortStatsService get cohortStatsService => CohortStatsService(
-        learnerRepo: learnerRepo,
+        profileRepo: profileRepo,
         questionRepo: questionRepo,
         attemptRepo: attemptRepo,
         reviewStateRepo: reviewStateRepo,
@@ -71,36 +71,39 @@ class AppContainer {
         optionRepo: optionRepo,
         acceptedAnswerRepo: acceptedAnswerRepo,
         subscriptionRepo: courseSubscriptionRepo,
-        learnerRepo: learnerRepo,
+        profileRepo: profileRepo,
       );
 
   AuthProvisioningService get authProvisioningService => AuthProvisioningService(
-        learnerRepo: learnerRepo,
+        profileRepo: profileRepo,
       );
 
-  /// Resolves the active [Learner] profile for the session.
+  /// Resolves the active [Profile] for the session.
   /// If the caller is authenticated, maps their auth user.
   /// If unauthenticated (e.g. during live demonstration/judging), resolves or creates a demo student.
-  Future<Learner> resolveCurrentLearner({
+  Future<Profile> resolveCurrentProfile({
     String? defaultDisplayName,
     Role defaultRole = Role.student,
+    String? defaultEmail,
   }) async {
     final auth = session.authenticated;
     if (auth != null) {
-      return authProvisioningService.ensureLearnerForSession(session);
+      return authProvisioningService.ensureProfileForSession(session);
     }
 
     final demoAuthId = defaultRole == Role.teacher
         ? UuidValue.fromString('00000000-0000-4000-8000-000000000022')
         : UuidValue.fromString('00000000-0000-4000-8000-000000000011');
-    final existing = await learnerRepo.findByAuthUserId(demoAuthId);
+    final existing = await profileRepo.findByAuthUserId(demoAuthId);
     if (existing != null) return existing;
 
-    return learnerRepo.save(Learner(
+    return profileRepo.save(Profile(
       authUserId: demoAuthId,
       displayName: defaultDisplayName ??
           (defaultRole == Role.teacher ? 'Mr. Hassan (Teacher)' : 'Alice (Student)'),
       role: defaultRole,
+      email: defaultEmail ??
+          (defaultRole == Role.teacher ? 'hassan@reflex.local' : 'alice@reflex.local'),
     ));
   }
 }

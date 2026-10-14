@@ -60,7 +60,10 @@ Future<void> signOutDemo() async {
   isDemoUserActive = false;
   try {
     await client.auth.signOutDevice();
-  } catch (_) {
+  } catch (e, st) {
+    debugPrint('[Auth] Note: signOutDevice error: $e');
+    unawaited(Sentry.captureException(e, stackTrace: st));
+  } finally {
     await authSessionManager?.updateSignedInUser(null);
   }
 }
@@ -71,8 +74,9 @@ Future<void> deleteCurrentUserAccount() async {
   if (isUserAuthenticated && !isDemoUserActive) {
     try {
       await client.userProfile.deleteAccount();
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('[UserProfile] Error deleting account: $e');
+      unawaited(Sentry.captureException(e, stackTrace: st));
       rethrow;
     }
   }
@@ -91,8 +95,9 @@ Future<({String? name, String? imageUrl})> fetchCurrentUserProfile() async {
         : (profile.userName?.isNotEmpty == true ? profile.userName : profile.email);
     final imageUrl = profile.imageUrl?.toString();
     return (name: name, imageUrl: imageUrl);
-  } catch (e) {
+  } catch (e, st) {
     debugPrint('[UserProfile] Error fetching profile: $e');
+    unawaited(Sentry.captureException(e, stackTrace: st));
     return (name: null, imageUrl: null);
   }
 }

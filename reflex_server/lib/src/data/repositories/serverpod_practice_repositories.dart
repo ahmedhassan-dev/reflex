@@ -2,21 +2,21 @@ import 'package:serverpod/serverpod.dart';
 import 'package:reflex_server/src/generated/protocol.dart';
 import 'interfaces.dart';
 
-/// Serverpod ORM implementation of [ILearnerRepository].
-class ServerpodLearnerRepository implements ILearnerRepository {
+/// Serverpod ORM implementation of [IProfileRepository].
+class ServerpodProfileRepository implements IProfileRepository {
   final Session session;
   final Transaction? transaction;
 
-  const ServerpodLearnerRepository(this.session, [this.transaction]);
+  const ServerpodProfileRepository(this.session, [this.transaction]);
 
   @override
-  Future<Learner?> findById(int id) async {
-    return Learner.db.findById(session, id, transaction: transaction);
+  Future<Profile?> findById(int id) async {
+    return Profile.db.findById(session, id, transaction: transaction);
   }
 
   @override
-  Future<Learner?> findByAuthUserId(UuidValue authUserId) async {
-    return Learner.db.findFirstRow(
+  Future<Profile?> findByAuthUserId(UuidValue authUserId) async {
+    return Profile.db.findFirstRow(
       session,
       where: (t) => t.authUserId.equals(authUserId),
       transaction: transaction,
@@ -24,21 +24,21 @@ class ServerpodLearnerRepository implements ILearnerRepository {
   }
 
   @override
-  Future<Learner> save(Learner learner) async {
-    if (learner.id != null) {
-      return Learner.db.updateRow(session, learner, transaction: transaction);
+  Future<Profile> save(Profile profile) async {
+    if (profile.id != null) {
+      return Profile.db.updateRow(session, profile, transaction: transaction);
     }
-    return Learner.db.insertRow(session, learner, transaction: transaction);
+    return Profile.db.insertRow(session, profile, transaction: transaction);
   }
 
   @override
-  Future<List<Learner>> listAll() async {
-    return Learner.db.find(session, transaction: transaction);
+  Future<List<Profile>> listAll() async {
+    return Profile.db.find(session, transaction: transaction);
   }
 
   @override
-  Future<void> delete(Learner learner) async {
-    await Learner.db.deleteRow(session, learner, transaction: transaction);
+  Future<void> delete(Profile profile) async {
+    await Profile.db.deleteRow(session, profile, transaction: transaction);
   }
 }
 
@@ -55,31 +55,31 @@ class ServerpodAttemptRepository implements IAttemptRepository {
   }
 
   @override
-  Future<void> deleteByLearnerId(int learnerId) async {
+  Future<void> deleteByProfileId(int profileId) async {
     await Attempt.db.deleteWhere(
       session,
-      where: (t) => t.learnerId.equals(learnerId),
+      where: (t) => t.profileId.equals(profileId),
       transaction: transaction,
     );
   }
 
   @override
-  Future<bool> hasPriorAttempt(int learnerId, int questionId) async {
+  Future<bool> hasPriorAttempt(int profileId, int questionId) async {
     final count = await Attempt.db.count(
       session,
       where: (t) =>
-          t.learnerId.equals(learnerId) & t.questionId.equals(questionId),
+          t.profileId.equals(profileId) & t.questionId.equals(questionId),
       transaction: transaction,
     );
     return count > 0;
   }
 
   @override
-  Future<bool> hasLearnerSolvedQuestion(int learnerId, int questionId) async {
+  Future<bool> hasProfileSolvedQuestion(int profileId, int questionId) async {
     final count = await Attempt.db.count(
       session,
       where: (t) =>
-          t.learnerId.equals(learnerId) &
+          t.profileId.equals(profileId) &
           t.questionId.equals(questionId) &
           t.status.equals(AttemptStatus.valid),
       transaction: transaction,
@@ -88,10 +88,10 @@ class ServerpodAttemptRepository implements IAttemptRepository {
   }
 
   @override
-  Future<List<Attempt>> listAttemptsByLearner(int learnerId) async {
+  Future<List<Attempt>> listAttemptsByProfile(int profileId) async {
     return Attempt.db.find(
       session,
-      where: (t) => t.learnerId.equals(learnerId),
+      where: (t) => t.profileId.equals(profileId),
       orderBy: (t) => t.createdAt,
       transaction: transaction,
     );
@@ -124,18 +124,18 @@ class ServerpodReviewStateRepository implements IReviewStateRepository {
   const ServerpodReviewStateRepository(this.session, [this.transaction]);
 
   @override
-  Future<ReviewState?> get(int learnerId, int questionId) async {
+  Future<ReviewState?> get(int profileId, int questionId) async {
     return ReviewState.db.findFirstRow(
       session,
       where: (t) =>
-          t.learnerId.equals(learnerId) & t.questionId.equals(questionId),
+          t.profileId.equals(profileId) & t.questionId.equals(questionId),
       transaction: transaction,
     );
   }
 
   @override
   Future<ReviewState> upsert(ReviewState state) async {
-    final existing = await get(state.learnerId, state.questionId);
+    final existing = await get(state.profileId, state.questionId);
     if (existing != null) {
       final updated = state.copyWith(id: existing.id);
       return ReviewState.db
@@ -146,7 +146,7 @@ class ServerpodReviewStateRepository implements IReviewStateRepository {
 
   @override
   Future<List<ReviewState>> findDueReviews({
-    required int learnerId,
+    required int profileId,
     required int courseId,
     required DateTime now,
   }) async {
@@ -161,7 +161,7 @@ class ServerpodReviewStateRepository implements IReviewStateRepository {
     return ReviewState.db.find(
       session,
       where: (t) =>
-          t.learnerId.equals(learnerId) &
+          t.profileId.equals(profileId) &
           t.questionId.inSet(qIds) &
           (t.dueAt <= now),
       orderBy: (t) => t.dueAt,
@@ -170,18 +170,18 @@ class ServerpodReviewStateRepository implements IReviewStateRepository {
   }
 
   @override
-  Future<List<ReviewState>> listByLearner(int learnerId) async {
+  Future<List<ReviewState>> listByProfile(int profileId) async {
     return ReviewState.db.find(
       session,
-      where: (t) => t.learnerId.equals(learnerId),
+      where: (t) => t.profileId.equals(profileId),
       transaction: transaction,
     );
   }
 
   @override
   Future<void> markServed(
-      int learnerId, int questionId, DateTime servedAt) async {
-    final existing = await get(learnerId, questionId);
+      int profileId, int questionId, DateTime servedAt) async {
+    final existing = await get(profileId, questionId);
     if (existing != null) {
       await ReviewState.db.updateRow(
         session,
@@ -192,10 +192,10 @@ class ServerpodReviewStateRepository implements IReviewStateRepository {
   }
 
   @override
-  Future<void> deleteByLearnerId(int learnerId) async {
+  Future<void> deleteByProfileId(int profileId) async {
     await ReviewState.db.deleteWhere(
       session,
-      where: (t) => t.learnerId.equals(learnerId),
+      where: (t) => t.profileId.equals(profileId),
       transaction: transaction,
     );
   }

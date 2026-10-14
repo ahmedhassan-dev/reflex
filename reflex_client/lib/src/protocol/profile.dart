@@ -13,26 +13,28 @@
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'enums/role.dart' as _iu4tij3a;
 
-abstract class Learner
+abstract class Profile
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
-  Learner._({
+  Profile._({
     this.id,
     required this.authUserId,
     required this.displayName,
     required this.role,
     this.fcmToken,
+    this.email,
   });
 
-  factory Learner({
+  factory Profile({
     int? id,
     required _isc.UuidValue authUserId,
     required String displayName,
     required _iu4tij3a.Role role,
     String? fcmToken,
-  }) = _LearnerImpl;
+    String? email,
+  }) = _ProfileImpl;
 
-  factory Learner.fromJson(Map<String, dynamic> jsonSerialization) {
-    return Learner(
+  factory Profile.fromJson(Map<String, dynamic> jsonSerialization) {
+    return Profile(
       id: jsonSerialization['id'] as int?,
       authUserId: _isc.UuidValueJsonExtension.fromJson(
         jsonSerialization['authUserId'],
@@ -40,6 +42,7 @@ abstract class Learner
       displayName: jsonSerialization['displayName'] as String,
       role: _iu4tij3a.Role.fromJson((jsonSerialization['role'] as String)),
       fcmToken: jsonSerialization['fcmToken'] as String?,
+      email: jsonSerialization['email'] as String?,
     );
   }
 
@@ -56,37 +59,42 @@ abstract class Learner
 
   String? fcmToken;
 
-  /// Returns a shallow copy of this [Learner]
+  String? email;
+
+  /// Returns a shallow copy of this [Profile]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
-  Learner copyWith({
+  Profile copyWith({
     int? id,
     _isc.UuidValue? authUserId,
     String? displayName,
     _iu4tij3a.Role? role,
     String? fcmToken,
+    String? email,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      '__className__': 'Learner',
+      '__className__': 'Profile',
       if (id != null) 'id': id,
       'authUserId': authUserId.toJson(),
       'displayName': displayName,
       'role': role.toJson(),
       if (fcmToken != null) 'fcmToken': fcmToken,
+      if (email != null) 'email': email,
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      '__className__': 'Learner',
+      '__className__': 'Profile',
       if (id != null) 'id': id,
       'authUserId': authUserId.toJson(),
       'displayName': displayName,
       'role': role.toJson(),
       if (fcmToken != null) 'fcmToken': fcmToken,
+      if (email != null) 'email': email,
     };
   }
 
@@ -98,38 +106,42 @@ abstract class Learner
 
 class _Undefined {}
 
-class _LearnerImpl extends Learner {
-  _LearnerImpl({
+class _ProfileImpl extends Profile {
+  _ProfileImpl({
     int? id,
     required _isc.UuidValue authUserId,
     required String displayName,
     required _iu4tij3a.Role role,
     String? fcmToken,
+    String? email,
   }) : super._(
          id: id,
          authUserId: authUserId,
          displayName: displayName,
          role: role,
          fcmToken: fcmToken,
+         email: email,
        );
 
-  /// Returns a shallow copy of this [Learner]
+  /// Returns a shallow copy of this [Profile]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
   @override
-  Learner copyWith({
+  Profile copyWith({
     Object? id = _Undefined,
     _isc.UuidValue? authUserId,
     String? displayName,
     _iu4tij3a.Role? role,
     Object? fcmToken = _Undefined,
+    Object? email = _Undefined,
   }) {
-    return Learner(
+    return Profile(
       id: id is int? ? id : this.id,
       authUserId: authUserId ?? this.authUserId,
       displayName: displayName ?? this.displayName,
       role: role ?? this.role,
       fcmToken: fcmToken is String? ? fcmToken : this.fcmToken,
+      email: email is String? ? email : this.email,
     );
   }
 }

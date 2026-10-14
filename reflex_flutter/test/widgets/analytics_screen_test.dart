@@ -46,7 +46,7 @@ void main() {
         ],
         students: [
           StudentProgress(
-            learnerId: 1,
+            profileId: 1,
             displayName: 'Tariq',
             solvedCount: 10,
             cleanFirstTryCount: 8,

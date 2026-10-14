@@ -6,19 +6,21 @@ import '../fakes/fake_repositories.dart';
 
 void main() {
   group('T-016: Fake Repositories Verification', () {
-    test('FakeLearnerRepository supports CRUD and lookup by authUserId', () async {
-      final repo = FakeLearnerRepository();
+    test('FakeProfileRepository supports CRUD and lookup by authUserId', () async {
+      final repo = FakeProfileRepository();
       final authId = UuidValue.fromString('00000000-0000-4000-8000-000000000001');
 
-      final learner = Learner(
+      final profile = Profile(
         authUserId: authId,
         displayName: 'Amina',
         role: Role.student,
+        email: 'amina@example.com',
       );
 
-      final saved = await repo.save(learner);
+      final saved = await repo.save(profile);
       expect(saved.id, equals(1));
       expect(saved.displayName, equals('Amina'));
+      expect(saved.email, equals('amina@example.com'));
 
       final byId = await repo.findById(1);
       expect(byId?.displayName, equals('Amina'));
@@ -75,10 +77,10 @@ void main() {
       final now = DateTime.now();
 
       expect(await repo.hasPriorAttempt(1, 100), isFalse);
-      expect(await repo.hasLearnerSolvedQuestion(1, 100), isFalse);
+      expect(await repo.hasProfileSolvedQuestion(1, 100), isFalse);
 
       await repo.insert(Attempt(
-        learnerId: 1,
+        profileId: 1,
         questionId: 100,
         status: AttemptStatus.wrong,
         responseMs: 5000,
@@ -91,10 +93,10 @@ void main() {
       ));
 
       expect(await repo.hasPriorAttempt(1, 100), isTrue);
-      expect(await repo.hasLearnerSolvedQuestion(1, 100), isFalse);
+      expect(await repo.hasProfileSolvedQuestion(1, 100), isFalse);
 
       await repo.insert(Attempt(
-        learnerId: 1,
+        profileId: 1,
         questionId: 100,
         status: AttemptStatus.valid,
         responseMs: 4000,
@@ -106,7 +108,7 @@ void main() {
         createdAt: now,
       ));
 
-      expect(await repo.hasLearnerSolvedQuestion(1, 100), isTrue);
+      expect(await repo.hasProfileSolvedQuestion(1, 100), isTrue);
     });
 
     test('FakeReviewStateRepository supports upsert, due query, and markServed', () async {
@@ -114,7 +116,7 @@ void main() {
       final now = DateTime.utc(2026, 10, 9, 12, 0, 0);
 
       final state = ReviewState(
-        learnerId: 1,
+        profileId: 1,
         questionId: 5,
         dueAt: now.subtract(const Duration(hours: 1)),
         intervalDays: 1,
@@ -124,7 +126,7 @@ void main() {
 
       await repo.upsert(state);
 
-      final due = await repo.findDueReviews(learnerId: 1, courseId: 1, now: now);
+      final due = await repo.findDueReviews(profileId: 1, courseId: 1, now: now);
       expect(due.length, equals(1));
       expect(due.first.questionId, equals(5));
 
@@ -134,32 +136,33 @@ void main() {
     });
 
     test('Fake repositories support deletion and unassignment for account removal', () async {
-      final learnerRepo = FakeLearnerRepository();
+      final profileRepo = FakeProfileRepository();
       final courseRepo = FakeCourseRepository();
       final subRepo = FakeCourseSubscriptionRepository();
       final attemptRepo = FakeAttemptRepository();
       final reviewRepo = FakeReviewStateRepository();
 
-      final learner = await learnerRepo.save(Learner(
+      final profile = await profileRepo.save(Profile(
         authUserId: UuidValue.fromString('00000000-0000-4000-8000-000000000099'),
         displayName: 'DeleteMe',
         role: Role.student,
+        email: 'deleteme@example.com',
       ));
-      final learnerId = learner.id!;
+      final profileId = profile.id!;
 
       final course = await courseRepo.save(Course(
         title: 'Owned Course',
         subject: 'Math',
-        teacherId: learnerId,
+        teacherId: profileId,
       ));
       await subRepo.save(CourseSubscription(
         courseId: course.id!,
-        studentId: learnerId,
+        studentId: profileId,
         status: SubscriptionStatus.accepted,
         requestedAt: DateTime.utc(2026, 10, 10),
       ));
       await attemptRepo.insert(Attempt(
-        learnerId: learnerId,
+        profileId: profileId,
         questionId: 1,
         status: AttemptStatus.valid,
         responseMs: 1000,
@@ -171,7 +174,7 @@ void main() {
         createdAt: DateTime.utc(2026, 10, 10),
       ));
       await reviewRepo.upsert(ReviewState(
-        learnerId: learnerId,
+        profileId: profileId,
         questionId: 1,
         dueAt: DateTime.utc(2026, 10, 10),
         intervalDays: 1,
@@ -180,18 +183,18 @@ void main() {
       ));
 
       // Execute cleanups
-      await attemptRepo.deleteByLearnerId(learnerId);
-      await reviewRepo.deleteByLearnerId(learnerId);
-      await subRepo.deleteByStudentId(learnerId);
-      await courseRepo.unassignTeacher(learnerId);
-      await learnerRepo.delete(learner);
+      await attemptRepo.deleteByProfileId(profileId);
+      await reviewRepo.deleteByProfileId(profileId);
+      await subRepo.deleteByStudentId(profileId);
+      await courseRepo.unassignTeacher(profileId);
+      await profileRepo.delete(profile);
 
-      expect(await attemptRepo.listAttemptsByLearner(learnerId), isEmpty);
-      expect(await reviewRepo.listByLearner(learnerId), isEmpty);
-      expect(await subRepo.listByStudent(learnerId), isEmpty);
+      expect(await attemptRepo.listAttemptsByProfile(profileId), isEmpty);
+      expect(await reviewRepo.listByProfile(profileId), isEmpty);
+      expect(await subRepo.listByStudent(profileId), isEmpty);
       final updatedCourse = await courseRepo.findById(course.id!);
       expect(updatedCourse?.teacherId, isNull);
-      expect(await learnerRepo.findById(learnerId), isNull);
+      expect(await profileRepo.findById(profileId), isNull);
     });
 
     test('FakeDemoClockRepository sets and retrieves offsetDays', () async {

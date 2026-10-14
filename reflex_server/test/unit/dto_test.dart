@@ -148,7 +148,7 @@ void main() {
         ],
         students: [
           StudentProgress(
-            learnerId: 10,
+            profileId: 10,
             displayName: 'Amina',
             solvedCount: 18,
             cleanFirstTryCount: 14,

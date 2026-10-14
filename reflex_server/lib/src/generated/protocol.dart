@@ -47,7 +47,7 @@ import 'enums/result_reason.dart' as _i3yqrgm0;
 import 'enums/role.dart' as _iu4tij3a;
 import 'enums/subscription_status.dart' as _i5d9goyo;
 import 'greetings/greeting.dart' as _izw8z7ou;
-import 'learner.dart' as _iia065xp;
+import 'profile.dart' as _ilz0o8l0;
 import 'question.dart' as _in6mynjk;
 import 'question_option.dart' as _irpjihwh;
 import 'review_state.dart' as _iiyeai10;
@@ -77,7 +77,7 @@ export 'enums/result_reason.dart';
 export 'enums/role.dart';
 export 'enums/subscription_status.dart';
 export 'greetings/greeting.dart';
-export 'learner.dart';
+export 'profile.dart';
 export 'question.dart';
 export 'question_option.dart';
 export 'review_state.dart';
@@ -148,7 +148,7 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnDefault: 'serial',
         ),
         _isp.ColumnDefinition(
-          name: 'learnerId',
+          name: 'profileId',
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
@@ -223,12 +223,12 @@ class Protocol extends _is.DatabaseSerializationManager {
       foreignKeys: [],
       indexes: [
         _isp.IndexDefinition(
-          indexName: 'attempt_learner_idx',
+          indexName: 'attempt_profile_idx',
           tableSpace: null,
           elements: [
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
-              definition: 'learnerId',
+              definition: 'profileId',
             ),
           ],
           type: 'btree',
@@ -363,7 +363,7 @@ class Protocol extends _is.DatabaseSerializationManager {
         _isp.ForeignKeyDefinition(
           constraintName: 'course_subscription_fk_1',
           columns: ['studentId'],
-          referenceTable: 'learner',
+          referenceTable: 'profile',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
           onUpdate: _isp.ForeignKeyAction.noAction,
@@ -417,8 +417,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     _isp.TableDefinition(
-      name: 'learner',
-      dartName: 'Learner',
+      name: 'profile',
+      dartName: 'Profile',
       schema: 'public',
       module: 'reflex',
       columns: [
@@ -453,11 +453,17 @@ class Protocol extends _is.DatabaseSerializationManager {
           isNullable: true,
           dartType: 'String?',
         ),
+        _isp.ColumnDefinition(
+          name: 'email',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
       ],
       foreignKeys: [],
       indexes: [
         _isp.IndexDefinition(
-          indexName: 'learner_auth_idx',
+          indexName: 'profile_auth_idx',
           tableSpace: null,
           elements: [
             _isp.IndexElementDefinition(
@@ -670,7 +676,7 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnDefault: 'serial',
         ),
         _isp.ColumnDefinition(
-          name: 'learnerId',
+          name: 'profileId',
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
@@ -721,12 +727,12 @@ class Protocol extends _is.DatabaseSerializationManager {
       foreignKeys: [],
       indexes: [
         _isp.IndexDefinition(
-          indexName: 'review_state_learner_q_idx',
+          indexName: 'review_state_profile_q_idx',
           tableSpace: null,
           elements: [
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
-              definition: 'learnerId',
+              definition: 'profileId',
             ),
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
@@ -850,8 +856,8 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
-    if (t == _iia065xp.Learner) {
-      return _iia065xp.Learner.fromJson(data) as T;
+    if (t == _ilz0o8l0.Profile) {
+      return _ilz0o8l0.Profile.fromJson(data) as T;
     }
     if (t == _in6mynjk.Question) {
       return _in6mynjk.Question.fromJson(data) as T;
@@ -958,8 +964,8 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
-    if (t == _is.getType<_iia065xp.Learner?>()) {
-      return (data != null ? _iia065xp.Learner.fromJson(data) : null) as T;
+    if (t == _is.getType<_ilz0o8l0.Profile?>()) {
+      return (data != null ? _ilz0o8l0.Profile.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_in6mynjk.Question?>()) {
       return (data != null ? _in6mynjk.Question.fromJson(data) : null) as T;
@@ -1107,7 +1113,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _iu4tij3a.Role => 'Role',
       _i5d9goyo.SubscriptionStatus => 'SubscriptionStatus',
       _izw8z7ou.Greeting => 'Greeting',
-      _iia065xp.Learner => 'Learner',
+      _ilz0o8l0.Profile => 'Profile',
       _in6mynjk.Question => 'Question',
       _irpjihwh.QuestionOption => 'QuestionOption',
       _iiyeai10.ReviewState => 'ReviewState',
@@ -1177,8 +1183,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'SubscriptionStatus';
       case _izw8z7ou.Greeting():
         return 'Greeting';
-      case _iia065xp.Learner():
-        return 'Learner';
+      case _ilz0o8l0.Profile():
+        return 'Profile';
       case _in6mynjk.Question():
         return 'Question';
       case _irpjihwh.QuestionOption():
@@ -1289,8 +1295,8 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
     }
-    if (dataClassName == 'Learner') {
-      return deserialize<_iia065xp.Learner>(data['data']);
+    if (dataClassName == 'Profile') {
+      return deserialize<_ilz0o8l0.Profile>(data['data']);
     }
     if (dataClassName == 'Question') {
       return deserialize<_in6mynjk.Question>(data['data']);
@@ -1352,8 +1358,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _iuhc77t0.CourseSubscription.t;
       case _itaqwut4.DemoClock:
         return _itaqwut4.DemoClock.t;
-      case _iia065xp.Learner:
-        return _iia065xp.Learner.t;
+      case _ilz0o8l0.Profile:
+        return _ilz0o8l0.Profile.t;
       case _in6mynjk.Question:
         return _in6mynjk.Question.t;
       case _irpjihwh.QuestionOption:

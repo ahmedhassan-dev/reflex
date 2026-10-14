@@ -46,7 +46,7 @@ import 'enums/result_reason.dart' as _i3yqrgm0;
 import 'enums/role.dart' as _iu4tij3a;
 import 'enums/subscription_status.dart' as _i5d9goyo;
 import 'greetings/greeting.dart' as _izw8z7ou;
-import 'learner.dart' as _iia065xp;
+import 'profile.dart' as _ilz0o8l0;
 import 'question.dart' as _in6mynjk;
 import 'question_option.dart' as _irpjihwh;
 import 'review_state.dart' as _iiyeai10;
@@ -76,7 +76,7 @@ export 'enums/result_reason.dart';
 export 'enums/role.dart';
 export 'enums/subscription_status.dart';
 export 'greetings/greeting.dart';
-export 'learner.dart';
+export 'profile.dart';
 export 'question.dart';
 export 'question_option.dart';
 export 'review_state.dart';
@@ -194,8 +194,8 @@ class Protocol extends _isc.SerializationManager {
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
-    if (t == _iia065xp.Learner) {
-      return _iia065xp.Learner.fromJson(data) as T;
+    if (t == _ilz0o8l0.Profile) {
+      return _ilz0o8l0.Profile.fromJson(data) as T;
     }
     if (t == _in6mynjk.Question) {
       return _in6mynjk.Question.fromJson(data) as T;
@@ -302,8 +302,8 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
-    if (t == _isc.getType<_iia065xp.Learner?>()) {
-      return (data != null ? _iia065xp.Learner.fromJson(data) : null) as T;
+    if (t == _isc.getType<_ilz0o8l0.Profile?>()) {
+      return (data != null ? _ilz0o8l0.Profile.fromJson(data) : null) as T;
     }
     if (t == _isc.getType<_in6mynjk.Question?>()) {
       return (data != null ? _in6mynjk.Question.fromJson(data) : null) as T;
@@ -448,7 +448,7 @@ class Protocol extends _isc.SerializationManager {
       _iu4tij3a.Role => 'Role',
       _i5d9goyo.SubscriptionStatus => 'SubscriptionStatus',
       _izw8z7ou.Greeting => 'Greeting',
-      _iia065xp.Learner => 'Learner',
+      _ilz0o8l0.Profile => 'Profile',
       _in6mynjk.Question => 'Question',
       _irpjihwh.QuestionOption => 'QuestionOption',
       _iiyeai10.ReviewState => 'ReviewState',
@@ -518,8 +518,8 @@ class Protocol extends _isc.SerializationManager {
         return 'SubscriptionStatus';
       case _izw8z7ou.Greeting():
         return 'Greeting';
-      case _iia065xp.Learner():
-        return 'Learner';
+      case _ilz0o8l0.Profile():
+        return 'Profile';
       case _in6mynjk.Question():
         return 'Question';
       case _irpjihwh.QuestionOption():
@@ -626,8 +626,8 @@ class Protocol extends _isc.SerializationManager {
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
     }
-    if (dataClassName == 'Learner') {
-      return deserialize<_iia065xp.Learner>(data['data']);
+    if (dataClassName == 'Profile') {
+      return deserialize<_ilz0o8l0.Profile>(data['data']);
     }
     if (dataClassName == 'Question') {
       return deserialize<_in6mynjk.Question>(data['data']);

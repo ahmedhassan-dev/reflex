@@ -12,7 +12,7 @@ class SelectedCard {
   });
 }
 
-/// Domain engine selecting cards for learner practice sessions.
+/// Domain engine selecting cards for profile practice sessions.
 /// Follows spaced repetition priority:
 /// 1. Due reviews first (ordered by dueAt ASC)
 /// 2. Unattempted / new cards next (ordered by question.position ASC)
@@ -26,15 +26,15 @@ class CardSelector {
     required this.reviewStateRepository,
   });
 
-  /// Selects the next card to practice for [learnerId] in [courseId] at [now].
+  /// Selects the next card to practice for [profileId] in [courseId] at [now].
   Future<SelectedCard?> selectNextCard({
-    required int learnerId,
+    required int profileId,
     required int courseId,
     required DateTime now,
   }) async {
     // 1. Prioritize overdue review cards
     final dueReviews = await reviewStateRepository.findDueReviews(
-      learnerId: learnerId,
+      profileId: profileId,
       courseId: courseId,
       now: now,
     );
@@ -49,7 +49,7 @@ class CardSelector {
     // 2. Serve new unattempted cards in position order
     final courseQuestions = await questionRepository.findByCourseId(courseId);
     for (final q in courseQuestions) {
-      final reviewState = await reviewStateRepository.get(learnerId, q.id!);
+      final reviewState = await reviewStateRepository.get(profileId, q.id!);
       if (reviewState == null) {
         return SelectedCard(question: q, kind: CardKind.newCard);
       }

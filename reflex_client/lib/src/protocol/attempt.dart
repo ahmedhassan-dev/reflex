@@ -18,7 +18,7 @@ abstract class Attempt
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
   Attempt._({
     this.id,
-    required this.learnerId,
+    required this.profileId,
     required this.questionId,
     this.selectedOptionId,
     this.answerText,
@@ -34,7 +34,7 @@ abstract class Attempt
 
   factory Attempt({
     int? id,
-    required int learnerId,
+    required int profileId,
     required int questionId,
     int? selectedOptionId,
     String? answerText,
@@ -51,7 +51,7 @@ abstract class Attempt
   factory Attempt.fromJson(Map<String, dynamic> jsonSerialization) {
     return Attempt(
       id: jsonSerialization['id'] as int?,
-      learnerId: jsonSerialization['learnerId'] as int,
+      profileId: jsonSerialization['profileId'] as int,
       questionId: jsonSerialization['questionId'] as int,
       selectedOptionId: jsonSerialization['selectedOptionId'] as int?,
       answerText: jsonSerialization['answerText'] as String?,
@@ -81,7 +81,7 @@ abstract class Attempt
   /// the id will be null.
   int? id;
 
-  int learnerId;
+  int profileId;
 
   int questionId;
 
@@ -110,7 +110,7 @@ abstract class Attempt
   @_isc.useResult
   Attempt copyWith({
     int? id,
-    int? learnerId,
+    int? profileId,
     int? questionId,
     int? selectedOptionId,
     String? answerText,
@@ -128,7 +128,7 @@ abstract class Attempt
     return {
       '__className__': 'Attempt',
       if (id != null) 'id': id,
-      'learnerId': learnerId,
+      'profileId': profileId,
       'questionId': questionId,
       if (selectedOptionId != null) 'selectedOptionId': selectedOptionId,
       if (answerText != null) 'answerText': answerText,
@@ -148,7 +148,7 @@ abstract class Attempt
     return {
       '__className__': 'Attempt',
       if (id != null) 'id': id,
-      'learnerId': learnerId,
+      'profileId': profileId,
       'questionId': questionId,
       if (selectedOptionId != null) 'selectedOptionId': selectedOptionId,
       if (answerText != null) 'answerText': answerText,
@@ -174,7 +174,7 @@ class _Undefined {}
 class _AttemptImpl extends Attempt {
   _AttemptImpl({
     int? id,
-    required int learnerId,
+    required int profileId,
     required int questionId,
     int? selectedOptionId,
     String? answerText,
@@ -188,7 +188,7 @@ class _AttemptImpl extends Attempt {
     required DateTime createdAt,
   }) : super._(
          id: id,
-         learnerId: learnerId,
+         profileId: profileId,
          questionId: questionId,
          selectedOptionId: selectedOptionId,
          answerText: answerText,
@@ -208,7 +208,7 @@ class _AttemptImpl extends Attempt {
   @override
   Attempt copyWith({
     Object? id = _Undefined,
-    int? learnerId,
+    int? profileId,
     int? questionId,
     Object? selectedOptionId = _Undefined,
     Object? answerText = _Undefined,
@@ -223,7 +223,7 @@ class _AttemptImpl extends Attempt {
   }) {
     return Attempt(
       id: id is int? ? id : this.id,
-      learnerId: learnerId ?? this.learnerId,
+      profileId: profileId ?? this.profileId,
       questionId: questionId ?? this.questionId,
       selectedOptionId: selectedOptionId is int?
           ? selectedOptionId

@@ -38,13 +38,13 @@ class PracticeService {
   /// Serves the next card due for review or unattempted in the course deck.
   /// Stamps `lastServedAt` and clears `helpUsed` on the card's [ReviewState].
   Future<PracticeItem?> serveNextCard({
-    required int learnerId,
+    required int profileId,
     required int courseId,
   }) async {
     if (courseRepo != null && subscriptionRepo != null) {
       final course = await courseRepo!.findById(courseId);
       if (course != null && course.isPublic == false) {
-        final sub = await subscriptionRepo!.findByCourseAndStudent(courseId, learnerId);
+        final sub = await subscriptionRepo!.findByCourseAndStudent(courseId, profileId);
         if (sub?.status != SubscriptionStatus.accepted) {
           throw const CourseAccessDeniedException(
             'This course is private. You must be accepted by the teacher to practice.',
@@ -56,7 +56,7 @@ class PracticeService {
     final now = clock.now();
 
     final selection = await cardSelector.selectNextCard(
-      learnerId: learnerId,
+      profileId: profileId,
       courseId: courseId,
       now: now,
     );
@@ -66,10 +66,10 @@ class PracticeService {
     final question = selection.question;
 
     // Stamp ReviewState as served now
-    final existingReview = await reviewStateRepo.get(learnerId, question.id!);
+    final existingReview = await reviewStateRepo.get(profileId, question.id!);
     final stateToSave = (existingReview ??
             ReviewState(
-              learnerId: learnerId,
+              profileId: profileId,
               questionId: question.id!,
               dueAt: now,
               intervalDays: 0,
@@ -101,7 +101,7 @@ class PracticeService {
     final totalScore = await ScoreCalculator.calculateTotalScore(
       attemptRepo: attemptRepo,
       questionRepo: questionRepo,
-      learnerId: learnerId,
+      profileId: profileId,
       courseId: courseId,
     );
     return PracticeItem(question: questionView, kind: selection.kind, totalScore: totalScore);
@@ -110,10 +110,10 @@ class PracticeService {
   /// Requests a help hint for the currently served card.
   /// Flags the card as having used help.
   Future<HelpResult> requestHelp({
-    required int learnerId,
+    required int profileId,
     required int questionId,
   }) async {
-    final state = await reviewStateRepo.get(learnerId, questionId);
+    final state = await reviewStateRepo.get(profileId, questionId);
     if (state == null || state.lastServedAt == null) {
       throw NoActiveCardException();
     }
@@ -137,12 +137,12 @@ class PracticeService {
   /// grades, updates spaced repetition interval, applies atomic counter SQL,
   /// and returns [SubmitResult] with explanations and teacher topic note.
   Future<SubmitResult> submitAnswer({
-    required int learnerId,
+    required int profileId,
     required int questionId,
     String? textAnswer,
     int? optionId,
   }) async {
-    final state = await reviewStateRepo.get(learnerId, questionId);
+    final state = await reviewStateRepo.get(profileId, questionId);
     if (state == null || state.lastServedAt == null) {
       throw CardAlreadyAnsweredException();
     }
@@ -179,9 +179,9 @@ class PracticeService {
       );
     }
 
-    // Determine prior learner history on this question
-    final hasPriorAttempt = await attemptRepo.hasPriorAttempt(learnerId, questionId);
-    final hasLearnerSolvedBefore = await attemptRepo.hasLearnerSolvedQuestion(learnerId, questionId);
+    // Determine prior profile history on this question
+    final hasPriorAttempt = await attemptRepo.hasPriorAttempt(profileId, questionId);
+    final hasLearnerSolvedBefore = await attemptRepo.hasProfileSolvedQuestion(profileId, questionId);
 
     // Calculate outcome metrics and counter deltas
     final outcome = AttemptOutcomeCalculator.calculate(
@@ -195,7 +195,7 @@ class PracticeService {
 
     // Persist attempt
     final attempt = Attempt(
-      learnerId: learnerId,
+      profileId: profileId,
       questionId: questionId,
       selectedOptionId: optionId,
       answerText: textAnswer,
@@ -233,7 +233,7 @@ class PracticeService {
     final totalScore = await ScoreCalculator.calculateTotalScore(
       attemptRepo: attemptRepo,
       questionRepo: questionRepo,
-      learnerId: learnerId,
+      profileId: profileId,
       courseId: question.courseId,
     );
 
@@ -253,7 +253,7 @@ class PracticeService {
 
   /// Requests subscription to a private course.
   Future<CourseSubscription> requestSubscription({
-    required int learnerId,
+    required int profileId,
     required int courseId,
   }) async {
     if (courseRepo != null) {
@@ -264,7 +264,7 @@ class PracticeService {
       throw const ValidationException('Subscription repository is not configured.');
     }
 
-    final existing = await subscriptionRepo!.findByCourseAndStudent(courseId, learnerId);
+    final existing = await subscriptionRepo!.findByCourseAndStudent(courseId, profileId);
     if (existing != null) {
       if (existing.status == SubscriptionStatus.accepted) return existing;
       final updated = existing.copyWith(
@@ -277,7 +277,7 @@ class PracticeService {
 
     final newSub = CourseSubscription(
       courseId: courseId,
-      studentId: learnerId,
+      studentId: profileId,
       status: SubscriptionStatus.pending,
       requestedAt: clock.now(),
     );
@@ -286,11 +286,11 @@ class PracticeService {
 
   /// Checks the subscription status of a student for a course.
   Future<SubscriptionStatus?> getSubscriptionStatus({
-    required int learnerId,
+    required int profileId,
     required int courseId,
   }) async {
     if (subscriptionRepo == null) return null;
-    final sub = await subscriptionRepo!.findByCourseAndStudent(courseId, learnerId);
+    final sub = await subscriptionRepo!.findByCourseAndStudent(courseId, profileId);
     return sub?.status;
   }
 }

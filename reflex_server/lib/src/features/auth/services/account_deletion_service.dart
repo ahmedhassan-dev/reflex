@@ -4,14 +4,14 @@ import 'package:reflex_server/src/data/repositories/interfaces.dart';
 
 /// Handles complete account and domain data deletion for a user.
 class AccountDeletionService {
-  final ILearnerRepository learnerRepo;
+  final IProfileRepository profileRepo;
   final IAttemptRepository attemptRepo;
   final IReviewStateRepository reviewStateRepo;
   final ICourseSubscriptionRepository subscriptionRepo;
   final ICourseRepository courseRepo;
 
   AccountDeletionService({
-    required this.learnerRepo,
+    required this.profileRepo,
     required this.attemptRepo,
     required this.reviewStateRepo,
     required this.subscriptionRepo,
@@ -19,16 +19,16 @@ class AccountDeletionService {
   });
 
   /// Deletes all domain data for the user (attempts, review states, subscriptions,
-  /// teacher course associations, learner record) and removes the Serverpod auth user.
+  /// teacher course associations, profile record) and removes the Serverpod auth user.
   Future<void> deleteUserAccount(Session session, UuidValue authUserId) async {
-    final learner = await learnerRepo.findByAuthUserId(authUserId);
-    if (learner != null && learner.id != null) {
-      final learnerId = learner.id!;
-      await attemptRepo.deleteByLearnerId(learnerId);
-      await reviewStateRepo.deleteByLearnerId(learnerId);
-      await subscriptionRepo.deleteByStudentId(learnerId);
-      await courseRepo.unassignTeacher(learnerId);
-      await learnerRepo.delete(learner);
+    final profile = await profileRepo.findByAuthUserId(authUserId);
+    if (profile != null && profile.id != null) {
+      final profileId = profile.id!;
+      await attemptRepo.deleteByProfileId(profileId);
+      await reviewStateRepo.deleteByProfileId(profileId);
+      await subscriptionRepo.deleteByStudentId(profileId);
+      await courseRepo.unassignTeacher(profileId);
+      await profileRepo.delete(profile);
     }
 
     try {

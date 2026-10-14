@@ -9,7 +9,7 @@ class QuestionAdminService {
   final IQuestionOptionRepository? optionRepo;
   final IAcceptedAnswerRepository? acceptedAnswerRepo;
   final ICourseSubscriptionRepository? subscriptionRepo;
-  final ILearnerRepository? learnerRepo;
+  final IProfileRepository? profileRepo;
 
   QuestionAdminService({
     required this.questionRepo,
@@ -17,7 +17,7 @@ class QuestionAdminService {
     this.optionRepo,
     this.acceptedAnswerRepo,
     this.subscriptionRepo,
-    this.learnerRepo,
+    this.profileRepo,
   });
 
   /// Lists all available courses.
@@ -85,8 +85,8 @@ class QuestionAdminService {
     if (course == null) throw CourseNotFoundException(courseId);
 
     final subs = await subscriptionRepo!.listByCourse(courseId);
-    final allLearners = learnerRepo != null ? await learnerRepo!.listAll() : <Learner>[];
-    final learnerMap = {for (final l in allLearners) l.id: l.displayName};
+    final allProfiles = profileRepo != null ? await profileRepo!.listAll() : <Profile>[];
+    final profileMap = {for (final l in allProfiles) l.id: l.displayName};
 
     return subs.map((s) {
       return CourseSubscriptionView(
@@ -94,7 +94,7 @@ class QuestionAdminService {
         courseId: courseId,
         courseTitle: course.title,
         studentId: s.studentId,
-        studentName: learnerMap[s.studentId] ?? 'Student #${s.studentId}',
+        studentName: profileMap[s.studentId] ?? 'Student #${s.studentId}',
         status: s.status,
         requestedAt: s.requestedAt,
         decidedAt: s.decidedAt,

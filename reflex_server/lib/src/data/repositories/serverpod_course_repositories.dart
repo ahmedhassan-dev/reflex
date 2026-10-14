@@ -28,8 +28,9 @@ class ServerpodCourseRepository implements ICourseRepository {
     );
   }
 
-  Future<List<Course>> listAccessible(int? learnerId) async {
-    if (learnerId == null) {
+  @override
+  Future<List<Course>> listAccessible(int? profileId) async {
+    if (profileId == null) {
       return Course.db.find(
         session,
         where: (t) => t.isPublic.equals(true),
@@ -40,7 +41,7 @@ class ServerpodCourseRepository implements ICourseRepository {
     final acceptedSubs = await CourseSubscription.db.find(
       session,
       where: (t) =>
-          t.studentId.equals(learnerId) &
+          t.studentId.equals(profileId) &
           t.status.equals(SubscriptionStatus.accepted),
       transaction: transaction,
     );

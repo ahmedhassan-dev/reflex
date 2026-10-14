@@ -18,7 +18,7 @@ abstract class Attempt
     implements _is.TableRow<int?>, _is.ProtocolSerialization {
   Attempt._({
     this.id,
-    required this.learnerId,
+    required this.profileId,
     required this.questionId,
     this.selectedOptionId,
     this.answerText,
@@ -34,7 +34,7 @@ abstract class Attempt
 
   factory Attempt({
     int? id,
-    required int learnerId,
+    required int profileId,
     required int questionId,
     int? selectedOptionId,
     String? answerText,
@@ -51,7 +51,7 @@ abstract class Attempt
   factory Attempt.fromJson(Map<String, dynamic> jsonSerialization) {
     return Attempt(
       id: jsonSerialization['id'] as int?,
-      learnerId: jsonSerialization['learnerId'] as int,
+      profileId: jsonSerialization['profileId'] as int,
       questionId: jsonSerialization['questionId'] as int,
       selectedOptionId: jsonSerialization['selectedOptionId'] as int?,
       answerText: jsonSerialization['answerText'] as String?,
@@ -83,7 +83,7 @@ abstract class Attempt
   @override
   int? id;
 
-  int learnerId;
+  int profileId;
 
   int questionId;
 
@@ -115,7 +115,7 @@ abstract class Attempt
   @_is.useResult
   Attempt copyWith({
     int? id,
-    int? learnerId,
+    int? profileId,
     int? questionId,
     int? selectedOptionId,
     String? answerText,
@@ -133,7 +133,7 @@ abstract class Attempt
     return {
       '__className__': 'Attempt',
       if (id != null) 'id': id,
-      'learnerId': learnerId,
+      'profileId': profileId,
       'questionId': questionId,
       if (selectedOptionId != null) 'selectedOptionId': selectedOptionId,
       if (answerText != null) 'answerText': answerText,
@@ -153,7 +153,7 @@ abstract class Attempt
     return {
       '__className__': 'Attempt',
       if (id != null) 'id': id,
-      'learnerId': learnerId,
+      'profileId': profileId,
       'questionId': questionId,
       if (selectedOptionId != null) 'selectedOptionId': selectedOptionId,
       if (answerText != null) 'answerText': answerText,
@@ -201,7 +201,7 @@ class _Undefined {}
 class _AttemptImpl extends Attempt {
   _AttemptImpl({
     int? id,
-    required int learnerId,
+    required int profileId,
     required int questionId,
     int? selectedOptionId,
     String? answerText,
@@ -215,7 +215,7 @@ class _AttemptImpl extends Attempt {
     required DateTime createdAt,
   }) : super._(
          id: id,
-         learnerId: learnerId,
+         profileId: profileId,
          questionId: questionId,
          selectedOptionId: selectedOptionId,
          answerText: answerText,
@@ -235,7 +235,7 @@ class _AttemptImpl extends Attempt {
   @override
   Attempt copyWith({
     Object? id = _Undefined,
-    int? learnerId,
+    int? profileId,
     int? questionId,
     Object? selectedOptionId = _Undefined,
     Object? answerText = _Undefined,
@@ -250,7 +250,7 @@ class _AttemptImpl extends Attempt {
   }) {
     return Attempt(
       id: id is int? ? id : this.id,
-      learnerId: learnerId ?? this.learnerId,
+      profileId: profileId ?? this.profileId,
       questionId: questionId ?? this.questionId,
       selectedOptionId: selectedOptionId is int?
           ? selectedOptionId
@@ -271,8 +271,8 @@ class _AttemptImpl extends Attempt {
 class AttemptUpdateTable extends _is.UpdateTable<AttemptTable> {
   AttemptUpdateTable(super.table);
 
-  _is.ColumnValue<int, int> learnerId(int value) => _is.ColumnValue(
-    table.learnerId,
+  _is.ColumnValue<int, int> profileId(int value) => _is.ColumnValue(
+    table.profileId,
     value,
   );
 
@@ -340,8 +340,8 @@ class AttemptUpdateTable extends _is.UpdateTable<AttemptTable> {
 class AttemptTable extends _is.Table<int?> {
   AttemptTable({super.tableRelation}) : super(tableName: 'attempt') {
     updateTable = AttemptUpdateTable(this);
-    learnerId = _is.ColumnInt(
-      'learnerId',
+    profileId = _is.ColumnInt(
+      'profileId',
       this,
     );
     questionId = _is.ColumnInt(
@@ -394,7 +394,7 @@ class AttemptTable extends _is.Table<int?> {
 
   late final AttemptUpdateTable updateTable;
 
-  late final _is.ColumnInt learnerId;
+  late final _is.ColumnInt profileId;
 
   late final _is.ColumnInt questionId;
 
@@ -421,7 +421,7 @@ class AttemptTable extends _is.Table<int?> {
   @override
   List<_is.Column> get columns => [
     id,
-    learnerId,
+    profileId,
     questionId,
     selectedOptionId,
     answerText,

@@ -2,7 +2,7 @@ class: CourseSubscription
 table: course_subscription
 fields:
   courseId: int, relation(parent=course)
-  studentId: int, relation(parent=learner)
+  studentId: int, relation(parent=profile)
   status: SubscriptionStatus
   requestedAt: DateTime
   decidedAt: DateTime?

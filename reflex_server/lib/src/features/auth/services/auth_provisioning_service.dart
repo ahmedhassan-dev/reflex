@@ -4,15 +4,15 @@ import 'package:reflex_server/src/features/auth/config/scopes.dart';
 import 'package:reflex_server/src/generated/protocol.dart';
 import 'package:reflex_server/src/data/repositories/interfaces.dart';
 
-/// Ensures every authenticated Serverpod user is mapped to a domain [Learner] record.
+/// Ensures every authenticated Serverpod user is mapped to a domain [Profile] record.
 class AuthProvisioningService {
-  final ILearnerRepository learnerRepo;
+  final IProfileRepository profileRepo;
 
-  AuthProvisioningService({required this.learnerRepo});
+  AuthProvisioningService({required this.profileRepo});
 
-  /// Resolves the authenticated user from the session and returns their [Learner] profile.
-  /// Automatically provisions a new [Learner] on first login.
-  Future<Learner> ensureLearnerForSession(
+  /// Resolves the authenticated user from the session and returns their [Profile].
+  /// Automatically provisions a new [Profile] on first login.
+  Future<Profile> ensureProfileForSession(
     Session session, {
     String? defaultDisplayName,
     Role defaultRole = Role.student,
@@ -23,10 +23,11 @@ class AuthProvisioningService {
     }
 
     final authUserId = UuidValue.fromString(authInfo.userIdentifier);
-    final existing = await learnerRepo.findByAuthUserId(authUserId);
+    final existing = await profileRepo.findByAuthUserId(authUserId);
 
-    // Attempt to resolve real full name from Serverpod auth user profile
+    // Attempt to resolve real full name and email from Serverpod auth user profile
     String? profileFullName;
+    String? profileEmail;
     try {
       final rows = await session.db.unsafeQuery(
         'SELECT "fullName", "userName", "email" FROM "serverpod_auth_core_profile" WHERE "authUserId" = \'$authUserId\' LIMIT 1;',
@@ -36,6 +37,9 @@ class AuthProvisioningService {
         final fn = row[0]?.toString();
         final un = row[1]?.toString();
         final em = row[2]?.toString();
+        if (em != null && em.trim().isNotEmpty) {
+          profileEmail = em.trim();
+        }
         if (fn != null && fn.trim().isNotEmpty) {
           profileFullName = fn.trim();
         } else if (un != null && un.trim().isNotEmpty) {
@@ -47,11 +51,19 @@ class AuthProvisioningService {
     } catch (_) {}
 
     if (existing != null) {
+      var updated = false;
       if (profileFullName != null &&
           (existing.displayName.startsWith('Student ') ||
               existing.displayName.startsWith('Teacher '))) {
         existing.displayName = profileFullName;
-        return learnerRepo.save(existing);
+        updated = true;
+      }
+      if (existing.email == null && profileEmail != null) {
+        existing.email = profileEmail;
+        updated = true;
+      }
+      if (updated) {
+        return profileRepo.save(existing);
       }
       return existing;
     }
@@ -77,12 +89,13 @@ class AuthProvisioningService {
               : 'Student ${uid.substring(0, 8)}');
     }
 
-    final newLearner = Learner(
+    final newProfile = Profile(
       authUserId: authUserId,
       displayName: resolvedName,
       role: isTeacher ? Role.teacher : defaultRole,
+      email: profileEmail,
     );
 
-    return learnerRepo.save(newLearner);
+    return profileRepo.save(newProfile);
   }
 }

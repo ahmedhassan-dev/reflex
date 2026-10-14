@@ -1,7 +1,7 @@
 class: Attempt
 table: attempt
 fields:
-  learnerId: int
+  profileId: int
   questionId: int
   selectedOptionId: int?
   answerText: String?
@@ -14,7 +14,7 @@ fields:
   reflexTier: ReflexTier
   createdAt: DateTime
 indexes:
-  attempt_learner_idx:
-    fields: learnerId
+  attempt_profile_idx:
+    fields: profileId
   attempt_question_idx:
     fields: questionId

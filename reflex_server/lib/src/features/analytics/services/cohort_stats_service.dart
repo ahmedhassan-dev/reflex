@@ -5,14 +5,14 @@ import 'package:reflex_server/src/data/repositories/interfaces.dart';
 
 /// Aggregates learning performance, topic mastery, and question difficulty insights.
 class CohortStatsService {
-  final ILearnerRepository learnerRepo;
+  final IProfileRepository profileRepo;
   final IQuestionRepository questionRepo;
   final IAttemptRepository attemptRepo;
   final IReviewStateRepository reviewStateRepo;
   final Clock clock;
 
   CohortStatsService({
-    required this.learnerRepo,
+    required this.profileRepo,
     required this.questionRepo,
     required this.attemptRepo,
     required this.reviewStateRepo,
@@ -31,8 +31,8 @@ class CohortStatsService {
     }
 
     final attempts = await attemptRepo.listAttemptsForCourse(courseId);
-    final allLearners = await learnerRepo.listAll();
-    final students = allLearners.where((l) => l.role == Role.student).toList();
+    final allProfiles = await profileRepo.listAll();
+    final students = allProfiles.where((l) => l.role == Role.student).toList();
 
     // 1. Question Insights
     final questionInsights = <QuestionInsight>[];
@@ -68,7 +68,7 @@ class CohortStatsService {
     // 2. Student Progress
     final studentProgressList = <StudentProgress>[];
     for (final student in students) {
-      final sAttempts = attempts.where((a) => a.learnerId == student.id).toList();
+      final sAttempts = attempts.where((a) => a.profileId == student.id).toList();
       if (sAttempts.isEmpty) continue;
 
       final solvedQuestionIds = sAttempts
@@ -91,12 +91,12 @@ class CohortStatsService {
       final totalScore = await ScoreCalculator.calculateTotalScore(
         attemptRepo: attemptRepo,
         questionRepo: questionRepo,
-        learnerId: student.id!,
+        profileId: student.id!,
         courseId: courseId,
       );
 
       studentProgressList.add(StudentProgress(
-        learnerId: student.id!,
+        profileId: student.id!,
         displayName: student.displayName,
         solvedCount: solvedQuestionIds.length,
         cleanFirstTryCount: cleanFirstTryCount,
@@ -137,11 +137,11 @@ class CohortStatsService {
 
   /// Computes progress for an individual student in a course.
   Future<StudentProgress> getStudentProgress({
-    required int learnerId,
+    required int profileId,
     required int courseId,
   }) async {
-    final learner = await learnerRepo.findById(learnerId);
-    final attempts = await attemptRepo.listAttemptsByLearner(learnerId);
+    final profile = await profileRepo.findById(profileId);
+    final attempts = await attemptRepo.listAttemptsByProfile(profileId);
     final courseQuestions = await questionRepo.findByCourseId(courseId);
     final courseQIds = courseQuestions.map((q) => q.id!).toSet();
 
@@ -167,13 +167,13 @@ class CohortStatsService {
     final totalScore = await ScoreCalculator.calculateTotalScore(
       attemptRepo: attemptRepo,
       questionRepo: questionRepo,
-      learnerId: learnerId,
+      profileId: profileId,
       courseId: courseId,
     );
 
     return StudentProgress(
-      learnerId: learnerId,
-      displayName: learner?.displayName ?? 'Student',
+      profileId: profileId,
+      displayName: profile?.displayName ?? 'Student',
       solvedCount: solvedQuestionIds.length,
       cleanFirstTryCount: cleanFirstTryCount,
       avgResponseMs: double.parse(avgLatency.toStringAsFixed(1)),

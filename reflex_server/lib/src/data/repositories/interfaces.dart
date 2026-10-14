@@ -2,13 +2,13 @@ import 'package:serverpod/serverpod.dart';
 import 'package:reflex_server/src/features/practice/domain/attempt_outcome.dart';
 import 'package:reflex_server/src/generated/protocol.dart';
 
-/// Repository interface for Learner entities.
-abstract interface class ILearnerRepository {
-  Future<Learner?> findById(int id);
-  Future<Learner?> findByAuthUserId(UuidValue authUserId);
-  Future<Learner> save(Learner learner);
-  Future<void> delete(Learner learner);
-  Future<List<Learner>> listAll();
+/// Repository interface for Profile entities.
+abstract interface class IProfileRepository {
+  Future<Profile?> findById(int id);
+  Future<Profile?> findByAuthUserId(UuidValue authUserId);
+  Future<Profile> save(Profile profile);
+  Future<void> delete(Profile profile);
+  Future<List<Profile>> listAll();
 }
 
 /// Repository interface for Course entities.
@@ -18,6 +18,7 @@ abstract interface class ICourseRepository {
   Future<List<Course>> listByTeacher(int teacherId);
   Future<Course> save(Course course);
   Future<void> unassignTeacher(int teacherId);
+  Future<List<Course>> listAccessible(int? profileId);
 }
 
 /// Repository interface for CourseSubscription entities.
@@ -57,25 +58,25 @@ abstract interface class IAcceptedAnswerRepository {
 /// Repository interface for recording and inspecting student Attempts.
 abstract interface class IAttemptRepository {
   Future<Attempt> insert(Attempt attempt);
-  Future<bool> hasPriorAttempt(int learnerId, int questionId);
-  Future<bool> hasLearnerSolvedQuestion(int learnerId, int questionId);
-  Future<List<Attempt>> listAttemptsByLearner(int learnerId);
+  Future<bool> hasPriorAttempt(int profileId, int questionId);
+  Future<bool> hasProfileSolvedQuestion(int profileId, int questionId);
+  Future<List<Attempt>> listAttemptsByProfile(int profileId);
   Future<List<Attempt>> listAttemptsForCourse(int courseId);
-  Future<void> deleteByLearnerId(int learnerId);
+  Future<void> deleteByProfileId(int profileId);
 }
 
 /// Repository interface for spaced repetition ReviewState entities.
 abstract interface class IReviewStateRepository {
-  Future<ReviewState?> get(int learnerId, int questionId);
+  Future<ReviewState?> get(int profileId, int questionId);
   Future<ReviewState> upsert(ReviewState state);
   Future<List<ReviewState>> findDueReviews({
-    required int learnerId,
+    required int profileId,
     required int courseId,
     required DateTime now,
   });
-  Future<List<ReviewState>> listByLearner(int learnerId);
-  Future<void> markServed(int learnerId, int questionId, DateTime servedAt);
-  Future<void> deleteByLearnerId(int learnerId);
+  Future<List<ReviewState>> listByProfile(int profileId);
+  Future<void> markServed(int profileId, int questionId, DateTime servedAt);
+  Future<void> deleteByProfileId(int profileId);
 }
 
 /// Repository interface for persisting DemoClock offset days.

@@ -4,10 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reflex_flutter/generated/codegen_loader.g.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:reflex_client/reflex_client.dart';
+import 'package:reflex_flutter/client.dart';
+
 Future<void> initTestLocalization() async {
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({});
   await EasyLocalization.ensureInitialized();
+  client = Client('http://localhost:8080/');
 }
 
 Widget createLocalizedTestWidget({

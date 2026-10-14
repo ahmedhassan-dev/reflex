@@ -73,7 +73,7 @@ void main() {
 
     test('returns new unattempted card by question.position ascending when no reviews are due', () async {
       final card = await cardSelector.selectNextCard(
-        learnerId: 10,
+        profileId: 10,
         courseId: 1,
         now: now,
       );
@@ -86,7 +86,7 @@ void main() {
     test('orders new cards by question.position ascending', () async {
       // Mark Q1 as attempted with review in future
       await reviewStateRepo.upsert(ReviewState(
-        learnerId: 10,
+        profileId: 10,
         questionId: 1,
         dueAt: now.add(const Duration(days: 1)),
         intervalDays: 1,
@@ -95,7 +95,7 @@ void main() {
       ));
 
       final card = await cardSelector.selectNextCard(
-        learnerId: 10,
+        profileId: 10,
         courseId: 1,
         now: now,
       );
@@ -108,7 +108,7 @@ void main() {
     test('returns overdue review card first before any new cards', () async {
       // Q2 has a review state that is OVERDUE (due 2 hours ago)
       await reviewStateRepo.upsert(ReviewState(
-        learnerId: 10,
+        profileId: 10,
         questionId: 2,
         dueAt: now.subtract(const Duration(hours: 2)),
         intervalDays: 1,
@@ -118,7 +118,7 @@ void main() {
 
       // Q1 is completely new (unattempted), but Q2 is due for review
       final card = await cardSelector.selectNextCard(
-        learnerId: 10,
+        profileId: 10,
         courseId: 1,
         now: now,
       );
@@ -131,7 +131,7 @@ void main() {
     test('orders multiple overdue review cards by dueAt ascending', () async {
       // Q1 due 1 hour ago
       await reviewStateRepo.upsert(ReviewState(
-        learnerId: 10,
+        profileId: 10,
         questionId: 1,
         dueAt: now.subtract(const Duration(hours: 1)),
         intervalDays: 1,
@@ -141,7 +141,7 @@ void main() {
 
       // Q2 due 5 hours ago (more overdue)
       await reviewStateRepo.upsert(ReviewState(
-        learnerId: 10,
+        profileId: 10,
         questionId: 2,
         dueAt: now.subtract(const Duration(hours: 5)),
         intervalDays: 1,
@@ -150,7 +150,7 @@ void main() {
       ));
 
       final card = await cardSelector.selectNextCard(
-        learnerId: 10,
+        profileId: 10,
         courseId: 1,
         now: now,
       );
@@ -163,7 +163,7 @@ void main() {
     test('returns null when all cards are scheduled in the future (deck complete)', () async {
       for (var qId = 1; qId <= 3; qId++) {
         await reviewStateRepo.upsert(ReviewState(
-          learnerId: 10,
+          profileId: 10,
           questionId: qId,
           dueAt: now.add(Duration(days: qId)),
           intervalDays: qId,
@@ -173,7 +173,7 @@ void main() {
       }
 
       final card = await cardSelector.selectNextCard(
-        learnerId: 10,
+        profileId: 10,
         courseId: 1,
         now: now,
       );
@@ -183,7 +183,7 @@ void main() {
 
     test('returns null when course has no questions', () async {
       final card = await cardSelector.selectNextCard(
-        learnerId: 10,
+        profileId: 10,
         courseId: 999, // Empty course
         now: now,
       );

@@ -24,7 +24,7 @@ void main() {
     testWidgets('renders student metrics and dynamic study streak correctly',
         (tester) async {
       final sampleProgress = StudentProgress(
-        learnerId: 101,
+        profileId: 101,
         displayName: 'Amira Tariq',
         solvedCount: 18,
         cleanFirstTryCount: 14,
@@ -85,7 +85,7 @@ void main() {
           Course(id: 2, title: 'Course 2', subject: 'Physics', isPublic: true);
 
       final progress1 = StudentProgress(
-        learnerId: 1,
+        profileId: 1,
         displayName: 'Student',
         solvedCount: 5,
         cleanFirstTryCount: 3,
@@ -93,7 +93,7 @@ void main() {
         studyStreakDays: 2,
       );
       final progress2 = StudentProgress(
-        learnerId: 1,
+        profileId: 1,
         displayName: 'Student',
         solvedCount: 10,
         cleanFirstTryCount: 8,
@@ -133,7 +133,7 @@ void main() {
     testWidgets('tapping avatar opens AvatarSelectorModal and allows changing avatar',
         (tester) async {
       final sampleProgress = StudentProgress(
-        learnerId: 101,
+        profileId: 101,
         displayName: 'Amira Tariq',
         solvedCount: 18,
         cleanFirstTryCount: 14,
@@ -177,7 +177,7 @@ void main() {
 
     testWidgets('tapping camera badge exists for photo upload', (tester) async {
       final sampleProgress = StudentProgress(
-        learnerId: 101,
+        profileId: 101,
         displayName: 'Amira Tariq',
         solvedCount: 18,
         cleanFirstTryCount: 14,

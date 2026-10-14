@@ -67,7 +67,7 @@ void main() {
     });
 
     test('serveNextCard stamps lastServedAt and resets helpUsed to false', () async {
-      final item = await service.serveNextCard(learnerId: 42, courseId: 1);
+      final item = await service.serveNextCard(profileId: 42, courseId: 1);
       expect(item, isNotNull);
       expect(item!.question.id, equals(1));
       expect(item.question.prompt, equals(sampleQuestion.prompt));
@@ -83,15 +83,15 @@ void main() {
 
     test('requestHelp throws NoActiveCardException if no card currently served', () async {
       expect(
-        () => service.requestHelp(learnerId: 42, questionId: 1),
+        () => service.requestHelp(profileId: 42, questionId: 1),
         throwsA(isA<NoActiveCardException>()),
       );
     });
 
     test('requestHelp flags card as helpUsed and returns hint', () async {
-      await service.serveNextCard(learnerId: 42, courseId: 1);
+      await service.serveNextCard(profileId: 42, courseId: 1);
 
-      final help = await service.requestHelp(learnerId: 42, questionId: 1);
+      final help = await service.requestHelp(profileId: 42, questionId: 1);
       expect(help.helpHint, equals('Think about state immutability.'));
 
       final reviewState = await reviewStateRepo.get(42, 1);
@@ -99,31 +99,31 @@ void main() {
     });
 
     test('submitAnswer throws CardAlreadyAnsweredException if card was already submitted (idempotency)', () async {
-      await service.serveNextCard(learnerId: 42, courseId: 1);
+      await service.serveNextCard(profileId: 42, courseId: 1);
 
       // Submit once
-      await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 101);
+      await service.submitAnswer(profileId: 42, questionId: 1, optionId: 101);
 
       // Second submit must fail idempotency check
       expect(
-        () => service.submitAnswer(learnerId: 42, questionId: 1, optionId: 101),
+        () => service.submitAnswer(profileId: 42, questionId: 1, optionId: 101),
         throwsA(isA<CardAlreadyAnsweredException>()),
       );
     });
 
     test('submitAnswer calculates latency from lastServedAt to now', () async {
-      await service.serveNextCard(learnerId: 42, courseId: 1);
+      await service.serveNextCard(profileId: 42, courseId: 1);
       clock.advance(const Duration(seconds: 4));
 
-      final result = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 101);
+      final result = await service.submitAnswer(profileId: 42, questionId: 1, optionId: 101);
       expect(result.responseMs, equals(4000));
     });
 
     test('submitAnswer persists Attempt, updates ReviewState, updates Question counters, and clears lastServedAt', () async {
-      await service.serveNextCard(learnerId: 42, courseId: 1);
+      await service.serveNextCard(profileId: 42, courseId: 1);
       clock.advance(const Duration(seconds: 5));
 
-      final result = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 101);
+      final result = await service.submitAnswer(profileId: 42, questionId: 1, optionId: 101);
       expect(result.verdict, equals(AttemptStatus.valid));
       expect(result.reflexTier, equals(ReflexTier.greenMastered));
       expect(result.reason, equals(ResultReason.correctClean));
@@ -134,7 +134,7 @@ void main() {
       expect(state.intervalDays, equals(30)); // Clean solve schedules 30 days out
 
       // Attempt logged
-      final attempts = await attemptRepo.listAttemptsByLearner(42);
+      final attempts = await attemptRepo.listAttemptsByProfile(42);
       expect(attempts.length, equals(1));
       expect(attempts.first.isClean, isTrue);
       expect(attempts.first.underExpectedTime, isTrue);
@@ -149,9 +149,9 @@ void main() {
     });
 
     test('submitAnswer returns SubmitResult containing topicNote, explanations, and reason', () async {
-      await service.serveNextCard(learnerId: 42, courseId: 1);
+      await service.serveNextCard(profileId: 42, courseId: 1);
 
-      final result = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 101);
+      final result = await service.submitAnswer(profileId: 42, questionId: 1, optionId: 101);
       expect(result.topicNote, equals('StatelessWidget does not store mutable state across frames.'));
       expect(result.optionExplanations?.length, equals(3));
       expect(result.optionExplanations?.first.isCorrect, isTrue);
@@ -159,9 +159,9 @@ void main() {
     });
 
     test('submitAnswer returns ReflexTier.redNeedsWork on incorrect answer', () async {
-      await service.serveNextCard(learnerId: 42, courseId: 1);
+      await service.serveNextCard(profileId: 42, courseId: 1);
 
-      final result = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 102);
+      final result = await service.submitAnswer(profileId: 42, questionId: 1, optionId: 102);
       expect(result.verdict, equals(AttemptStatus.wrong));
       expect(result.reflexTier, equals(ReflexTier.redNeedsWork));
       expect(result.reason, equals(ResultReason.wrong));
@@ -172,11 +172,11 @@ void main() {
     });
 
     test('submitAnswer returns ReflexTier.yellowDeveloping on slow or helped answer', () async {
-      await service.serveNextCard(learnerId: 42, courseId: 1);
+      await service.serveNextCard(profileId: 42, courseId: 1);
       // Take longer than expected 15s
       clock.advance(const Duration(seconds: 20));
 
-      final result = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 101);
+      final result = await service.submitAnswer(profileId: 42, questionId: 1, optionId: 101);
       expect(result.verdict, equals(AttemptStatus.valid));
       expect(result.reflexTier, equals(ReflexTier.yellowDeveloping));
       expect(result.reason, equals(ResultReason.correctSlow));
@@ -186,8 +186,8 @@ void main() {
     });
 
     test('submitAnswer awards 0 points on wrong answer and does not increment totalScore', () async {
-      await service.serveNextCard(learnerId: 42, courseId: 1);
-      final result = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 102);
+      await service.serveNextCard(profileId: 42, courseId: 1);
+      final result = await service.submitAnswer(profileId: 42, questionId: 1, optionId: 102);
 
       expect(result.verdict, equals(AttemptStatus.wrong));
       expect(result.points, equals(0));
@@ -196,22 +196,22 @@ void main() {
 
     test('submitAnswer awards points on 2nd attempt when right after wrong first attempt, but only once', () async {
       // 1st attempt: wrong -> 0 points
-      await service.serveNextCard(learnerId: 42, courseId: 1);
-      final wrongRes = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 102);
+      await service.serveNextCard(profileId: 42, courseId: 1);
+      final wrongRes = await service.submitAnswer(profileId: 42, questionId: 1, optionId: 102);
       expect(wrongRes.points, equals(0));
       expect(wrongRes.totalScore, equals(0));
 
       // 2nd attempt: right -> awards 10 points
       clock.advance(const Duration(days: 1));
-      await service.serveNextCard(learnerId: 42, courseId: 1);
-      final rightRes = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 101);
+      await service.serveNextCard(profileId: 42, courseId: 1);
+      final rightRes = await service.submitAnswer(profileId: 42, questionId: 1, optionId: 101);
       expect(rightRes.points, equals(10));
       expect(rightRes.totalScore, equals(10));
 
       // 3rd attempt: right again -> 0 points, totalScore still 10
       clock.advance(const Duration(days: 30));
-      await service.serveNextCard(learnerId: 42, courseId: 1);
-      final rightAgainRes = await service.submitAnswer(learnerId: 42, questionId: 1, optionId: 101);
+      await service.serveNextCard(profileId: 42, courseId: 1);
+      final rightAgainRes = await service.submitAnswer(profileId: 42, questionId: 1, optionId: 101);
       expect(rightAgainRes.points, equals(0));
       expect(rightAgainRes.totalScore, equals(10));
     });

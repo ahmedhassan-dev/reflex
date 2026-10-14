@@ -13,6 +13,7 @@ class UserProfileEndpoint extends UserProfileEditBaseEndpoint {
   final AccountDeletionService? _accountDeletionService;
 
   UserProfileEndpoint({AccountDeletionService? accountDeletionService})
+      // ignore: prefer_initializing_formals
       : _accountDeletionService = accountDeletionService;
 
   /// Updates the FCM device token for the authenticated user.
@@ -22,14 +23,14 @@ class UserProfileEndpoint extends UserProfileEditBaseEndpoint {
       throw const UnauthorizedException('Authentication required.');
     }
     final authUserId = UuidValue.fromString(authInfo.userIdentifier);
-    final repo = ServerpodLearnerRepository(session);
-    var learner = await repo.findByAuthUserId(authUserId);
-    if (learner == null) {
+    final repo = ServerpodProfileRepository(session);
+    var profile = await repo.findByAuthUserId(authUserId);
+    if (profile == null) {
       final container = AppContainer(session);
-      learner = await container.resolveCurrentLearner();
+      profile = await container.resolveCurrentProfile();
     }
-    learner.fcmToken = fcmToken;
-    await repo.save(learner);
+    profile.fcmToken = fcmToken;
+    await repo.save(profile);
     return true;
   }
 
@@ -42,7 +43,7 @@ class UserProfileEndpoint extends UserProfileEditBaseEndpoint {
     final authUserId = UuidValue.fromString(authInfo.userIdentifier);
     final service = _accountDeletionService ??
         AccountDeletionService(
-          learnerRepo: ServerpodLearnerRepository(session),
+          profileRepo: ServerpodProfileRepository(session),
           attemptRepo: ServerpodAttemptRepository(session),
           reviewStateRepo: ServerpodReviewStateRepository(session),
           subscriptionRepo: ServerpodCourseSubscriptionRepository(session),

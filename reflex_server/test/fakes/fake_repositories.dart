@@ -4,36 +4,36 @@ import 'package:reflex_server/src/data/repositories/interfaces.dart';
 
 export 'fake_question_repositories.dart';
 
-class FakeLearnerRepository implements ILearnerRepository {
-  final Map<int, Learner> _storage = {};
+class FakeProfileRepository implements IProfileRepository {
+  final Map<int, Profile> _storage = {};
   int _nextId = 1;
 
   @override
-  Future<Learner?> findById(int id) async => _storage[id];
+  Future<Profile?> findById(int id) async => _storage[id];
 
   @override
-  Future<Learner?> findByAuthUserId(UuidValue authUserId) async {
-    for (final learner in _storage.values) {
-      if (learner.authUserId == authUserId) return learner;
+  Future<Profile?> findByAuthUserId(UuidValue authUserId) async {
+    for (final profile in _storage.values) {
+      if (profile.authUserId == authUserId) return profile;
     }
     return null;
   }
 
   @override
-  Future<Learner> save(Learner learner) async {
-    final id = learner.id ?? _nextId++;
-    final saved = learner.copyWith(id: id);
+  Future<Profile> save(Profile profile) async {
+    final id = profile.id ?? _nextId++;
+    final saved = profile.copyWith(id: id);
     _storage[id] = saved;
     return saved;
   }
 
   @override
-  Future<void> delete(Learner learner) async {
-    _storage.remove(learner.id);
+  Future<void> delete(Profile profile) async {
+    _storage.remove(profile.id);
   }
 
   @override
-  Future<List<Learner>> listAll() async => _storage.values.toList();
+  Future<List<Profile>> listAll() async => _storage.values.toList();
 }
 
 class FakeCourseRepository implements ICourseRepository {
@@ -66,6 +66,11 @@ class FakeCourseRepository implements ICourseRepository {
         _storage[key] = _storage[key]!.copyWith(teacherId: null);
       }
     }
+  }
+
+  @override
+  Future<List<Course>> listAccessible(int? profileId) async {
+    return _storage.values.where((c) => c.isPublic == true).toList();
   }
 }
 
@@ -122,25 +127,25 @@ class FakeAttemptRepository implements IAttemptRepository {
   }
 
   @override
-  Future<void> deleteByLearnerId(int learnerId) async {
-    _attempts.removeWhere((a) => a.learnerId == learnerId);
+  Future<void> deleteByProfileId(int profileId) async {
+    _attempts.removeWhere((a) => a.profileId == profileId);
   }
 
   @override
-  Future<bool> hasPriorAttempt(int learnerId, int questionId) async {
-    return _attempts.any((a) => a.learnerId == learnerId && a.questionId == questionId);
+  Future<bool> hasPriorAttempt(int profileId, int questionId) async {
+    return _attempts.any((a) => a.profileId == profileId && a.questionId == questionId);
   }
 
   @override
-  Future<bool> hasLearnerSolvedQuestion(int learnerId, int questionId) async {
+  Future<bool> hasProfileSolvedQuestion(int profileId, int questionId) async {
     return _attempts.any(
-      (a) => a.learnerId == learnerId && a.questionId == questionId && a.status == AttemptStatus.valid,
+      (a) => a.profileId == profileId && a.questionId == questionId && a.status == AttemptStatus.valid,
     );
   }
 
   @override
-  Future<List<Attempt>> listAttemptsByLearner(int learnerId) async {
-    return _attempts.where((a) => a.learnerId == learnerId).toList();
+  Future<List<Attempt>> listAttemptsByProfile(int profileId) async {
+    return _attempts.where((a) => a.profileId == profileId).toList();
   }
 
   @override
@@ -153,42 +158,42 @@ class FakeReviewStateRepository implements IReviewStateRepository {
   final Map<String, ReviewState> _storage = {};
   int _nextId = 1;
 
-  String _key(int learnerId, int questionId) => '$learnerId-$questionId';
+  String _key(int profileId, int questionId) => '$profileId-$questionId';
 
   @override
-  Future<ReviewState?> get(int learnerId, int questionId) async {
-    return _storage[_key(learnerId, questionId)];
+  Future<ReviewState?> get(int profileId, int questionId) async {
+    return _storage[_key(profileId, questionId)];
   }
 
   @override
   Future<ReviewState> upsert(ReviewState state) async {
     final id = state.id ?? _nextId++;
     final saved = state.copyWith(id: id);
-    _storage[_key(state.learnerId, state.questionId)] = saved;
+    _storage[_key(state.profileId, state.questionId)] = saved;
     return saved;
   }
 
   @override
   Future<List<ReviewState>> findDueReviews({
-    required int learnerId,
+    required int profileId,
     required int courseId,
     required DateTime now,
   }) async {
     final list = _storage.values
-        .where((r) => r.learnerId == learnerId && !r.dueAt.isAfter(now))
+        .where((r) => r.profileId == profileId && !r.dueAt.isAfter(now))
         .toList();
     list.sort((a, b) => a.dueAt.compareTo(b.dueAt));
     return list;
   }
 
   @override
-  Future<List<ReviewState>> listByLearner(int learnerId) async {
-    return _storage.values.where((r) => r.learnerId == learnerId).toList();
+  Future<List<ReviewState>> listByProfile(int profileId) async {
+    return _storage.values.where((r) => r.profileId == profileId).toList();
   }
 
   @override
-  Future<void> markServed(int learnerId, int questionId, DateTime servedAt) async {
-    final key = _key(learnerId, questionId);
+  Future<void> markServed(int profileId, int questionId, DateTime servedAt) async {
+    final key = _key(profileId, questionId);
     final existing = _storage[key];
     if (existing != null) {
       _storage[key] = existing.copyWith(lastServedAt: servedAt);
@@ -196,8 +201,8 @@ class FakeReviewStateRepository implements IReviewStateRepository {
   }
 
   @override
-  Future<void> deleteByLearnerId(int learnerId) async {
-    _storage.removeWhere((key, _) => key.startsWith('$learnerId-'));
+  Future<void> deleteByProfileId(int profileId) async {
+    _storage.removeWhere((key, _) => key.startsWith('$profileId-'));
   }
 }
 

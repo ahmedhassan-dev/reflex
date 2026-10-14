@@ -6,7 +6,7 @@ class ScoreCalculator {
   /// Calculates points to award for the current attempt.
   ///
   /// Points are awarded strictly once: only if the attempt is valid and
-  /// the learner has not previously solved this question.
+  /// the profile has not previously solved this question.
   static int calculateAwardedPoints({
     required AttemptStatus status,
     required bool hasLearnerSolvedBefore,
@@ -21,17 +21,17 @@ class ScoreCalculator {
     return questionPoints;
   }
 
-  /// Calculates the cumulative score for a learner.
+  /// Calculates the cumulative score for a profile.
   ///
   /// The total score is the sum of points for distinct questions that the
-  /// learner has solved at least once with a valid verdict.
+  /// profile has solved at least once with a valid verdict.
   static Future<int> calculateTotalScore({
     required IAttemptRepository attemptRepo,
     required IQuestionRepository questionRepo,
-    required int learnerId,
+    required int profileId,
     int? courseId,
   }) async {
-    final attempts = await attemptRepo.listAttemptsByLearner(learnerId);
+    final attempts = await attemptRepo.listAttemptsByProfile(profileId);
     final solvedQuestionIds = attempts
         .where((a) => a.status == AttemptStatus.valid)
         .map((a) => a.questionId)

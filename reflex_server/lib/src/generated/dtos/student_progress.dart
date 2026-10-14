@@ -15,7 +15,7 @@ import 'package:serverpod/serverpod.dart' as _is;
 abstract class StudentProgress
     implements _is.SerializableModel, _is.ProtocolSerialization {
   StudentProgress._({
-    required this.learnerId,
+    required this.profileId,
     required this.displayName,
     required this.solvedCount,
     required this.cleanFirstTryCount,
@@ -25,7 +25,7 @@ abstract class StudentProgress
   });
 
   factory StudentProgress({
-    required int learnerId,
+    required int profileId,
     required String displayName,
     required int solvedCount,
     required int cleanFirstTryCount,
@@ -36,7 +36,7 @@ abstract class StudentProgress
 
   factory StudentProgress.fromJson(Map<String, dynamic> jsonSerialization) {
     return StudentProgress(
-      learnerId: jsonSerialization['learnerId'] as int,
+      profileId: jsonSerialization['profileId'] as int,
       displayName: jsonSerialization['displayName'] as String,
       solvedCount: jsonSerialization['solvedCount'] as int,
       cleanFirstTryCount: jsonSerialization['cleanFirstTryCount'] as int,
@@ -46,7 +46,7 @@ abstract class StudentProgress
     );
   }
 
-  int learnerId;
+  int profileId;
 
   String displayName;
 
@@ -64,7 +64,7 @@ abstract class StudentProgress
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
   StudentProgress copyWith({
-    int? learnerId,
+    int? profileId,
     String? displayName,
     int? solvedCount,
     int? cleanFirstTryCount,
@@ -76,7 +76,7 @@ abstract class StudentProgress
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'StudentProgress',
-      'learnerId': learnerId,
+      'profileId': profileId,
       'displayName': displayName,
       'solvedCount': solvedCount,
       'cleanFirstTryCount': cleanFirstTryCount,
@@ -90,7 +90,7 @@ abstract class StudentProgress
   Map<String, dynamic> toJsonForProtocol() {
     return {
       '__className__': 'StudentProgress',
-      'learnerId': learnerId,
+      'profileId': profileId,
       'displayName': displayName,
       'solvedCount': solvedCount,
       'cleanFirstTryCount': cleanFirstTryCount,
@@ -110,7 +110,7 @@ class _Undefined {}
 
 class _StudentProgressImpl extends StudentProgress {
   _StudentProgressImpl({
-    required int learnerId,
+    required int profileId,
     required String displayName,
     required int solvedCount,
     required int cleanFirstTryCount,
@@ -118,7 +118,7 @@ class _StudentProgressImpl extends StudentProgress {
     int? studyStreakDays,
     int? totalScore,
   }) : super._(
-         learnerId: learnerId,
+         profileId: profileId,
          displayName: displayName,
          solvedCount: solvedCount,
          cleanFirstTryCount: cleanFirstTryCount,
@@ -132,7 +132,7 @@ class _StudentProgressImpl extends StudentProgress {
   @_is.useResult
   @override
   StudentProgress copyWith({
-    int? learnerId,
+    int? profileId,
     String? displayName,
     int? solvedCount,
     int? cleanFirstTryCount,
@@ -141,7 +141,7 @@ class _StudentProgressImpl extends StudentProgress {
     Object? totalScore = _Undefined,
   }) {
     return StudentProgress(
-      learnerId: learnerId ?? this.learnerId,
+      profileId: profileId ?? this.profileId,
       displayName: displayName ?? this.displayName,
       solvedCount: solvedCount ?? this.solvedCount,
       cleanFirstTryCount: cleanFirstTryCount ?? this.cleanFirstTryCount,

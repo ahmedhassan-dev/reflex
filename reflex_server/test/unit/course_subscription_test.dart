@@ -15,7 +15,7 @@ void main() {
     late FakeAcceptedAnswerRepository acceptedAnswerRepo;
     late FakeAttemptRepository attemptRepo;
     late FakeReviewStateRepository reviewStateRepo;
-    late FakeLearnerRepository learnerRepo;
+    late FakeProfileRepository profileRepo;
     late PracticeService practiceService;
     late QuestionAdminService adminService;
     final fixedTime = DateTime.utc(2026, 10, 11, 10, 0, 0);
@@ -28,7 +28,7 @@ void main() {
       acceptedAnswerRepo = FakeAcceptedAnswerRepository();
       attemptRepo = FakeAttemptRepository();
       reviewStateRepo = FakeReviewStateRepository();
-      learnerRepo = FakeLearnerRepository();
+      profileRepo = FakeProfileRepository();
 
       practiceService = PracticeService(
         questionRepo: questionRepo,
@@ -47,7 +47,7 @@ void main() {
         optionRepo: optionRepo,
         acceptedAnswerRepo: acceptedAnswerRepo,
         subscriptionRepo: subscriptionRepo,
-        learnerRepo: learnerRepo,
+        profileRepo: profileRepo,
       );
     });
 
@@ -91,9 +91,9 @@ void main() {
         isPublic: false,
       );
 
-      // 2. Student (learnerId = 10) requests subscription
+      // 2. Student (profileId = 10) requests subscription
       final sub = await practiceService.requestSubscription(
-        learnerId: 10,
+        profileId: 10,
         courseId: course.id!,
       );
       expect(sub.status, equals(SubscriptionStatus.pending));
@@ -114,7 +114,7 @@ void main() {
 
       // 5. Student status is now accepted
       final status = await practiceService.getSubscriptionStatus(
-        learnerId: 10,
+        profileId: 10,
         courseId: course.id!,
       );
       expect(status, equals(SubscriptionStatus.accepted));
@@ -145,19 +145,19 @@ void main() {
 
       // Student has not subscribed
       expect(
-        () => practiceService.serveNextCard(learnerId: 10, courseId: course.id!),
+        () => practiceService.serveNextCard(profileId: 10, courseId: course.id!),
         throwsA(isA<CourseAccessDeniedException>()),
       );
 
       // Student subscribes (status = pending)
       await practiceService.requestSubscription(
-        learnerId: 10,
+        profileId: 10,
         courseId: course.id!,
       );
 
       // Still blocked while pending
       expect(
-        () => practiceService.serveNextCard(learnerId: 10, courseId: course.id!),
+        () => practiceService.serveNextCard(profileId: 10, courseId: course.id!),
         throwsA(isA<CourseAccessDeniedException>()),
       );
 
@@ -169,7 +169,7 @@ void main() {
       );
 
       // Now student can practice!
-      final card = await practiceService.serveNextCard(learnerId: 10, courseId: course.id!);
+      final card = await practiceService.serveNextCard(profileId: 10, courseId: course.id!);
       expect(card, isNotNull);
       expect(card!.question.prompt, equals('What is force?'));
     });

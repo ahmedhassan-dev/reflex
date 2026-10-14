@@ -143,13 +143,15 @@ class AppDrawerWidget extends StatelessWidget {
         ),
       ),
       onTap: () async {
-        Navigator.of(context).pop();
+        final navigator = Navigator.of(context);
+        final messenger = ScaffoldMessenger.of(context);
+        navigator.pop();
         final deleted = await DeleteAccountDialog.show(
-          context,
+          navigator.context,
           onConfirm: onDeleteAccount,
         );
-        if (deleted == true && context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+        if (deleted == true) {
+          messenger.showSnackBar(
             SnackBar(
               content: Text(LocaleKeys.drawer_delete_account_success.tr()),
               backgroundColor: Colors.green,

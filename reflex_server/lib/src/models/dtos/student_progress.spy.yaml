@@ -1,6 +1,6 @@
 class: StudentProgress
 fields:
-  learnerId: int
+  profileId: int
   displayName: String
   solvedCount: int
   cleanFirstTryCount: int

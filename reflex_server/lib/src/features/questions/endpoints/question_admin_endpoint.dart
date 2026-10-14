@@ -26,7 +26,7 @@ class QuestionAdminEndpoint extends Endpoint {
     bool isPublic = true,
   }) async {
     final container = AppContainer(session);
-    final teacher = await container.resolveCurrentLearner(
+    final teacher = await container.resolveCurrentProfile(
       defaultDisplayName: 'Mr. Hassan (Teacher)',
       defaultRole: Role.teacher,
     );

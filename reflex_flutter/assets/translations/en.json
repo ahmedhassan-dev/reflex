@@ -243,6 +243,7 @@
     "invalid_code": "Invalid or expired verification code.",
     "otp_expired": "The verification code has expired. Please request a new one.",
     "enter_otp_code": "Please enter the verification code sent to your email.",
+    "remember_password": "Remember password",
     "forgot_password": "Forgot password?",
     "reset_password_title": "Reset Password",
     "reset_password_desc": "Enter your email address to receive a verification code to reset your password.",

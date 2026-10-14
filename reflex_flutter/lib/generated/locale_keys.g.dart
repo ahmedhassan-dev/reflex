@@ -238,6 +238,7 @@ abstract class  LocaleKeys {
   static const auth_invalid_code = 'auth.invalid_code';
   static const auth_otp_expired = 'auth.otp_expired';
   static const auth_enter_otp_code = 'auth.enter_otp_code';
+  static const auth_remember_password = 'auth.remember_password';
   static const auth_forgot_password = 'auth.forgot_password';
   static const auth_reset_password_title = 'auth.reset_password_title';
   static const auth_reset_password_desc = 'auth.reset_password_desc';

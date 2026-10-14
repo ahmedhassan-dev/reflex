@@ -14,10 +14,10 @@ class AnalyticsEndpoint extends Endpoint {
   /// Returns progress metrics for the currently active student.
   Future<StudentProgress> getMyProgress(Session session, int courseId) async {
     final container = AppContainer(session);
-    final learner = await container.resolveCurrentLearner();
+    final profile = await container.resolveCurrentProfile();
     final stats = await container.getCohortStatsService();
     return stats.getStudentProgress(
-      learnerId: learner.id!,
+      profileId: profile.id!,
       courseId: courseId,
     );
   }

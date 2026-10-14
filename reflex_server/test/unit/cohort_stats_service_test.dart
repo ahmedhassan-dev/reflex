@@ -7,7 +7,7 @@ import '../fakes/fake_repositories.dart';
 
 void main() {
   group('T-020: CohortStatsService & Insights Aggregator (TDD)', () {
-    late FakeLearnerRepository learnerRepo;
+    late FakeProfileRepository profileRepo;
     late FakeQuestionRepository questionRepo;
     late FakeAttemptRepository attemptRepo;
     late FakeReviewStateRepository reviewStateRepo;
@@ -15,31 +15,33 @@ void main() {
     final now = DateTime.utc(2026, 10, 10);
 
     setUp(() async {
-      learnerRepo = FakeLearnerRepository();
+      profileRepo = FakeProfileRepository();
       questionRepo = FakeQuestionRepository();
       attemptRepo = FakeAttemptRepository();
       reviewStateRepo = FakeReviewStateRepository();
 
       service = CohortStatsService(
-        learnerRepo: learnerRepo,
+        profileRepo: profileRepo,
         questionRepo: questionRepo,
         attemptRepo: attemptRepo,
         reviewStateRepo: reviewStateRepo,
         clock: FakeClock(now),
       );
 
-      // Learners
-      await learnerRepo.save(Learner(
+      // Profiles
+      await profileRepo.save(Profile(
         id: 1,
         authUserId: UuidValue.fromString('00000000-0000-0000-0000-000000000001'),
         displayName: 'Alice Student',
         role: Role.student,
+        email: 'alice@example.com',
       ));
-      await learnerRepo.save(Learner(
+      await profileRepo.save(Profile(
         id: 2,
         authUserId: UuidValue.fromString('00000000-0000-0000-0000-000000000002'),
         displayName: 'Bob Student',
         role: Role.student,
+        email: 'bob@example.com',
       ));
 
       // Questions for Course 1
@@ -79,7 +81,7 @@ void main() {
 
       // Attempts for Course 1
       await attemptRepo.insert(Attempt(
-        learnerId: 1,
+        profileId: 1,
         questionId: 1,
         status: AttemptStatus.valid,
         responseMs: 5000,
@@ -91,7 +93,7 @@ void main() {
         createdAt: now,
       ));
       await attemptRepo.insert(Attempt(
-        learnerId: 1,
+        profileId: 1,
         questionId: 2,
         status: AttemptStatus.valid,
         responseMs: 15000,
@@ -104,7 +106,7 @@ void main() {
       ));
 
       await attemptRepo.insert(Attempt(
-        learnerId: 2,
+        profileId: 2,
         questionId: 1,
         status: AttemptStatus.valid,
         responseMs: 7000,
@@ -116,7 +118,7 @@ void main() {
         createdAt: now,
       ));
       await attemptRepo.insert(Attempt(
-        learnerId: 2,
+        profileId: 2,
         questionId: 2,
         status: AttemptStatus.wrong,
         responseMs: 25000,
@@ -147,13 +149,13 @@ void main() {
       final summary = await service.getCohortSummary(courseId: 1);
 
       expect(summary.students.length, equals(2));
-      final alice = summary.students.firstWhere((s) => s.learnerId == 1);
+      final alice = summary.students.firstWhere((s) => s.profileId == 1);
       expect(alice.displayName, equals('Alice Student'));
       expect(alice.solvedCount, equals(2));
       expect(alice.cleanFirstTryCount, equals(1));
       expect(alice.avgResponseMs, equals(10000.0)); // (5000 + 15000) / 2 = 10000
 
-      final bob = summary.students.firstWhere((s) => s.learnerId == 2);
+      final bob = summary.students.firstWhere((s) => s.profileId == 2);
       expect(bob.displayName, equals('Bob Student'));
       expect(bob.solvedCount, equals(1));
       expect(bob.cleanFirstTryCount, equals(1));
@@ -182,7 +184,7 @@ void main() {
 
     test('calculates studyStreakDays dynamically across consecutive calendar days', () async {
       await attemptRepo.insert(Attempt(
-        learnerId: 1,
+        profileId: 1,
         questionId: 1,
         status: AttemptStatus.valid,
         responseMs: 4000,
@@ -194,25 +196,25 @@ void main() {
         createdAt: DateTime.utc(2026, 10, 9),
       ));
 
-      final progressAlice = await service.getStudentProgress(learnerId: 1, courseId: 1);
+      final progressAlice = await service.getStudentProgress(profileId: 1, courseId: 1);
       expect(progressAlice.studyStreakDays, equals(2));
       expect(progressAlice.totalScore, isNotNull);
 
-      final progressBob = await service.getStudentProgress(learnerId: 2, courseId: 1);
+      final progressBob = await service.getStudentProgress(profileId: 2, courseId: 1);
       expect(progressBob.studyStreakDays, equals(1));
       expect(progressBob.totalScore, isNotNull);
     });
 
     test('resets studyStreakDays to 0 when last practice was before yesterday', () async {
       final brokenService = CohortStatsService(
-        learnerRepo: learnerRepo,
+        profileRepo: profileRepo,
         questionRepo: questionRepo,
         attemptRepo: attemptRepo,
         reviewStateRepo: reviewStateRepo,
         clock: FakeClock(DateTime.utc(2026, 10, 15)),
       );
 
-      final progress = await brokenService.getStudentProgress(learnerId: 1, courseId: 1);
+      final progress = await brokenService.getStudentProgress(profileId: 1, courseId: 1);
       expect(progress.studyStreakDays, equals(0));
     });
   });

@@ -17,7 +17,7 @@ abstract class ReviewState
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
   ReviewState._({
     this.id,
-    required this.learnerId,
+    required this.profileId,
     required this.questionId,
     required this.dueAt,
     required this.intervalDays,
@@ -29,7 +29,7 @@ abstract class ReviewState
 
   factory ReviewState({
     int? id,
-    required int learnerId,
+    required int profileId,
     required int questionId,
     required DateTime dueAt,
     required int intervalDays,
@@ -42,7 +42,7 @@ abstract class ReviewState
   factory ReviewState.fromJson(Map<String, dynamic> jsonSerialization) {
     return ReviewState(
       id: jsonSerialization['id'] as int?,
-      learnerId: jsonSerialization['learnerId'] as int,
+      profileId: jsonSerialization['profileId'] as int,
       questionId: jsonSerialization['questionId'] as int,
       dueAt: _isc.DateTimeJsonExtension.fromJson(jsonSerialization['dueAt']),
       intervalDays: jsonSerialization['intervalDays'] as int,
@@ -66,7 +66,7 @@ abstract class ReviewState
   /// the id will be null.
   int? id;
 
-  int learnerId;
+  int profileId;
 
   int questionId;
 
@@ -87,7 +87,7 @@ abstract class ReviewState
   @_isc.useResult
   ReviewState copyWith({
     int? id,
-    int? learnerId,
+    int? profileId,
     int? questionId,
     DateTime? dueAt,
     int? intervalDays,
@@ -101,7 +101,7 @@ abstract class ReviewState
     return {
       '__className__': 'ReviewState',
       if (id != null) 'id': id,
-      'learnerId': learnerId,
+      'profileId': profileId,
       'questionId': questionId,
       'dueAt': dueAt.toJson(),
       'intervalDays': intervalDays,
@@ -117,7 +117,7 @@ abstract class ReviewState
     return {
       '__className__': 'ReviewState',
       if (id != null) 'id': id,
-      'learnerId': learnerId,
+      'profileId': profileId,
       'questionId': questionId,
       'dueAt': dueAt.toJson(),
       'intervalDays': intervalDays,
@@ -139,7 +139,7 @@ class _Undefined {}
 class _ReviewStateImpl extends ReviewState {
   _ReviewStateImpl({
     int? id,
-    required int learnerId,
+    required int profileId,
     required int questionId,
     required DateTime dueAt,
     required int intervalDays,
@@ -149,7 +149,7 @@ class _ReviewStateImpl extends ReviewState {
     _ir7impgi.AttemptStatus? lastResult,
   }) : super._(
          id: id,
-         learnerId: learnerId,
+         profileId: profileId,
          questionId: questionId,
          dueAt: dueAt,
          intervalDays: intervalDays,
@@ -165,7 +165,7 @@ class _ReviewStateImpl extends ReviewState {
   @override
   ReviewState copyWith({
     Object? id = _Undefined,
-    int? learnerId,
+    int? profileId,
     int? questionId,
     DateTime? dueAt,
     int? intervalDays,
@@ -176,7 +176,7 @@ class _ReviewStateImpl extends ReviewState {
   }) {
     return ReviewState(
       id: id is int? ? id : this.id,
-      learnerId: learnerId ?? this.learnerId,
+      profileId: profileId ?? this.profileId,
       questionId: questionId ?? this.questionId,
       dueAt: dueAt ?? this.dueAt,
       intervalDays: intervalDays ?? this.intervalDays,
