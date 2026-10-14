@@ -231,6 +231,7 @@
     "google_unconfigured": "Google Sign-In is not configured for this domain.",
     "google_signin_failed": "Google Sign-In failed to authenticate.",
     "registration_failed": "Registration failed. Please check your details and try again.",
+    "email_already_registered": "An account with this email already exists. Please sign in or reset your password.",
     "verify_email_title": "Verify Your Email",
     "verify_email_subtitle": "We've sent a verification code to {}. Enter the code below to complete your registration.",
     "otp_code_label": "Verification Code",

@@ -2,8 +2,9 @@ analytics:
   - getCohortSummary:
   - getMyProgress:
 emailIdp:
-  - login:
+  - isEmailRegistered:
   - startRegistration:
+  - login:
   - verifyRegistrationCode:
   - finishRegistration:
   - startPasswordReset:

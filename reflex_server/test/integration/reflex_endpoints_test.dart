@@ -24,5 +24,13 @@ void main() {
       expect(summary.students, isEmpty);
       expect(summary.mastery, isEmpty);
     });
+
+    test('when checking unregistered email then isEmailRegistered returns false', () async {
+      final exists = await endpoints.emailIdp.isEmailRegistered(
+        sessionBuilder,
+        email: 'brand_new_${DateTime.now().millisecondsSinceEpoch}@example.com',
+      );
+      expect(exists, isFalse);
+    });
   });
 }

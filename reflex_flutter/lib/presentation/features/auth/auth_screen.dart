@@ -102,13 +102,41 @@ class _AuthScreenState extends AuthController {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: Text(
-                              errorMessage!,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onErrorContainer,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  errorMessage!,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onErrorContainer,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                if (errorMessage == LocaleKeys.auth_email_already_registered.tr() &&
+                                    tabController.index == 1) ...[
+                                  const SizedBox(height: 4),
+                                  InkWell(
+                                    key: const Key('btn_switch_to_signin_from_error'),
+                                    onTap: () {
+                                      setState(() {
+                                        errorMessage = null;
+                                        tabController.animateTo(0);
+                                      });
+                                    },
+                                    child: Text(
+                                      '${LocaleKeys.sign_in.tr()} →',
+                                      style: TextStyle(
+                                        color: roleColor,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
                           IconButton(

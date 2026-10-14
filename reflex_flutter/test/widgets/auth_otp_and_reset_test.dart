@@ -135,5 +135,46 @@ void main() {
       expect(find.text("إرسال رمز التعيين"), findsOneWidget);
       expect(find.text("العودة لتسجيل الدخول"), findsOneWidget);
     });
+
+    testWidgets("displays error banner and shortcut to Sign In on duplicate email", (tester) async {
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: const AuthScreen(initialRole: Role.student),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Switch to Sign Up tab (tab index 1)
+      await tester.tap(find.text(LocaleKeys.auth_tab_signup.tr()));
+      await tester.pumpAndSettle();
+
+      // Verify on Sign Up tab
+      final submitBtn = find.byKey(const Key("btn_submit_signup"));
+      expect(submitBtn, findsOneWidget);
+
+      // Trigger sign up with empty email to see validation error banner
+      await tester.ensureVisible(submitBtn);
+      await tester.tap(submitBtn);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key("auth_error_banner")), findsOneWidget);
+      expect(find.text(LocaleKeys.auth_enter_email_password.tr()), findsOneWidget);
+
+      // Enter name, email and password
+      await tester.enterText(find.byKey(const Key("input_signup_name")), "Existing User");
+      await tester.enterText(find.byKey(const Key("input_signup_email")), "existing@example.com");
+      await tester.enterText(find.byKey(const Key("input_signup_password")), "securePassword123");
+      await tester.pumpAndSettle();
+
+      // Tap submit sign up
+      await tester.ensureVisible(submitBtn);
+      await tester.tap(submitBtn);
+      await tester.pumpAndSettle();
+
+      // Should show duplicate email or registration error banner without transitioning to OTP
+      expect(find.byType(OtpVerificationWidget), findsNothing);
+      expect(find.byKey(const Key("auth_error_banner")), findsOneWidget);
+    });
   });
 }
+

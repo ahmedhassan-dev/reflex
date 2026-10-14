@@ -226,6 +226,7 @@ abstract class  LocaleKeys {
   static const auth_google_unconfigured = 'auth.google_unconfigured';
   static const auth_google_signin_failed = 'auth.google_signin_failed';
   static const auth_registration_failed = 'auth.registration_failed';
+  static const auth_email_already_registered = 'auth.email_already_registered';
   static const auth_verify_email_title = 'auth.verify_email_title';
   static const auth_verify_email_subtitle = 'auth.verify_email_subtitle';
   static const auth_otp_code_label = 'auth.otp_code_label';

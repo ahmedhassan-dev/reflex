@@ -48,6 +48,13 @@ mixin EmailRegistrationMixin on State<AuthScreen> {
     });
 
     try {
+      final isAlreadyRegistered = await client.emailIdp.isEmailRegistered(email: email);
+      if (isAlreadyRegistered) {
+        if (!mounted) return;
+        setState(() => errorMessage = LocaleKeys.auth_email_already_registered.tr());
+        return;
+      }
+
       final reqId = await client.emailIdp.startRegistration(email: email);
       if (!mounted) return;
       setState(() {
@@ -66,7 +73,12 @@ mixin EmailRegistrationMixin on State<AuthScreen> {
       debugPrint("[EmailRegistrationMixin.signUp] error: $e\n$st");
       unawaited(Sentry.captureException(e, stackTrace: st));
       if (mounted) {
-        setState(() => errorMessage = "${LocaleKeys.auth_registration_failed.tr()}: $e");
+        final errStr = e.toString().toLowerCase();
+        if (errStr.contains("policyviolation") || errStr.contains("already")) {
+          setState(() => errorMessage = LocaleKeys.auth_email_already_registered.tr());
+        } else {
+          setState(() => errorMessage = "${LocaleKeys.auth_registration_failed.tr()}: $e");
+        }
       }
     } finally {
       if (mounted) setState(() => isLoading = false);
