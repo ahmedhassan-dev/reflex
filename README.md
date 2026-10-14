@@ -4,6 +4,29 @@
 
 ---
 
+## ☁️ Live Demo & Deployment
+
+Reflex is deployed and running live on **Serverpod Cloud**:
+
+| Service | Public URL | Description |
+| :--- | :--- | :--- |
+| 🌐 **Live Web App** | [https://reflex.serverpod.space/](https://reflex.serverpod.space/) | Deployed Flutter Web client |
+| ⚡ **API Server** | [https://reflex.api.serverpod.space/](https://reflex.api.serverpod.space/) | Live Serverpod backend API |
+| 📊 **Serverpod Insights** | [https://reflex.insights.serverpod.space/](https://reflex.insights.serverpod.space/) | Serverpod Insights dashboard |
+
+## 🔑 Test Credentials
+
+Use these pre-configured accounts to explore the live app directly against the production backend:
+
+| Role | Email | Password | What to explore |
+| :--- | :--- | :--- | :--- |
+| 👩‍🏫 **Teacher** | `ah3656056@gmail.com` | `12345678` | Course admin, question editor, subscription manager, cohort analytics |
+| 🎓 **Student** | `ahmedhassan.op9@gmail.com` | `12345678` | Speed-recall drills, chromatic feedback, compulsory concept notes, study streaks |
+
+> 💡 **Quick Start:** On the role selection screen, pick **Teacher** or **Student** to match your chosen persona, then sign in with the credentials above (or tap any of the demo persona buttons on the auth screen).
+
+---
+
 ## 💡 Inspiration
 
 Most educational apps are built for students who already love reading textbooks or sitting through 45-minute lectures. But many students don't: teenagers who struggle with ADHD, students in underfunded schools without access to top tutors, and kids whose attention is captured by gaming and social media.
@@ -70,31 +93,6 @@ reflex/
 └── tool/
     └── check.sh            # Monorepo static analysis, server tests, and flutter tests
 ```
-
----
-
-## ☁️ Live Cloud Deployment (Serverpod Cloud)
-
-Reflex is deployed and running on **Serverpod Cloud**:
-
-| Service | Public URL | Description |
-| :--- | :--- | :--- |
-| **Web App** | [https://reflex.serverpod.space/](https://reflex.serverpod.space/) | Deployed Flutter Web client |
-| **API Server** | [https://reflex.api.serverpod.space/](https://reflex.api.serverpod.space/) | Live Serverpod backend API |
-| **Insights** | [https://reflex.insights.serverpod.space/](https://reflex.insights.serverpod.space/) | Serverpod Insights dashboard |
-
----
-
-## 🔑 Test Credentials
-
-Use these accounts to try the live app (email & password sign-in) against the deployed backend:
-
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| 👩‍🏫 **Teacher** | `ah3656056@gmail.com` | `12345678` |
-| 🎓 **Student** | `ahmedhassan.op9@gmail.com` | `12345678` |
-
-> On the role selection screen, choose **Teacher** or **Student** to match the account, then sign in with the credentials above.
 
 ---
 
