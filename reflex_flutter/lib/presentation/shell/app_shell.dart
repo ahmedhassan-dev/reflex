@@ -14,6 +14,7 @@ import '../features/demo_clock/widgets/demo_clock_widget.dart';
 import '../features/practice/practice_screen.dart';
 import '../features/profile/student_progress_screen.dart';
 import '../features/question_admin/question_admin_screen.dart';
+import '../../core/storage/role_preferences.dart';
 import 'widgets/app_drawer_widget.dart';
 
 /// App shell providing role-tailored navigation for Students and Teachers,
@@ -78,20 +79,24 @@ class _AppShellState extends State<AppShell> {
     setState(() {});
   }
 
-  void _switchToAuthScreen() {
+  void _switchToAuthScreen({bool clearRole = false}) {
     unawaited(signOutDemo());
-    Navigator.of(context).pushReplacement(
+    if (clearRole) {
+      unawaited(RolePreferences.clearRole());
+    }
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (_) => RoleSelectionScreen(initialRole: _currentRole),
+        builder: (_) => clearRole
+            ? const RoleSelectionScreen()
+            : RoleSelectionScreen(initialRole: _currentRole),
       ),
+      (route) => false,
     );
   }
 
   Future<void> _handleDeleteAccount() async {
     await deleteCurrentUserAccount();
-    if (mounted) {
-      _switchToAuthScreen();
-    }
+    await RolePreferences.clearRole();
   }
 
   @override

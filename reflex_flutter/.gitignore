@@ -49,4 +49,11 @@ app.*.map.json
 *.jks
 *.keystore
 
+# Firebase & Google Cloud private credentials
+*-firebase-adminsdk-*.json
+*service_account*.json
+*service-account*.json
+client_secret_*.json
+
+
 

@@ -28,6 +28,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.5
   easy_localization: ^3.0.8
+  firebase_core: ^4.15.0
+  firebase_messaging: ^16.7.0
   flutter:
     sdk: flutter
   go_router: ^14.8.1

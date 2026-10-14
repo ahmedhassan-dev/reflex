@@ -150,9 +150,9 @@ void main() {
       expect(find.byKey(const Key('btn_submit_signin')), findsOneWidget);
       expect(find.text(LocaleKeys.auth_continue_as_student.tr()), findsOneWidget);
 
-      // OAuth buttons
+      // OAuth buttons (Google is visible, Apple is currently hidden)
       expect(find.byKey(const Key('btn_google_signin')), findsOneWidget);
-      expect(find.byKey(const Key('btn_apple_signin')), findsOneWidget);
+      expect(find.byKey(const Key('btn_apple_signin')), findsNothing);
     });
 
     testWidgets('renders teacher role correctly when initialRole is Teacher', (tester) async {
@@ -216,7 +216,7 @@ void main() {
       expect(find.text('طالب'), findsWidgets);
       expect(find.text('الدخول كطالب'), findsOneWidget);
       expect(find.text('تسجيل الدخول عبر Google'), findsOneWidget);
-      expect(find.text('تسجيل الدخول عبر Apple'), findsOneWidget);
+      expect(find.text('تسجيل الدخول عبر Apple'), findsNothing);
       expect(find.text('تبديل الدور'), findsWidgets);
     });
   });

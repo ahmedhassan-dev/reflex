@@ -155,6 +155,7 @@ class AppDrawerWidget extends StatelessWidget {
               backgroundColor: Colors.green,
             ),
           );
+          onSignOut();
         }
       },
     );

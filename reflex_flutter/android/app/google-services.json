@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "734034762250",
+    "project_id": "reflex-edu",
+    "storage_bucket": "reflex-edu.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734034762250:android:34a85a139f1d6b30031df3",
+        "android_client_info": {
+          "package_name": "com.reflex.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDw0AgnBwfenIKyw3VEJtEUceyNC9aR_nA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "734034762250-oqf9beii56jafh9foolv2u34bc08sdts.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

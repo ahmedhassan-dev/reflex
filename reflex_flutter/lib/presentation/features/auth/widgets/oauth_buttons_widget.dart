@@ -5,12 +5,14 @@ import '../../../core/theme/app_colors.dart';
 
 class OAuthButtonsWidget extends StatelessWidget {
   final VoidCallback onGoogleSignIn;
-  final VoidCallback onAppleSignIn;
+  final VoidCallback? onAppleSignIn;
+  final bool showAppleSignIn;
 
   const OAuthButtonsWidget({
     super.key,
     required this.onGoogleSignIn,
-    required this.onAppleSignIn,
+    this.onAppleSignIn,
+    this.showAppleSignIn = false,
   });
 
   @override
@@ -54,24 +56,26 @@ class OAuthButtonsWidget extends StatelessWidget {
             onPressed: onGoogleSignIn,
           ),
         ),
-        const SizedBox(height: 10),
-        // Apple Sign-In Button
-        SizedBox(
-          width: double.infinity,
-          height: 46,
-          child: OutlinedButton.icon(
-            key: const Key('btn_apple_signin'),
-            icon: const Icon(Icons.apple_rounded, size: 22),
-            label: Text(
-              LocaleKeys.auth_sign_in_with_apple.tr(),
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        if (showAppleSignIn && onAppleSignIn != null) ...[
+          const SizedBox(height: 10),
+          // Apple Sign-In Button
+          SizedBox(
+            width: double.infinity,
+            height: 46,
+            child: OutlinedButton.icon(
+              key: const Key('btn_apple_signin'),
+              icon: const Icon(Icons.apple_rounded, size: 22),
+              label: Text(
+                LocaleKeys.auth_sign_in_with_apple.tr(),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: onAppleSignIn,
             ),
-            style: OutlinedButton.styleFrom(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: onAppleSignIn,
           ),
-        ),
+        ],
       ],
     );
   }
