@@ -1,3 +1,4 @@
+import 'package:reflex_server/src/core/errors/exceptions.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:reflex_server/src/core/di/app_container.dart';
 import 'package:reflex_server/src/features/auth/config/scopes.dart';
@@ -11,10 +12,14 @@ class QuestionAdminEndpoint extends Endpoint {
   @override
   Set<Scope> get requiredScopes => {AppScopes.teacher};
 
-  /// Lists all courses.
+  /// Lists courses belonging to the authenticated teacher.
   Future<List<Course>> listCourses(Session session) async {
     final container = AppContainer(session);
-    return container.questionAdminService.listCourses();
+    final teacher = await container.resolveCurrentProfile(
+      defaultDisplayName: 'Mr. Hassan (Teacher)',
+      defaultRole: Role.teacher,
+    );
+    return container.questionAdminService.listCourses(teacherId: teacher.id);
   }
 
   /// Creates a new course.
@@ -47,9 +52,14 @@ class QuestionAdminEndpoint extends Endpoint {
     required bool isPublic,
   }) async {
     final container = AppContainer(session);
+    final teacher = await container.resolveCurrentProfile(
+      defaultDisplayName: 'Mr. Hassan (Teacher)',
+      defaultRole: Role.teacher,
+    );
     return container.questionAdminService.updateCourseVisibility(
       courseId: courseId,
       isPublic: isPublic,
+      teacherId: teacher.id,
     );
   }
 
@@ -59,7 +69,14 @@ class QuestionAdminEndpoint extends Endpoint {
     int courseId,
   ) async {
     final container = AppContainer(session);
-    return container.questionAdminService.listSubscriptions(courseId);
+    final teacher = await container.resolveCurrentProfile(
+      defaultDisplayName: 'Mr. Hassan (Teacher)',
+      defaultRole: Role.teacher,
+    );
+    return container.questionAdminService.listSubscriptions(
+      courseId,
+      teacherId: teacher.id,
+    );
   }
 
   /// Accepts or rejects a student's course subscription request.
@@ -69,9 +86,14 @@ class QuestionAdminEndpoint extends Endpoint {
     required SubscriptionStatus status,
   }) async {
     final container = AppContainer(session);
+    final teacher = await container.resolveCurrentProfile(
+      defaultDisplayName: 'Mr. Hassan (Teacher)',
+      defaultRole: Role.teacher,
+    );
     return container.questionAdminService.respondToSubscription(
       subscriptionId: subscriptionId,
       status: status,
+      teacherId: teacher.id,
     );
   }
 
@@ -81,7 +103,14 @@ class QuestionAdminEndpoint extends Endpoint {
     CreateQuestionInput input,
   ) async {
     final container = AppContainer(session);
-    return container.questionAdminService.createQuestion(input);
+    final teacher = await container.resolveCurrentProfile(
+      defaultDisplayName: 'Mr. Hassan (Teacher)',
+      defaultRole: Role.teacher,
+    );
+    return container.questionAdminService.createQuestion(
+      input,
+      teacherId: teacher.id,
+    );
   }
 
   /// Updates teacher topic explanation note and help hint for a question.
@@ -92,16 +121,30 @@ class QuestionAdminEndpoint extends Endpoint {
     String? helpHint,
   }) async {
     final container = AppContainer(session);
+    final teacher = await container.resolveCurrentProfile(
+      defaultDisplayName: 'Mr. Hassan (Teacher)',
+      defaultRole: Role.teacher,
+    );
     return container.questionAdminService.updateTopicNoteAndHint(
       questionId: questionId,
       topicNote: topicNote,
       helpHint: helpHint,
+      teacherId: teacher.id,
     );
   }
 
-  /// Lists all questions belonging to a course.
+  /// Lists all questions belonging to a course owned by the teacher.
   Future<List<Question>> listQuestions(Session session, int courseId) async {
     final container = AppContainer(session);
+    final teacher = await container.resolveCurrentProfile(
+      defaultDisplayName: 'Mr. Hassan (Teacher)',
+      defaultRole: Role.teacher,
+    );
+    final course = await container.courseRepo.findById(courseId);
+    if (course == null) throw CourseNotFoundException(courseId);
+    if (course.teacherId != null && course.teacherId != teacher.id) {
+      throw const CourseAccessDeniedException('You can only view questions for your own courses.');
+    }
     return container.questionRepo.findByCourseId(courseId);
   }
 }

@@ -28,12 +28,14 @@ abstract class AnalyticsController extends State<AnalyticsScreen> {
     analyticsRepo = widget.repositoryOverride ?? AnalyticsRepositoryImpl();
     if (widget.questionRepositoryOverride != null) {
       questionRepo = widget.questionRepositoryOverride;
-    } else {
+    } else if (widget.repositoryOverride == null) {
       try {
         questionRepo = QuestionAdminRepositoryImpl();
       } catch (_) {
         questionRepo = null;
       }
+    } else {
+      questionRepo = null;
     }
     loadCoursesAndSummary();
   }
@@ -56,16 +58,29 @@ abstract class AnalyticsController extends State<AnalyticsScreen> {
           orElse: () => courses.first,
         );
         courseId = selectedCourse!.id ?? 1;
+        await Future.wait([
+          loadSummary(),
+          loadSubscriptions(),
+        ]);
+      } else {
+        courses = [];
+        selectedCourse = null;
+        courseId = 0;
+        summary = null;
+        subscriptions = [];
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (e, st) {
       debugPrint('[AnalyticsController.loadCoursesAndSummary] error: $e\n$st');
       unawaited(Sentry.captureException(e, stackTrace: st));
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
-
-    await Future.wait([
-      loadSummary(),
-      loadSubscriptions(),
-    ]);
   }
 
   void onSelectCourse(Course course) {
@@ -80,6 +95,14 @@ abstract class AnalyticsController extends State<AnalyticsScreen> {
   }
 
   Future<void> loadSummary() async {
+    if (courseId == 0 || selectedCourse == null) {
+      setState(() {
+        isLoading = false;
+        summary = null;
+      });
+      return;
+    }
+
     setState(() {
       isLoading = true;
       errorMessage = null;
@@ -103,7 +126,13 @@ abstract class AnalyticsController extends State<AnalyticsScreen> {
 
   Future<void> loadSubscriptions() async {
     final repo = questionRepo;
-    if (selectedCourse == null || repo == null) return;
+    if (selectedCourse == null || repo == null || courseId == 0) {
+      setState(() {
+        subscriptions = [];
+        isLoadingSubscriptions = false;
+      });
+      return;
+    }
     setState(() => isLoadingSubscriptions = true);
 
     try {

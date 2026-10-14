@@ -124,6 +124,7 @@ mixin EmailRegistrationMixin on State<AuthScreen> {
           await client.userProfile.changeFullName(fullName);
         } catch (_) {}
       }
+      await syncUserProfileRole(selectedRole);
       if (!mounted) return;
       navigateToAppShell(
         role: selectedRole,

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
@@ -5,7 +6,7 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// Table displaying individual student progress with clean first-try solves.
-class StudentCohortTable extends StatelessWidget {
+class StudentCohortTable extends StatefulWidget {
   final List<StudentProgress> students;
 
   const StudentCohortTable({
@@ -14,11 +15,30 @@ class StudentCohortTable extends StatelessWidget {
   });
 
   @override
+  State<StudentCohortTable> createState() => _StudentCohortTableState();
+}
+
+class _StudentCohortTableState extends State<StudentCohortTable> {
+  late final ScrollController _horizontalController;
+
+  @override
+  void initState() {
+    super.initState();
+    _horizontalController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _horizontalController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    if (students.isEmpty) {
+    if (widget.students.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -42,61 +62,91 @@ class StudentCohortTable extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            headingRowColor: WidgetStatePropertyAll(
-              isDark ? ReflexColors.darkSurface : ReflexColors.lightSurface,
-            ),
-            columns: [
-              DataColumn(label: Text(LocaleKeys.dashboard_student_name.tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text(LocaleKeys.dashboard_mastered_count.tr(), style: const TextStyle(fontWeight: FontWeight.bold)), numeric: true),
-              DataColumn(label: Text(LocaleKeys.dashboard_clean_first_try.tr(), style: const TextStyle(fontWeight: FontWeight.bold)), numeric: true),
-              DataColumn(label: Text(LocaleKeys.dashboard_avg_latency.tr(), style: const TextStyle(fontWeight: FontWeight.bold)), numeric: true),
-            ],
-            rows: [
-              for (final s in students)
-                DataRow(
-                  cells: [
-                    DataCell(
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircleAvatar(
-                            radius: 12,
-                            backgroundColor: ReflexColors.primary.withValues(alpha: 0.2),
-                            child: Text(
-                              s.displayName.isNotEmpty ? s.displayName[0] : 'S',
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: ReflexColors.primary),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(s.displayName),
-                        ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth > 800;
+            final isMedium = constraints.maxWidth > 500;
+            final columnSpacing = isWide ? 48.0 : (isMedium ? 28.0 : 16.0);
+
+            return ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                  PointerDeviceKind.trackpad,
+                  PointerDeviceKind.stylus,
+                },
+              ),
+              child: Scrollbar(
+                controller: _horizontalController,
+                thumbVisibility: true,
+                trackVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _horizontalController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                    child: DataTable(
+                      columnSpacing: columnSpacing,
+                      horizontalMargin: isMedium ? 24.0 : 14.0,
+                      headingRowColor: WidgetStatePropertyAll(
+                        isDark ? ReflexColors.darkSurface : ReflexColors.lightSurface,
                       ),
-                    ),
-                    DataCell(Text('${s.solvedCount}')),
-                    DataCell(
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: ReflexColors.chromaticGreen.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          '${s.cleanFirstTryCount}',
-                          style: const TextStyle(
-                            color: ReflexColors.chromaticGreen,
-                            fontWeight: FontWeight.bold,
+                      columns: [
+                        DataColumn(label: Text(LocaleKeys.dashboard_student_name.tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(LocaleKeys.dashboard_mastered_count.tr(), style: const TextStyle(fontWeight: FontWeight.bold)), numeric: true),
+                        DataColumn(label: Text(LocaleKeys.dashboard_clean_first_try.tr(), style: const TextStyle(fontWeight: FontWeight.bold)), numeric: true),
+                        DataColumn(label: Text(LocaleKeys.dashboard_avg_latency.tr(), style: const TextStyle(fontWeight: FontWeight.bold)), numeric: true),
+                      ],
+                      rows: [
+                        for (final s in widget.students)
+                          DataRow(
+                            cells: [
+                              DataCell(
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 12,
+                                      backgroundColor: ReflexColors.primary.withValues(alpha: 0.2),
+                                      child: Text(
+                                        s.displayName.isNotEmpty ? s.displayName[0] : 'S',
+                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: ReflexColors.primary),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(s.displayName),
+                                  ],
+                                ),
+                              ),
+                              DataCell(Text('${s.solvedCount}')),
+                              DataCell(
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: ReflexColors.chromaticGreen.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    '${s.cleanFirstTryCount}',
+                                    style: const TextStyle(
+                                      color: ReflexColors.chromaticGreen,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(Text('${(s.avgResponseMs / 1000).toStringAsFixed(1)}s')),
+                            ],
                           ),
-                        ),
-                      ),
+                      ],
                     ),
-                    DataCell(Text('${(s.avgResponseMs / 1000).toStringAsFixed(1)}s')),
-                  ],
+                  ),
                 ),
-            ],
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

@@ -164,6 +164,7 @@ void main() {
       expect(continueBtn.onPressed, isNotNull);
 
       // 3. Tap Continue to Next Card -> Toast is dismissed
+      await tester.ensureVisible(continueBtnFinder);
       await tester.tap(continueBtnFinder);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('top_explanation_toast')), findsNothing);
@@ -183,7 +184,8 @@ void main() {
       expect(find.byKey(const Key('top_explanation_toast')), findsOneWidget);
 
       // 5. Advance to 3rd attempt
-      await tester.tap(find.byKey(const Key('practice_continue_button')));
+      await tester.ensureVisible(continueBtnFinder);
+      await tester.tap(continueBtnFinder);
       await tester.pumpAndSettle();
 
       // 6. Third attempt: Answer correctly again

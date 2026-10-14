@@ -20,9 +20,12 @@ class QuestionAdminService {
     this.profileRepo,
   });
 
-  /// Lists all available courses.
-  Future<List<Course>> listCourses() async {
+  /// Lists all available courses, optionally scoped to a specific [teacherId].
+  Future<List<Course>> listCourses({int? teacherId}) async {
     if (courseRepo == null) return [];
+    if (teacherId != null) {
+      return courseRepo!.listByTeacher(teacherId);
+    }
     return courseRepo!.listAll();
   }
 
@@ -67,22 +70,32 @@ class QuestionAdminService {
   Future<Course> updateCourseVisibility({
     required int courseId,
     required bool isPublic,
+    int? teacherId,
   }) async {
     if (courseRepo == null) {
       throw const ValidationException('Course repository is not configured.');
     }
     final course = await courseRepo!.findById(courseId);
     if (course == null) throw CourseNotFoundException(courseId);
+    if (teacherId != null && course.teacherId != null && course.teacherId != teacherId) {
+      throw const CourseAccessDeniedException('You can only manage your own courses.');
+    }
 
     final updated = course.copyWith(isPublic: isPublic);
     return courseRepo!.save(updated);
   }
 
   /// Lists subscription requests for a given course.
-  Future<List<CourseSubscriptionView>> listSubscriptions(int courseId) async {
+  Future<List<CourseSubscriptionView>> listSubscriptions(
+    int courseId, {
+    int? teacherId,
+  }) async {
     if (subscriptionRepo == null || courseRepo == null) return [];
     final course = await courseRepo!.findById(courseId);
     if (course == null) throw CourseNotFoundException(courseId);
+    if (teacherId != null && course.teacherId != null && course.teacherId != teacherId) {
+      throw const CourseAccessDeniedException('You can only view subscriptions for your own courses.');
+    }
 
     final subs = await subscriptionRepo!.listByCourse(courseId);
     final allProfiles = profileRepo != null ? await profileRepo!.listAll() : <Profile>[];
@@ -106,6 +119,7 @@ class QuestionAdminService {
   Future<CourseSubscription> respondToSubscription({
     required int subscriptionId,
     required SubscriptionStatus status,
+    int? teacherId,
   }) async {
     if (subscriptionRepo == null) {
       throw const ValidationException('Subscription repository is not configured.');
@@ -113,6 +127,12 @@ class QuestionAdminService {
     final sub = await subscriptionRepo!.findById(subscriptionId);
     if (sub == null) {
       throw const ValidationException('Subscription not found.');
+    }
+    if (teacherId != null && courseRepo != null) {
+      final course = await courseRepo!.findById(sub.courseId);
+      if (course != null && course.teacherId != null && course.teacherId != teacherId) {
+        throw const CourseAccessDeniedException('You can only manage subscriptions for your own courses.');
+      }
     }
     final updated = sub.copyWith(
       status: status,
@@ -122,7 +142,7 @@ class QuestionAdminService {
   }
 
   /// Creates a new question within a course with optional options or accepted answers.
-  Future<Question> createQuestion(CreateQuestionInput input) async {
+  Future<Question> createQuestion(CreateQuestionInput input, {int? teacherId}) async {
     final prompt = input.prompt.trim();
     final topic = input.topic.trim();
     if (prompt.isEmpty) {
@@ -135,6 +155,9 @@ class QuestionAdminService {
       final course = await courseRepo!.findById(input.courseId);
       if (course == null) {
         throw ValidationException('Course with id ${input.courseId} not found.');
+      }
+      if (teacherId != null && course.teacherId != null && course.teacherId != teacherId) {
+        throw const CourseAccessDeniedException('You can only add questions to your own courses.');
       }
     }
 
@@ -228,10 +251,17 @@ class QuestionAdminService {
     required int questionId,
     String? topicNote,
     String? helpHint,
+    int? teacherId,
   }) async {
     final existing = await questionRepo.findById(questionId);
     if (existing == null) {
       throw QuestionNotFoundException(questionId);
+    }
+    if (teacherId != null && courseRepo != null) {
+      final course = await courseRepo!.findById(existing.courseId);
+      if (course != null && course.teacherId != null && course.teacherId != teacherId) {
+        throw const CourseAccessDeniedException('You can only edit questions for your own courses.');
+      }
     }
 
     String? sanitizedNote;

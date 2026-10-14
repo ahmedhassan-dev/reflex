@@ -47,6 +47,7 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     _currentRole = widget.initialRole;
+    RolePreferences.saveRole(_currentRole);
     _userName = widget.userName;
     _userImageUrl = widget.userImageUrl;
     _syncDemoAuthToken(_currentRole);
@@ -54,6 +55,9 @@ class _AppShellState extends State<AppShell> {
   }
 
   Future<void> _loadUserProfile() async {
+    if (isUserAuthenticated && !isDemoUserActive) {
+      await syncUserProfileRole(_currentRole);
+    }
     final profile = await fetchCurrentUserProfile();
     if (mounted && (profile.name != null || profile.imageUrl != null)) {
       setState(() {
@@ -83,11 +87,12 @@ class _AppShellState extends State<AppShell> {
     setState(() {});
   }
 
-  void _switchToAuthScreen({bool clearRole = false}) {
-    unawaited(signOutDemo());
+  Future<void> _switchToAuthScreen({bool clearRole = false}) async {
+    await signOutDemo();
     if (clearRole) {
-      unawaited(RolePreferences.clearRole());
+      await RolePreferences.clearRole();
     }
+    if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (_) => clearRole
@@ -144,7 +149,9 @@ class _AppShellState extends State<AppShell> {
             CoursesScreen(
               key: ValueKey('courses_student_$_currentIndex'),
               onStartPractice: (courseId) => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => PracticeScreen(initialCourseId: courseId)),
+                MaterialPageRoute(
+                  builder: (_) => PracticeScreen(initialCourseId: courseId),
+                ),
               ),
             ),
             StudentProgressScreen(
@@ -166,7 +173,8 @@ class _AppShellState extends State<AppShell> {
               userName: _userName,
               userImageUrl: _userImageUrl,
               showTimeMachine: _showTimeMachine,
-              onToggleTimeMachine: (val) => setState(() => _showTimeMachine = val),
+              onToggleTimeMachine: (val) =>
+                  setState(() => _showTimeMachine = val),
               onSignOut: _switchToAuthScreen,
               onDeleteAccount: _handleDeleteAccount,
             )
@@ -205,7 +213,9 @@ class _AppShellState extends State<AppShell> {
                       const SizedBox(width: 4),
                     ] else ...[
                       Icon(
-                        isStudent ? Icons.school_rounded : Icons.co_present_rounded,
+                        isStudent
+                            ? Icons.school_rounded
+                            : Icons.co_present_rounded,
                         size: 14,
                         color: roleColor,
                       ),
@@ -232,15 +242,15 @@ class _AppShellState extends State<AppShell> {
         ),
         actions: isMobile
             ? [
-                IconButton(
-                  icon: Icon(
-                    Icons.access_time_filled_rounded,
-                    color: _showTimeMachine ? ReflexColors.accent : null,
-                  ),
-                  tooltip: LocaleKeys.demo_clock_title.tr(),
-                  onPressed: () => setState(() => _showTimeMachine = !_showTimeMachine),
-                ),
-                const SizedBox(width: 4),
+                // IconButton(
+                //   icon: Icon(
+                //     Icons.access_time_filled_rounded,
+                //     color: _showTimeMachine ? ReflexColors.accent : null,
+                //   ),
+                //   tooltip: LocaleKeys.demo_clock_title.tr(),
+                //   onPressed: () => setState(() => _showTimeMachine = !_showTimeMachine),
+                // ),
+                const SizedBox(),
               ]
             : [
                 IconButton(
@@ -255,7 +265,8 @@ class _AppShellState extends State<AppShell> {
                     color: _showTimeMachine ? ReflexColors.accent : null,
                   ),
                   tooltip: LocaleKeys.demo_clock_title.tr(),
-                  onPressed: () => setState(() => _showTimeMachine = !_showTimeMachine),
+                  onPressed: () =>
+                      setState(() => _showTimeMachine = !_showTimeMachine),
                 ),
                 IconButton(
                   icon: const Icon(Icons.language_rounded),
@@ -274,7 +285,9 @@ class _AppShellState extends State<AppShell> {
               padding: const EdgeInsetsDirectional.fromSTEB(16, 4, 16, 12),
               child: DemoClockWidget(onClockShifted: _onClockShifted),
             ),
-          Expanded(child: IndexedStack(index: safeIndex, children: screens)),
+          Expanded(
+            child: IndexedStack(index: safeIndex, children: screens),
+          ),
         ],
       ),
       bottomNavigationBar: NavigationBar(

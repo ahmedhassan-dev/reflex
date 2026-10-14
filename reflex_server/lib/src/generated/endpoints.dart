@@ -13,6 +13,7 @@
 import 'dart:typed_data' as _idt;
 import 'package:reflex_server/src/generated/dtos/create_question_input.dart'
     as _i27r3xjl;
+import 'package:reflex_server/src/generated/enums/role.dart' as _ilpnmuum;
 import 'package:reflex_server/src/generated/enums/subscription_status.dart'
     as _ipub36mu;
 import 'package:serverpod/serverpod.dart' as _is;
@@ -435,6 +436,48 @@ class Endpoints extends _is.EndpointDispatch {
       name: 'userProfile',
       endpoint: endpoints['userProfile']!,
       methodConnectors: {
+        'get': _is.MethodConnector(
+          name: 'get',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
+                      .get(session),
+        ),
+        'ensureProfile': _is.MethodConnector(
+          name: 'ensureProfile',
+          params: {
+            'role': _is.ParameterDescription(
+              name: 'role',
+              type: _is.getType<_ilpnmuum.Role?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
+                      .ensureProfile(
+                        session,
+                        role: params['role'],
+                      ),
+        ),
+        'getMyProfile': _is.MethodConnector(
+          name: 'getMyProfile',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
+                      .getMyProfile(session),
+        ),
         'updateFcmToken': _is.MethodConnector(
           name: 'updateFcmToken',
           params: {
@@ -536,17 +579,6 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         params['fullName'],
                       ),
-        ),
-        'get': _is.MethodConnector(
-          name: 'get',
-          params: {},
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
-                      .get(session),
         ),
       },
     );

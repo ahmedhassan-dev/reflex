@@ -112,44 +112,66 @@ class _AnalyticsScreenState extends AnalyticsController {
             // Course Selector Header Banner
             if (courses.isNotEmpty)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                margin: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? ReflexColors.darkSurface : ReflexColors.lightSurface,
-                  border: Border(
-                    bottom: BorderSide(
-                      color: isDark ? ReflexColors.darkBorder : ReflexColors.lightBorder,
-                    ),
+                  color: isDark ? ReflexColors.darkCard : ReflexColors.lightCard,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark ? ReflexColors.darkBorder : ReflexColors.lightBorder,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.school_rounded, size: 20, color: ReflexColors.primary),
-                    const SizedBox(width: 8),
-                    Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isCompact = constraints.maxWidth < 560;
+
+                    final dropdownWidget = Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isDark ? ReflexColors.darkSurface : ReflexColors.lightSurface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark ? ReflexColors.darkBorder : ReflexColors.lightBorder,
+                        ),
+                      ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<Course>(
                           isExpanded: true,
                           value: selectedCourse,
-                          icon: const Icon(Icons.arrow_drop_down_rounded),
+                          icon: const Icon(Icons.arrow_drop_down_rounded, color: ReflexColors.primary),
                           items: courses.map((c) {
                             final cIsPub = c.isPublic ?? true;
                             return DropdownMenuItem<Course>(
                               value: c,
                               child: Row(
                                 children: [
-                                  Text(
-                                    c.title,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                                    overflow: TextOverflow.ellipsis,
+                                  const Icon(Icons.school_rounded, size: 18, color: ReflexColors.primary),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      c.title,
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                  const SizedBox(width: 6),
+                                  const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: cIsPub
-                                          ? ReflexColors.chromaticGreen.withValues(alpha: 0.15)
-                                          : ReflexColors.chromaticYellow.withValues(alpha: 0.15),
-                                      borderRadius: BorderRadius.circular(4),
+                                      color: (cIsPub ? ReflexColors.chromaticGreen : ReflexColors.chromaticYellow)
+                                          .withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(
+                                        color: (cIsPub ? ReflexColors.chromaticGreen : ReflexColors.chromaticYellow)
+                                            .withValues(alpha: 0.3),
+                                      ),
                                     ),
                                     child: Text(
                                       cIsPub
@@ -173,9 +195,9 @@ class _AnalyticsScreenState extends AnalyticsController {
                           },
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton.icon(
+                    );
+
+                    final subscriptionsButton = ElevatedButton.icon(
                       key: const Key('btn_analytics_manage_subscriptions'),
                       icon: Badge(
                         isLabelVisible: pendingCount > 0,
@@ -190,13 +212,33 @@ class _AnalyticsScreenState extends AnalyticsController {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ReflexColors.primary,
                         foregroundColor: Colors.white,
+                        elevation: 0,
                         visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: _openSubscriptionsSheet,
-                    ),
-                  ],
+                    );
+
+                    if (isCompact) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          dropdownWidget,
+                          const SizedBox(height: 10),
+                          subscriptionsButton,
+                        ],
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        Expanded(child: dropdownWidget),
+                        const SizedBox(width: 12),
+                        subscriptionsButton,
+                      ],
+                    );
+                  },
                 ),
               ),
 
@@ -240,10 +282,31 @@ class _AnalyticsScreenState extends AnalyticsController {
                 ),
               ),
 
-            // Tabs Content
-            Expanded(
-              child: TabBarView(
-                children: [
+            // Empty courses view or Tabs Content
+            if (courses.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.school_outlined, size: 48, color: ReflexColors.primary),
+                        const SizedBox(height: 16),
+                        Text(
+                          LocaleKeys.courses_no_courses.tr(),
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                child: TabBarView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
                   RefreshIndicator(
                     onRefresh: loadSummary,
                     child: ListView(

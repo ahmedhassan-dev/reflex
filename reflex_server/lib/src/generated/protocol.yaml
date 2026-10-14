@@ -18,13 +18,15 @@ googleIdp:
 jwtRefresh:
   - refreshAccessToken:
 userProfile:
+  - get:
+  - ensureProfile:
+  - getMyProfile:
   - updateFcmToken:
   - deleteAccount:
   - removeUserImage:
   - setUserImage:
   - changeUserName:
   - changeFullName:
-  - get:
 demoClock:
   - getOffsetDays:
   - setOffsetDays:

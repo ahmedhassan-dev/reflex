@@ -1,3 +1,4 @@
+import 'package:reflex_server/src/core/errors/exceptions.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:reflex_server/src/core/di/app_container.dart';
 import 'package:reflex_server/src/generated/protocol.dart';
@@ -7,6 +8,14 @@ class AnalyticsEndpoint extends Endpoint {
   /// Returns aggregated cohort metrics for teacher dashboard and question analytics.
   Future<CohortSummary> getCohortSummary(Session session, int courseId) async {
     final container = AppContainer(session);
+    final teacher = await container.resolveCurrentProfile(
+      defaultDisplayName: 'Mr. Hassan (Teacher)',
+      defaultRole: Role.teacher,
+    );
+    final course = await container.courseRepo.findById(courseId);
+    if (course != null && course.teacherId != null && course.teacherId != teacher.id) {
+      throw const CourseAccessDeniedException('You can only view analytics for your own courses.');
+    }
     final stats = await container.getCohortStatsService();
     return stats.getCohortSummary(courseId: courseId);
   }

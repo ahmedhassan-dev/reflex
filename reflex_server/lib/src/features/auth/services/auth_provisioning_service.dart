@@ -62,13 +62,17 @@ class AuthProvisioningService {
         existing.email = profileEmail;
         updated = true;
       }
+      if (defaultRole == Role.teacher && existing.role != Role.teacher) {
+        existing.role = Role.teacher;
+        updated = true;
+      }
       if (updated) {
         return profileRepo.save(existing);
       }
       return existing;
     }
 
-    final isTeacher = authInfo.scopes.contains(AppScopes.teacher);
+    final isTeacher = authInfo.scopes.contains(AppScopes.teacher) || defaultRole == Role.teacher;
     final uid = authUserId.uuid;
     String resolvedName;
     if (uid == '00000000-0000-4000-8000-000000000022') {

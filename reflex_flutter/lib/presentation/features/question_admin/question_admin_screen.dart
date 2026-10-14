@@ -57,6 +57,10 @@ class _QuestionAdminScreenState extends QuestionAdminController {
   }
 
   void _openCreateQuestionDialog() {
+    if (selectedCourse == null || courseId == 0) {
+      _openCreateCourseDialog();
+      return;
+    }
     CreateQuestionBottomSheet.show(
       context,
       courseId: courseId,

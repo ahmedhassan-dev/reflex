@@ -6,6 +6,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import '../../client.dart';
 import '../../core/result.dart';
 
+import '../../core/storage/role_preferences.dart';
+
 abstract interface class IAnalyticsRepository {
   Future<Result<List<Course>>> listCourses();
   Future<Result<CohortSummary>> getCohortSummary(int courseId);
@@ -21,7 +23,11 @@ class AnalyticsRepositoryImpl implements IAnalyticsRepository {
   @override
   Future<Result<List<Course>>> listCourses() async {
     try {
-      final list = await _client.practice.listCourses();
+      final role = await RolePreferences.getSavedRole();
+      final isTeacher = role == Role.teacher;
+      final list = isTeacher
+          ? await _client.questionAdmin.listCourses()
+          : await _client.practice.listCourses();
       return Result.success(list);
     } catch (e, st) {
       debugPrint('[AnalyticsRepository.listCourses] error: $e\n$st');

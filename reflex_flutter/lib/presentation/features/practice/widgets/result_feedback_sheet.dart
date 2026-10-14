@@ -41,7 +41,7 @@ class ResultFeedbackWidget extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsetsDirectional.all(16),
+      padding: const EdgeInsetsDirectional.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: tierColor.withValues(alpha: isDark ? 0.15 : 0.08),
         borderRadius: BorderRadius.circular(16),
@@ -50,6 +50,7 @@ class ResultFeedbackWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // ── Row 1: Verdict text & Tier icon ───────────────────────
           Row(
             children: [
               Container(
@@ -68,11 +69,19 @@ class ResultFeedbackWidget extends StatelessWidget {
                     color: tierColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
+                    height: 1.3,
                   ),
                 ),
               ),
+            ],
+          ),
+          const SizedBox(height: 10),
+
+          // ── Row 2: Points delta & Total Score badge ───────────────
+          Row(
+            children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: result.points > 0
                       ? tierColor.withValues(alpha: 0.2)
@@ -91,10 +100,10 @@ class ResultFeedbackWidget extends StatelessWidget {
                 ),
               ),
               if (result.totalScore != null) ...[
-                const SizedBox(width: 6),
+                const SizedBox(width: 8),
                 Container(
                   key: const Key('result_total_score_badge'),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: ReflexColors.primary.withValues(alpha: isDark ? 0.25 : 0.15),
                     borderRadius: BorderRadius.circular(8),

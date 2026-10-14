@@ -71,7 +71,7 @@ class TopicQuestionCard extends StatelessWidget {
               _MetricBadge(
                 icon: Icons.flag_rounded,
                 label:
-                    '${LocaleKeys.dashboard_first_try_rate.tr()}: ${(question.firstTryRate * 100).round()}%',
+                    '${LocaleKeys.dashboard_first_try_rate.tr()}: ${(question.firstTryRate > 1.0 ? question.firstTryRate : question.firstTryRate * 100).round()}%',
                 color: ReflexColors.primary,
               ),
               _MetricBadge(

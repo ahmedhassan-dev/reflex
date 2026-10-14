@@ -58,13 +58,12 @@ Future<void> signInDemoStudentCharlie() =>
 /// Clears the active demo session or signs out authenticated user.
 Future<void> signOutDemo() async {
   isDemoUserActive = false;
+  await authSessionManager?.updateSignedInUser(null);
   try {
     await client.auth.signOutDevice();
   } catch (e, st) {
     debugPrint('[Auth] Note: signOutDevice error: $e');
     unawaited(Sentry.captureException(e, stackTrace: st));
-  } finally {
-    await authSessionManager?.updateSignedInUser(null);
   }
 }
 
@@ -99,6 +98,23 @@ Future<({String? name, String? imageUrl})> fetchCurrentUserProfile() async {
     debugPrint('[UserProfile] Error fetching profile: $e');
     unawaited(Sentry.captureException(e, stackTrace: st));
     return (name: null, imageUrl: null);
+  }
+}
+
+/// Ensures the authenticated user's domain profile exists on the server with the specified role
+/// (e.g. Teacher vs Student) and synchronizes Serverpod scopes.
+Future<Profile?> syncUserProfileRole(Role role) async {
+  if (isDemoUserActive || !isUserAuthenticated) {
+    return null;
+  }
+  try {
+    final profile = await client.userProfile.ensureProfile(role: role);
+    debugPrint('[UserProfile] Successfully synchronized profile for ${profile.displayName} with role $role');
+    return profile;
+  } catch (e, st) {
+    debugPrint('[UserProfile] Error synchronizing profile role: $e');
+    unawaited(Sentry.captureException(e, stackTrace: st));
+    return null;
   }
 }
 

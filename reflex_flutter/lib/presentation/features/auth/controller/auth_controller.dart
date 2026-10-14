@@ -73,11 +73,6 @@ abstract class AuthController extends State<AuthScreen>
     if (widget.initialRole != null) {
       selectedRole = widget.initialRole!;
     }
-    if (isUserAuthenticated) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _navigateToAppShell(role: selectedRole, userName: null);
-      });
-    }
   }
 
   @override
@@ -104,7 +99,8 @@ abstract class AuthController extends State<AuthScreen>
 
   Future<void> signInWithEmail() async {
     if (isUserAuthenticated) {
-      _navigateToAppShell(role: selectedRole, userName: null);
+      await syncUserProfileRole(selectedRole);
+      if (mounted) _navigateToAppShell(role: selectedRole, userName: null);
       return;
     }
     final email = emailController.text.trim();
@@ -123,7 +119,8 @@ abstract class AuthController extends State<AuthScreen>
       final authSuccess = await client.emailIdp.login(email: email, password: password);
       await authSessionManager?.updateSignedInUser(authSuccess);
       TextInput.finishAutofillContext(shouldSave: true);
-      _navigateToAppShell(role: selectedRole, userName: null);
+      await syncUserProfileRole(selectedRole);
+      if (mounted) _navigateToAppShell(role: selectedRole, userName: null);
     } catch (e, st) {
       TextInput.finishAutofillContext(shouldSave: false);
       debugPrint("[AuthController.signInWithEmail] error: $e\n$st");
@@ -151,8 +148,9 @@ abstract class AuthController extends State<AuthScreen>
     context.setLocale(newLocale);
   }
 
-  void switchToRoleSelection() {
-    unawaited(signOutDemo());
+  Future<void> switchToRoleSelection() async {
+    await signOutDemo();
+    if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => RoleSelectionScreen(initialRole: selectedRole),

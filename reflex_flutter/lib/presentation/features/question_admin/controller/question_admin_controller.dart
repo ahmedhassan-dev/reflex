@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
+import '../../../../client.dart';
 import '../../../../data/repositories/question_admin_repository.dart';
 import '../question_admin_screen.dart';
 
@@ -47,6 +48,10 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
       errorMessage = null;
     });
 
+    if (isUserAuthenticated && !isDemoUserActive) {
+      await syncUserProfileRole(Role.teacher);
+    }
+
     final coursesRes = await questionRepo.listCourses();
     if (!mounted) return;
 
@@ -61,9 +66,20 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
       if (selectedCourse!.isPublic == false) {
         unawaited(loadSubscriptions());
       }
+      await loadQuestions();
+    } else {
+      setState(() {
+        courses = [];
+        selectedCourse = null;
+        courseId = 0;
+        questions = [];
+        selectedQuestion = null;
+        subscriptions = [];
+        topicNoteController.clear();
+        helpHintController.clear();
+        isLoading = false;
+      });
     }
-
-    await loadQuestions();
   }
 
   Future<void> onCourseSelected(Course course) async {
@@ -85,6 +101,15 @@ abstract class QuestionAdminController extends State<QuestionAdminScreen> {
   }
 
   Future<void> loadQuestions() async {
+    if (courseId == 0 || selectedCourse == null) {
+      setState(() {
+        questions = [];
+        selectedQuestion = null;
+        isLoading = false;
+      });
+      return;
+    }
+
     setState(() {
       isLoading = true;
       errorMessage = null;

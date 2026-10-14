@@ -21,16 +21,17 @@ Future<void> main(List<String> args) async {
     // 1. Ensure Teacher exists (Mr. Hassan)
     final teacherAuthId = '00000000-0000-4000-8000-000000000001';
     final teacherCheck = await connection.execute(
-      Sql.named('SELECT id FROM learner WHERE "authUserId" = @authId;'),
+      Sql.named('SELECT id FROM profile WHERE "authUserId" = @authId;'),
       parameters: {'authId': teacherAuthId},
     );
     if (teacherCheck.isEmpty) {
       await connection.execute(
-        Sql.named('INSERT INTO learner ("authUserId", "displayName", "role") VALUES (@authId, @name, @role);'),
+        Sql.named('INSERT INTO profile ("authUserId", "displayName", "role", "email") VALUES (@authId, @name, @role, @email);'),
         parameters: {
           'authId': teacherAuthId,
           'name': 'Mr. Hassan (Teacher)',
           'role': 'teacher',
+          'email': 'teacher@reflex.app',
         },
       );
       print('✅ Created Teacher: Mr. Hassan (Teacher)');
@@ -44,16 +45,17 @@ Future<void> main(List<String> args) async {
     for (var i = 0; i < studentNames.length; i++) {
       final authId = '00000000-0000-4000-8000-00000000001${i + 1}';
       final check = await connection.execute(
-        Sql.named('SELECT id FROM learner WHERE "authUserId" = @authId;'),
+        Sql.named('SELECT id FROM profile WHERE "authUserId" = @authId;'),
         parameters: {'authId': authId},
       );
       if (check.isEmpty) {
         final inserted = await connection.execute(
-          Sql.named('INSERT INTO learner ("authUserId", "displayName", "role") VALUES (@authId, @name, @role) RETURNING id;'),
+          Sql.named('INSERT INTO profile ("authUserId", "displayName", "role", "email") VALUES (@authId, @name, @role, @email) RETURNING id;'),
           parameters: {
             'authId': authId,
             'name': studentNames[i],
             'role': 'student',
+            'email': '${studentNames[i].toLowerCase()}@reflex.app',
           },
         );
         final id = inserted.first.first as int;
@@ -537,14 +539,14 @@ VALUES (@qId, @normText);
             await connection.execute(
               Sql.named('''
 INSERT INTO attempt (
-  "learnerId", "questionId", "status", "responseMs", "usedHelp",
+  "profileId", "questionId", "status", "responseMs", "usedHelp",
   "isFirstAttempt", "underExpectedTime", "isClean", "reflexTier", "createdAt"
 ) VALUES (
-  @lId, @qId, @status, @respMs, @usedHelp, @firstAtt, @underTime, @clean, @tier, @created
+  @pId, @qId, @status, @respMs, @usedHelp, @firstAtt, @underTime, @clean, @tier, @created
 );
 '''),
               parameters: {
-                'lId': sId,
+                'pId': sId,
                 'qId': qId,
                 'status': status,
                 'respMs': latency,

@@ -43,6 +43,8 @@ void run(List<String> args) async {
   );
 
   // Wrap authentication handler to support seamless developer demo & judging logins
+  // Wrap authentication handler to support seamless developer demo & judging logins
+  // and dynamically grant teacher scopes based on the persistent Profile role.
   final defaultAuthHandler = pod.authenticationHandler;
   pod.authenticationHandler = (session, key) async {
     final demoAccounts = {
@@ -57,7 +59,26 @@ void run(List<String> args) async {
       return AuthenticationInfo(match.$1, match.$2, authId: match.$1);
     }
     if (defaultAuthHandler != null) {
-      return defaultAuthHandler(session, key);
+      final authInfo = await defaultAuthHandler(session, key);
+      if (authInfo != null) {
+        final userId = authInfo.userIdentifier;
+        final scopes = Set<Scope>.from(authInfo.scopes);
+        try {
+          final rows = await session.db.unsafeQuery(
+            'SELECT role FROM profile WHERE "authUserId" = \'$userId\' LIMIT 1;',
+          );
+          if (rows.isNotEmpty) {
+            final roleStr = rows.first[0]?.toString();
+            if (roleStr == 'teacher') {
+              scopes.add(AppScopes.teacher);
+            } else if (roleStr == 'student') {
+              scopes.add(AppScopes.student);
+            }
+          }
+        } catch (_) {}
+        return AuthenticationInfo(authInfo.userIdentifier, scopes, authId: authInfo.authId);
+      }
+      return null;
     }
     return null;
   };

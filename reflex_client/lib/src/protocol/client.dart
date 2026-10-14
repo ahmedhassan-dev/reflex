@@ -29,10 +29,12 @@ import 'package:reflex_client/src/protocol/dtos/student_progress.dart'
     as _ibk5hkxp;
 import 'package:reflex_client/src/protocol/dtos/submit_result.dart'
     as _ida54fs3;
+import 'package:reflex_client/src/protocol/enums/role.dart' as _ijjfc08c;
 import 'package:reflex_client/src/protocol/enums/subscription_status.dart'
     as _iuzp1e2t;
 import 'package:reflex_client/src/protocol/greetings/greeting.dart'
     as _igwxqmcb;
+import 'package:reflex_client/src/protocol/profile.dart' as _ia9c2ws9;
 import 'package:reflex_client/src/protocol/question.dart' as _idjaghnf;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -355,6 +357,33 @@ class EndpointUserProfile extends _iacc.EndpointUserProfileEditBase {
   @override
   String get name => 'userProfile';
 
+  /// Returns the user profile of the current user. Overrides base implementation
+  /// to gracefully handle missing profile records without throwing 500 exceptions.
+  @override
+  _ida.Future<_iacc.UserProfileModel> get() =>
+      caller.callServerEndpoint<_iacc.UserProfileModel>(
+        'userProfile',
+        'get',
+        {},
+      );
+
+  /// Ensures the authenticated user has a domain [Profile] record and synchronizes
+  /// their role (Teacher or Student) and Serverpod scopes.
+  _ida.Future<_ia9c2ws9.Profile> ensureProfile({_ijjfc08c.Role? role}) =>
+      caller.callServerEndpoint<_ia9c2ws9.Profile>(
+        'userProfile',
+        'ensureProfile',
+        {'role': role},
+      );
+
+  /// Returns the domain [Profile] of the currently authenticated user.
+  _ida.Future<_ia9c2ws9.Profile> getMyProfile() =>
+      caller.callServerEndpoint<_ia9c2ws9.Profile>(
+        'userProfile',
+        'getMyProfile',
+        {},
+      );
+
   /// Updates the FCM device token for the authenticated user.
   _ida.Future<bool> updateFcmToken({required String fcmToken}) =>
       caller.callServerEndpoint<bool>(
@@ -406,15 +435,6 @@ class EndpointUserProfile extends _iacc.EndpointUserProfileEditBase {
         'userProfile',
         'changeFullName',
         {'fullName': fullName},
-      );
-
-  /// Returns the user profile of the current user.
-  @override
-  _ida.Future<_iacc.UserProfileModel> get() =>
-      caller.callServerEndpoint<_iacc.UserProfileModel>(
-        'userProfile',
-        'get',
-        {},
       );
 }
 
@@ -530,7 +550,7 @@ class EndpointPractice extends _isc.EndpointRef {
     {'courseId': courseId},
   );
 
-  /// Checks subscription status of active learner for a course.
+  /// Checks subscription status of active profile for a course.
   _ida.Future<_iuzp1e2t.SubscriptionStatus?> getCourseSubscriptionStatus(
     int courseId,
   ) => caller.callServerEndpoint<_iuzp1e2t.SubscriptionStatus?>(
@@ -548,7 +568,7 @@ class EndpointQuestionAdmin extends _isc.EndpointRef {
   @override
   String get name => 'questionAdmin';
 
-  /// Lists all courses.
+  /// Lists courses belonging to the authenticated teacher.
   _ida.Future<List<_irm1rqva.Course>> listCourses() =>
       caller.callServerEndpoint<List<_irm1rqva.Course>>(
         'questionAdmin',
@@ -632,7 +652,7 @@ class EndpointQuestionAdmin extends _isc.EndpointRef {
     },
   );
 
-  /// Lists all questions belonging to a course.
+  /// Lists all questions belonging to a course owned by the teacher.
   _ida.Future<List<_idjaghnf.Question>> listQuestions(int courseId) =>
       caller.callServerEndpoint<List<_idjaghnf.Question>>(
         'questionAdmin',

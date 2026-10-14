@@ -179,5 +179,99 @@ void main() {
       expect(answers.length, equals(2));
       expect(answers.first.normalizedText, equals('paris'));
     });
+
+    test('listCourses with teacherId isolates courses per teacher', () async {
+      await courseRepo.save(Course(
+        id: 10,
+        title: 'Teacher 1 Course',
+        subject: 'CS',
+        teacherId: 1,
+      ));
+      await courseRepo.save(Course(
+        id: 20,
+        title: 'Teacher 2 Course',
+        subject: 'Math',
+        teacherId: 2,
+      ));
+
+      final teacher1Courses = await service.listCourses(teacherId: 1);
+      expect(teacher1Courses.any((c) => c.id == 10), isTrue);
+      expect(teacher1Courses.any((c) => c.id == 20), isFalse);
+
+      final teacher2Courses = await service.listCourses(teacherId: 2);
+      expect(teacher2Courses.any((c) => c.id == 20), isTrue);
+      expect(teacher2Courses.any((c) => c.id == 10), isFalse);
+    });
+
+    test('createQuestion blocks teacher from modifying other teachers course', () async {
+      await courseRepo.save(Course(
+        id: 50,
+        title: 'Teacher 1 Private Deck',
+        subject: 'Algorithms',
+        teacherId: 1,
+      ));
+
+      final input = CreateQuestionInput(
+        courseId: 50,
+        prompt: 'What is quicksort?',
+        topic: 'Sorting',
+        questionType: QuestionType.multipleChoice,
+        points: 10,
+        expectedSeconds: 10,
+      );
+
+      // Teacher 2 tries to add a question to Teacher 1's course
+      expect(
+        () => service.createQuestion(input, teacherId: 2),
+        throwsA(isA<CourseAccessDeniedException>()),
+      );
+
+      // Teacher 1 succeeds
+      final created = await service.createQuestion(input, teacherId: 1);
+      expect(created.id, isNotNull);
+    });
+
+    test('updateTopicNoteAndHint blocks teacher from editing another teachers question', () async {
+      await courseRepo.save(Course(
+        id: 60,
+        title: 'Teacher 1 Bio',
+        subject: 'Science',
+        teacherId: 1,
+      ));
+      await questionRepo.save(Question(
+        id: 99,
+        courseId: 60,
+        position: 1,
+        prompt: 'Cell structure',
+        topic: 'Biology',
+        questionType: QuestionType.textInput,
+        points: 10,
+        expectedSeconds: 10,
+        attemptCount: 0,
+        attemptedStudentCount: 0,
+        solvedStudentCount: 0,
+        firstTrySolveCount: 0,
+        underTimeSolveCount: 0,
+        cleanSolveCount: 0,
+      ));
+
+      // Teacher 2 tries to edit note
+      expect(
+        () => service.updateTopicNoteAndHint(
+          questionId: 99,
+          topicNote: 'Hacked note',
+          teacherId: 2,
+        ),
+        throwsA(isA<CourseAccessDeniedException>()),
+      );
+
+      // Teacher 1 succeeds
+      final updated = await service.updateTopicNoteAndHint(
+        questionId: 99,
+        topicNote: 'Teacher 1 approved note',
+        teacherId: 1,
+      );
+      expect(updated.topicNote, equals('Teacher 1 approved note'));
+    });
   });
 }

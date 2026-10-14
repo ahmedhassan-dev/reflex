@@ -86,40 +86,40 @@ class _ResponseTimerWidgetState extends State<ResponseTimerWidget> {
     final elapsedSeconds = (_elapsedMillis / 1000).toStringAsFixed(1);
 
     return Container(
-      padding: const EdgeInsetsDirectional.symmetric(horizontal: 14, vertical: 8),
+      padding: const EdgeInsetsDirectional.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: timerColor.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: timerColor.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            width: 18,
-            height: 18,
+            width: 16,
+            height: 16,
             child: CircularProgressIndicator(
               value: progress,
-              strokeWidth: 2.5,
+              strokeWidth: 2.2,
               backgroundColor: timerColor.withValues(alpha: 0.2),
               valueColor: AlwaysStoppedAnimation<Color>(timerColor),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
           Text(
             '${elapsedSeconds}s',
             style: TextStyle(
               color: timerColor,
               fontWeight: FontWeight.bold,
-              fontSize: 13,
+              fontSize: 12,
             ),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 4),
           Text(
             '(${LocaleKeys.practice_target_time.tr(args: [widget.expectedSeconds.toString()])})',
             style: theme.textTheme.bodySmall?.copyWith(
               color: timerColor.withValues(alpha: 0.85),
-              fontSize: 11,
+              fontSize: 10,
             ),
           ),
         ],

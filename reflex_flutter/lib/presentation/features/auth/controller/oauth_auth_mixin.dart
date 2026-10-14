@@ -64,8 +64,9 @@ mixin OAuthAuthMixin on State<AuthScreen> {
 
       final googleController = GoogleAuthController(
         client: client,
-        onAuthenticated: () {
-          navigateToAppShell(role: selectedRole, userName: null);
+        onAuthenticated: () async {
+          await syncUserProfileRole(selectedRole);
+          if (mounted) navigateToAppShell(role: selectedRole, userName: null);
         },
         onError: (err) {
           if (mounted) {

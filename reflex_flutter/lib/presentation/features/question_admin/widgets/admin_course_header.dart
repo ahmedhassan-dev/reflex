@@ -56,43 +56,46 @@ class AdminCourseHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: courses.isEmpty
-                    ? Text(selectedCourse?.title ?? 'Default Course')
-                    : DropdownButtonFormField<int>(
-                        key: const Key('dropdown_course_selector'),
-                        initialValue: courses.any((c) => c.id == courseId)
-                            ? courseId
-                            : courses.first.id,
-                        isExpanded: true,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                        ),
-                        items: courses
-                            .map((c) => DropdownMenuItem<int>(
-                                  value: c.id,
-                                  child: Text('${c.title} (${c.subject})'),
-                                ))
-                            .toList(),
-                        onChanged: (newId) {
-                          if (newId != null) {
-                            final found = courses
-                                .where((c) => c.id == newId)
-                                .firstOrNull;
-                            if (found != null) {
-                              onCourseSelected(found);
-                            }
-                          }
-                        },
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 480;
+
+              final dropdownField = courses.isEmpty
+                  ? Text(selectedCourse?.title ?? 'Default Course')
+                  : DropdownButtonFormField<int>(
+                      key: const Key('dropdown_course_selector'),
+                      initialValue: courses.any((c) => c.id == courseId)
+                          ? courseId
+                          : courses.first.id,
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
-              ),
-              const SizedBox(width: 8),
-              OutlinedButton.icon(
+                      items: courses
+                          .map((c) => DropdownMenuItem<int>(
+                                value: c.id,
+                                child: Text(
+                                  '${c.title} (${c.subject})',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ))
+                          .toList(),
+                      onChanged: (newId) {
+                        if (newId != null) {
+                          final found = courses
+                              .where((c) => c.id == newId)
+                              .firstOrNull;
+                          if (found != null) {
+                            onCourseSelected(found);
+                          }
+                        }
+                      },
+                    );
+
+              final addCourseButton = OutlinedButton.icon(
                 key: const Key('btn_add_course'),
                 icon: const Icon(Icons.add, size: 16),
                 label: Text(LocaleKeys.questions_admin_add_course_button.tr()),
@@ -103,8 +106,27 @@ class AdminCourseHeader extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: onAddCourse,
-              ),
-            ],
+              );
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    dropdownField,
+                    const SizedBox(height: 8),
+                    addCourseButton,
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: dropdownField),
+                  const SizedBox(width: 8),
+                  addCourseButton,
+                ],
+              );
+            },
           ),
           const SizedBox(height: 12),
           Wrap(

@@ -88,6 +88,21 @@ void main() {
       expect(find.text('What is Newton second law?'), findsOneWidget);
       expect(find.text('15'), findsOneWidget); // attemptCount
       expect(find.text('80%'), findsOneWidget); // firstTryRate
+
+      // Verify horizontal drag on Question Insights table
+      await tester.dragFrom(const Offset(400, 300), const Offset(-100, 0));
+      await tester.pumpAndSettle();
+
+      // Switch to Tab 3: Student Solves table
+      await tester.tap(find.byIcon(Icons.people_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tariq'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget); // solvedCount
+
+      // Verify horizontal drag on Student Solves table
+      await tester.dragFrom(const Offset(400, 300), const Offset(-100, 0));
+      await tester.pumpAndSettle();
     });
   });
 }

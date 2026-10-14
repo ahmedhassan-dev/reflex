@@ -90,35 +90,41 @@ class _PracticeCardContentWidgetState
       children: [
         // ── Top header bar: Topic, Total Score & Response Timer ───────────
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Chip(
-              label: Text(
-                q.topic,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+            Flexible(
+              child: Chip(
+                label: Text(
+                  q.topic,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                backgroundColor: ReflexColors.primary.withValues(alpha: isDark ? 0.2 : 0.1),
+                side: BorderSide(color: ReflexColors.primary.withValues(alpha: 0.3)),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                visualDensity: VisualDensity.compact,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              backgroundColor: ReflexColors.primary.withValues(alpha: isDark ? 0.2 : 0.1),
-              side: BorderSide(color: ReflexColors.primary.withValues(alpha: 0.3)),
-              padding: const EdgeInsets.symmetric(horizontal: 4),
             ),
-            if (widget.card.totalScore != null || widget.submitResult?.totalScore != null)
+            const SizedBox(width: 8),
+            if (widget.card.totalScore != null || widget.submitResult?.totalScore != null) ...[
               Container(
                 key: const Key('practice_header_score_badge'),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
                   color: ReflexColors.primary.withValues(alpha: isDark ? 0.2 : 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: ReflexColors.primary.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.stars_rounded, color: ReflexColors.primary, size: 16),
+                    const Icon(Icons.stars_rounded, color: ReflexColors.primary, size: 15),
                     const SizedBox(width: 4),
                     Text(
                       '${LocaleKeys.practice_total_score.tr()}: ${widget.submitResult?.totalScore ?? widget.card.totalScore ?? 0}',
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: ReflexColors.primary,
                       ),
@@ -126,6 +132,8 @@ class _PracticeCardContentWidgetState
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
+            ],
             ResponseTimerWidget(
               expectedSeconds: q.expectedSeconds,
               isRunning: !isSubmitted,

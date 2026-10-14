@@ -62,25 +62,27 @@ class DeckCompleteWidget extends StatelessWidget {
             Text(
               LocaleKeys.practice_deck_complete_subtitle.tr(),
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isDark ? ReflexColors.textSecondaryDark : ReflexColors.textSecondaryLight,
+                color: isDark
+                    ? ReflexColors.textSecondaryDark
+                    : ReflexColors.textSecondaryLight,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
-            if (onRefresh != null) ...[
-              const SizedBox(height: 28),
-              OutlinedButton.icon(
-                onPressed: onRefresh,
-                icon: const Icon(Icons.refresh),
-                label: Text(LocaleKeys.retry.tr()),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ],
+            // if (onRefresh != null) ...[
+            //   const SizedBox(height: 28),
+            //   OutlinedButton.icon(
+            //     onPressed: onRefresh,
+            //     icon: const Icon(Icons.refresh),
+            //     label: Text(LocaleKeys.retry.tr()),
+            //     style: OutlinedButton.styleFrom(
+            //       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(12),
+            //       ),
+            //     ),
+            //   ),
+            // ],
           ],
         ),
       ),

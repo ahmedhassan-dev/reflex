@@ -88,7 +88,11 @@ class AppContainer {
   }) async {
     final auth = session.authenticated;
     if (auth != null) {
-      return authProvisioningService.ensureProfileForSession(session);
+      return authProvisioningService.ensureProfileForSession(
+        session,
+        defaultDisplayName: defaultDisplayName,
+        defaultRole: defaultRole,
+      );
     }
 
     final demoAuthId = defaultRole == Role.teacher

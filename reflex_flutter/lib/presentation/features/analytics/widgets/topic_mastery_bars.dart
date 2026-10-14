@@ -205,23 +205,6 @@ class _TopicBarItemState extends State<_TopicBarItem> {
                             color: ReflexColors.primary,
                           ),
                         ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isDark ? ReflexColors.darkSurface : ReflexColors.lightSurface,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            LocaleKeys.dashboard_topic_questions_count.tr(
-                              args: [widget.questions.length.toString()],
-                            ),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isDark ? ReflexColors.textMutedDark : ReflexColors.textMutedLight,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
