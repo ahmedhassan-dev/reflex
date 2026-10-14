@@ -206,6 +206,6 @@ bash tool/check.sh
 
 ---
 
-## 📄 License
+## 📄 License & Vision
 
-Reflex is developed for educational and competition purposes.
+Reflex is developed for the Serverpod Hackathon 2026 and serves as the seed for an upcoming EdTech startup transforming active speed-recall learning.
