@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
 import '../../../generated/locale_keys.g.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/reflex_logo.dart';
 
 /// Distinctive branded header for the app drawer with user persona info.
 class AppDrawerHeader extends StatelessWidget {
@@ -42,18 +43,7 @@ class AppDrawerHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: ReflexColors.primary.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.flash_on_rounded,
-                  color: ReflexColors.primary,
-                  size: 24,
-                ),
-              ),
+              const ReflexLogo(size: 36, borderRadius: 10),
               const SizedBox(width: 10),
               Text(
                 LocaleKeys.app_title.tr(),

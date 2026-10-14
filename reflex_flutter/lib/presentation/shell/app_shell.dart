@@ -6,6 +6,7 @@ import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import '../../client.dart';
 import '../../generated/locale_keys.g.dart';
 import '../core/theme/app_colors.dart';
+import '../core/widgets/reflex_logo.dart';
 import '../features/analytics/analytics_screen.dart';
 import '../features/auth/role_selection_screen.dart';
 import '../features/courses/courses_screen.dart';
@@ -164,18 +165,7 @@ class _AppShellState extends State<AppShell> {
       appBar: AppBar(
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: ReflexColors.primary.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.flash_on_rounded,
-                color: ReflexColors.primary,
-                size: 20,
-              ),
-            ),
+            const ReflexLogo(size: 28, borderRadius: 8),
             const SizedBox(width: 8),
             Text(
               LocaleKeys.app_title.tr(),

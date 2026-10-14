@@ -2,15 +2,20 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/reflex_logo.dart';
 import '../../../generated/locale_keys.g.dart';
 import 'controller/auth_controller.dart';
+import 'controller/auth_view_mode.dart';
+import 'widgets/auth_header_widget.dart';
 import 'widgets/auth_persona_banner_widget.dart';
+import 'widgets/forgot_password_widget.dart';
+import 'widgets/otp_verification_widget.dart';
 import 'widgets/quick_demo_section_widget.dart';
 import 'widgets/sign_in_form_widget.dart';
 import 'widgets/sign_up_form_widget.dart';
 
 /// Authentication Screen with Persona Banner, Email Sign In/Sign Up,
-/// Google & Apple OAuth sign-in integration, and Quick Demo profiles.
+/// OTP Verification, Forgot Password, Google & Apple OAuth, and Quick Demo profiles.
 class AuthScreen extends StatefulWidget {
   final Role? initialRole;
 
@@ -33,18 +38,7 @@ class _AuthScreenState extends AuthController {
       appBar: AppBar(
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: ReflexColors.primary.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.flash_on_rounded,
-                color: ReflexColors.primary,
-                size: 20,
-              ),
-            ),
+            const ReflexLogo(size: 28, borderRadius: 8),
             const SizedBox(width: 10),
             Text(
               LocaleKeys.app_title.tr(),
@@ -57,12 +51,12 @@ class _AuthScreenState extends AuthController {
             key: const Key('btn_switch_role_appbar'),
             icon: const Icon(Icons.switch_account_outlined),
             tooltip: LocaleKeys.auth_switch_role.tr(),
-            onPressed: () => switchToRoleSelection(context),
+            onPressed: switchToRoleSelection,
           ),
           IconButton(
             icon: const Icon(Icons.language_rounded),
             tooltip: LocaleKeys.switch_language.tr(),
-            onPressed: () => toggleLanguage(context),
+            onPressed: toggleLanguage,
           ),
           const SizedBox(width: 8),
         ],
@@ -77,69 +71,17 @@ class _AuthScreenState extends AuthController {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Hero Icon & Branding
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            roleColor.withValues(alpha: 0.25),
-                            ReflexColors.accent.withValues(alpha: 0.15),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: roleColor.withValues(alpha: 0.25),
-                            blurRadius: 24,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        selectedRole == Role.student
-                            ? Icons.school_rounded
-                            : Icons.co_present_rounded,
-                        size: 40,
-                        color: roleColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    LocaleKeys.auth_welcome_title.tr(),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    LocaleKeys.auth_welcome_subtitle.tr(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: isDark
-                          ? ReflexColors.textSecondaryDark
-                          : ReflexColors.textSecondaryLight,
-                    ),
+                  AuthHeaderWidget(
+                    selectedRole: selectedRole,
+                    roleColor: roleColor,
                   ),
                   const SizedBox(height: 20),
-
-                  // Active Persona Banner with Switch Role Action
                   AuthPersonaBannerWidget(
                     selectedRole: selectedRole,
                     roleColor: roleColor,
-                    onSwitchRole: () => switchToRoleSelection(context),
+                    onSwitchRole: switchToRoleSelection,
                   ),
                   const SizedBox(height: 16),
-
-                  // Prominent Error Banner
                   if (errorMessage != null) ...[
                     Container(
                       key: const Key('auth_error_banner'),
@@ -181,81 +123,104 @@ class _AuthScreenState extends AuthController {
                     ),
                     const SizedBox(height: 16),
                   ],
-
-                  // Authentication Tabs (Sign In, Sign Up, Quick Demo)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? ReflexColors.darkSurface : ReflexColors.lightCard,
-                      borderRadius: BorderRadius.circular(12),
+                  if (authViewMode == AuthViewMode.otpVerification) ...[
+                    OtpVerificationWidget(
+                      email: emailController.text.trim(),
+                      otpController: otpController,
+                      roleColor: roleColor,
+                      isLoading: isLoading,
+                      onVerify: verifyOtpAndCompleteRegistration,
+                      onResend: resendRegistrationOtp,
+                      onBack: cancelSubView,
                     ),
-                    child: TabBar(
-                      controller: tabController,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      indicator: BoxDecoration(
-                        color: roleColor,
-                        borderRadius: BorderRadius.circular(10),
+                  ] else if (authViewMode == AuthViewMode.forgotPassword) ...[
+                    ForgotPasswordWidget(
+                      emailController: emailController,
+                      otpController: otpController,
+                      newPasswordController: newPasswordController,
+                      confirmPasswordController: confirmPasswordController,
+                      roleColor: roleColor,
+                      isCodeSent: isResetCodeSent,
+                      isLoading: isLoading,
+                      onSendResetCode: sendPasswordResetCode,
+                      onSubmitPasswordReset: verifyResetOtpAndSetPassword,
+                      onResendResetCode: resendPasswordResetOtp,
+                      onBack: cancelSubView,
+                    ),
+                  ] else ...[
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDark ? ReflexColors.darkSurface : ReflexColors.lightCard,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      labelColor: Colors.white,
-                      unselectedLabelColor: isDark
-                          ? ReflexColors.textSecondaryDark
-                          : ReflexColors.textSecondaryLight,
-                      tabs: [
-                        Tab(
-                          icon: const Icon(Icons.login_rounded, size: 18),
-                          text: LocaleKeys.auth_tab_signin.tr(),
+                      child: TabBar(
+                        controller: tabController,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        indicator: BoxDecoration(
+                          color: roleColor,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        Tab(
-                          icon: const Icon(Icons.person_add_rounded, size: 18),
-                          text: LocaleKeys.auth_tab_signup.tr(),
-                        ),
-                        Tab(
-                          icon: const Icon(Icons.bolt_rounded, size: 18),
-                          text: LocaleKeys.auth_tab_demo.tr(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-
-                  // Tab Views
-                  AnimatedBuilder(
-                    animation: tabController,
-                    builder: (context, _) {
-                      return IndexedStack(
-                        index: tabController.index,
-                        children: [
-                          SignInFormWidget(
-                            emailController: emailController,
-                            passwordController: passwordController,
-                            selectedRole: selectedRole,
-                            roleColor: roleColor,
-                            isLoading: isLoading,
-                            onSignIn: () => signInWithEmail(context),
-                            onGoogleSignIn: () => signInWithGoogle(context),
-                            onAppleSignIn: () => signInWithApple(context),
+                        labelColor: Colors.white,
+                        unselectedLabelColor: isDark
+                            ? ReflexColors.textSecondaryDark
+                            : ReflexColors.textSecondaryLight,
+                        tabs: [
+                          Tab(
+                            icon: const Icon(Icons.login_rounded, size: 18),
+                            text: LocaleKeys.auth_tab_signin.tr(),
                           ),
-                          SignUpFormWidget(
-                            nameController: nameController,
-                            emailController: emailController,
-                            passwordController: passwordController,
-                            selectedRole: selectedRole,
-                            roleColor: roleColor,
-                            isLoading: isLoading,
-                            onSignUp: () => signUpWithEmail(context),
-                            onGoogleSignIn: () => signInWithGoogle(context),
-                            onAppleSignIn: () => signInWithApple(context),
+                          Tab(
+                            icon: const Icon(Icons.person_add_rounded, size: 18),
+                            text: LocaleKeys.auth_tab_signup.tr(),
                           ),
-                          QuickDemoSectionWidget(
-                            onEnterAsStudent: () => enterAsStudent(context),
-                            onEnterAsStudentBob: () => enterAsStudentBob(context),
-                            onEnterAsStudentCharlie: () => enterAsStudentCharlie(context),
-                            onEnterAsTeacher: () => enterAsTeacher(context),
-                            onEnterAsTeacherSarah: () => enterAsTeacherSarah(context),
+                          Tab(
+                            icon: const Icon(Icons.bolt_rounded, size: 18),
+                            text: LocaleKeys.auth_tab_demo.tr(),
                           ),
                         ],
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    AnimatedBuilder(
+                      animation: tabController,
+                      builder: (context, _) {
+                        return IndexedStack(
+                          index: tabController.index,
+                          children: [
+                            SignInFormWidget(
+                              emailController: emailController,
+                              passwordController: passwordController,
+                              selectedRole: selectedRole,
+                              roleColor: roleColor,
+                              isLoading: isLoading,
+                              onSignIn: signInWithEmail,
+                              onForgotPassword: openForgotPassword,
+                              onGoogleSignIn: signInWithGoogle,
+                              onAppleSignIn: signInWithApple,
+                            ),
+                            SignUpFormWidget(
+                              nameController: nameController,
+                              emailController: emailController,
+                              passwordController: passwordController,
+                              selectedRole: selectedRole,
+                              roleColor: roleColor,
+                              isLoading: isLoading,
+                              onSignUp: signUpWithEmail,
+                              onGoogleSignIn: signInWithGoogle,
+                              onAppleSignIn: signInWithApple,
+                            ),
+                            QuickDemoSectionWidget(
+                              onEnterAsStudent: enterAsStudent,
+                              onEnterAsStudentBob: enterAsStudentBob,
+                              onEnterAsStudentCharlie: enterAsStudentCharlie,
+                              onEnterAsTeacher: enterAsTeacher,
+                              onEnterAsTeacherSarah: enterAsTeacherSarah,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),

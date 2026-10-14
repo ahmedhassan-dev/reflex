@@ -13,6 +13,7 @@ class SignInFormWidget extends StatelessWidget {
   final VoidCallback onSignIn;
   final VoidCallback onGoogleSignIn;
   final VoidCallback onAppleSignIn;
+  final VoidCallback? onForgotPassword;
 
   const SignInFormWidget({
     super.key,
@@ -24,6 +25,7 @@ class SignInFormWidget extends StatelessWidget {
     required this.onSignIn,
     required this.onGoogleSignIn,
     required this.onAppleSignIn,
+    this.onForgotPassword,
   });
 
   @override
@@ -52,7 +54,23 @@ class SignInFormWidget extends StatelessWidget {
             prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
           ),
         ),
-        const SizedBox(height: 18),
+        if (onForgotPassword != null)
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: TextButton(
+              key: const Key('btn_forgot_password'),
+              onPressed: onForgotPassword,
+              child: Text(
+                LocaleKeys.auth_forgot_password.tr(),
+                style: TextStyle(
+                  color: roleColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        const SizedBox(height: 12),
         SizedBox(
           height: 50,
           child: ElevatedButton.icon(

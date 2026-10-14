@@ -5,6 +5,7 @@ import 'package:reflex_client/reflex_client.dart';
 import '../../../core/storage/role_preferences.dart';
 import '../../../generated/locale_keys.g.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/reflex_logo.dart';
 import 'auth_screen.dart';
 import 'widgets/role_card.dart';
 
@@ -72,18 +73,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: ReflexColors.primary.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.flash_on_rounded,
-                color: ReflexColors.primary,
-                size: 20,
-              ),
-            ),
+            const ReflexLogo(size: 28, borderRadius: 8),
             const SizedBox(width: 10),
             Text(
               LocaleKeys.app_title.tr(),
