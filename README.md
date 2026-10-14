@@ -4,6 +4,28 @@
 
 ---
 
+## 💡 Inspiration
+
+Most educational apps are built for students who already love reading textbooks or sitting through 45-minute lectures. But many students don't: teenagers who struggle with ADHD, students in underfunded schools without access to top tutors, and kids whose attention is captured by gaming and social media.
+
+While completing my Master's in Software Engineering at **Quantic** (a global community of over 17,000 members and alumni), I experienced how active, bite-sized smart cases transform engagement. **Reflex** brings that fast-paced active learning to the high school students who need it most.
+
+## 🎯 What Reflex Does
+
+Students solve quick, 30-second scenario cards. Reflex doesn't only check if an answer is right; it **tracks hesitation**:
+
+- Answer fast and correctly: the concept is **Mastered**.
+- Answer correctly but slowly (or with a hint): the concept is **unstable** and is automatically scheduled to repeat tomorrow.
+- Answer incorrectly: the card returns for review until it becomes an automatic reflex.
+
+Teachers create courses and questions, approve student subscriptions to private courses, and see live cohort analytics. **Each teacher only sees and manages their own content.**
+
+## 🧠 Why Serverpod?
+
+After years of building with Firebase, concurrency was the wall: many users writing the same shared data at the same time (a whole class submitting attempts while a teacher edits a course) leads to race conditions. Serverpod gives a typed Dart backend with **true PostgreSQL transactions**. When an answer is tapped, the server safely logs the attempt, calculates the new spaced-repetition schedule, and atomically updates counters without data conflicts. The generated client gives end-to-end type safety from database to UI.
+
+---
+
 ## 🌟 Key Features
 
 - **Spaced-Repetition Review Queue:** Dynamically selects overdue flashcards or prioritizes new unattempted questions based on forgetting curve intervals.
@@ -15,6 +37,8 @@
 - **Option-Specific Rationales (MCQ):** Detailed post-submission explanations for every multiple-choice option clarifying why it is correct or incorrect.
 - **Atomic PostgreSQL Performance Counters:** Parameterized raw SQL atomic increments ensuring zero counter drift or race-condition data loss even under concurrent load.
 - **Live Cohort Analytics:** Teacher dashboard delivering topic mastery breakdowns, question difficulty indices, and student progress metrics.
+- **Teacher Content Isolation:** Every teacher can only list, edit, and view analytics for their own courses, questions, notes, and subscriptions. Ownership is enforced server-side.
+- **Public & Private Courses:** Private courses require teacher approval of student subscription requests.
 - **Time-Travel Demo Clock:** Allows judges and testers to advance the virtual calendar to simulate spaced repetition due dates in real time.
 - **100% Localized (English & Arabic):** Full bilingual support with RTL awareness using `easy_localization`.
 - **End-to-End Monitoring:** Distributed error tracking powered by Sentry on both backend and frontend.
@@ -58,6 +82,19 @@ Reflex is deployed and running on **Serverpod Cloud**:
 | **Web App** | [https://reflex.serverpod.space/](https://reflex.serverpod.space/) | Deployed Flutter Web client |
 | **API Server** | [https://reflex.api.serverpod.space/](https://reflex.api.serverpod.space/) | Live Serverpod backend API |
 | **Insights** | [https://reflex.insights.serverpod.space/](https://reflex.insights.serverpod.space/) | Serverpod Insights dashboard |
+
+---
+
+## 🔑 Test Credentials
+
+Use these accounts to try the live app (email & password sign-in) against the deployed backend:
+
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| 👩‍🏫 **Teacher** | `ah3656056@gmail.com` | `12345678` |
+| 🎓 **Student** | `ahmedhassan.op9@gmail.com` | `12345678` |
+
+> On the role selection screen, choose **Teacher** or **Student** to match the account, then sign in with the credentials above.
 
 ---
 
