@@ -1,6 +1,7 @@
 import "dart:async";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:reflex_client/reflex_client.dart";
 import "package:sentry_flutter/sentry_flutter.dart";
 import "../../../../client.dart";
@@ -116,6 +117,7 @@ mixin PasswordResetMixin on State<AuthScreen> {
       try {
         final authSuccess = await client.emailIdp.login(email: email, password: newPassword);
         await authSessionManager?.updateSignedInUser(authSuccess);
+        TextInput.finishAutofillContext(shouldSave: true);
         if (!mounted) return;
         navigateToAppShell(role: selectedRole, userName: null);
       } catch (_) {

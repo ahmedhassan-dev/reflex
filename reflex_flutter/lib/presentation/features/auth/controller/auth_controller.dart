@@ -1,6 +1,7 @@
 import "dart:async";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:reflex_client/reflex_client.dart";
 import "package:sentry_flutter/sentry_flutter.dart";
 import "../../../../client.dart";
@@ -121,8 +122,10 @@ abstract class AuthController extends State<AuthScreen>
     try {
       final authSuccess = await client.emailIdp.login(email: email, password: password);
       await authSessionManager?.updateSignedInUser(authSuccess);
+      TextInput.finishAutofillContext(shouldSave: true);
       _navigateToAppShell(role: selectedRole, userName: null);
     } catch (e, st) {
+      TextInput.finishAutofillContext(shouldSave: false);
       debugPrint("[AuthController.signInWithEmail] error: $e\n$st");
       unawaited(Sentry.captureException(e, stackTrace: st));
       if (e.toString().contains("SignInWhileAuthenticatedException")) {

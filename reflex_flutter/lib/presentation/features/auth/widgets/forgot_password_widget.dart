@@ -138,47 +138,61 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
             ),
           ),
         ] else ...[
-          TextField(
-            key: const Key("input_reset_otp"),
-            controller: widget.otpController,
-            textAlign: TextAlign.center,
-            maxLength: 8,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 5),
-            decoration: InputDecoration(
-              counterText: "",
-              labelText: LocaleKeys.auth_otp_code_label.tr(),
-              hintText: LocaleKeys.auth_otp_code_hint.tr(),
-              prefixIcon: const Icon(Icons.security_rounded, size: 20),
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            key: const Key("input_new_password"),
-            controller: widget.newPasswordController,
-            obscureText: _obscureNewPassword,
-            decoration: InputDecoration(
-              labelText: LocaleKeys.auth_new_password_label.tr(),
-              hintText: LocaleKeys.auth_new_password_hint.tr(),
-              prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
-              suffixIcon: IconButton(
-                icon: Icon(_obscureNewPassword ? Icons.visibility_off : Icons.visibility, size: 20),
-                onPressed: () => setState(() => _obscureNewPassword = !_obscureNewPassword),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            key: const Key("input_confirm_password"),
-            controller: widget.confirmPasswordController,
-            obscureText: _obscureConfirmPassword,
-            decoration: InputDecoration(
-              labelText: LocaleKeys.auth_confirm_password_label.tr(),
-              hintText: LocaleKeys.auth_confirm_password_hint.tr(),
-              prefixIcon: const Icon(Icons.lock_reset_rounded, size: 20),
-              suffixIcon: IconButton(
-                icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility, size: 20),
-                onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
-              ),
+          AutofillGroup(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextField(
+                  key: const Key("input_reset_otp"),
+                  controller: widget.otpController,
+                  textAlign: TextAlign.center,
+                  maxLength: 8,
+                  autofillHints: const [AutofillHints.oneTimeCode],
+                  textInputAction: TextInputAction.next,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 5),
+                  decoration: InputDecoration(
+                    counterText: "",
+                    labelText: LocaleKeys.auth_otp_code_label.tr(),
+                    hintText: LocaleKeys.auth_otp_code_hint.tr(),
+                    prefixIcon: const Icon(Icons.security_rounded, size: 20),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  key: const Key("input_new_password"),
+                  controller: widget.newPasswordController,
+                  obscureText: _obscureNewPassword,
+                  autofillHints: const [AutofillHints.newPassword],
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                    labelText: LocaleKeys.auth_new_password_label.tr(),
+                    hintText: LocaleKeys.auth_new_password_hint.tr(),
+                    prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscureNewPassword ? Icons.visibility_off : Icons.visibility, size: 20),
+                      onPressed: () => setState(() => _obscureNewPassword = !_obscureNewPassword),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  key: const Key("input_confirm_password"),
+                  controller: widget.confirmPasswordController,
+                  obscureText: _obscureConfirmPassword,
+                  autofillHints: const [AutofillHints.newPassword],
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => widget.onSubmitPasswordReset(),
+                  decoration: InputDecoration(
+                    labelText: LocaleKeys.auth_confirm_password_label.tr(),
+                    hintText: LocaleKeys.auth_confirm_password_hint.tr(),
+                    prefixIcon: const Icon(Icons.lock_reset_rounded, size: 20),
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility, size: 20),
+                      onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 18),

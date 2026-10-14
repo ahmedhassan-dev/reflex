@@ -36,40 +36,48 @@ class SignUpFormWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        TextField(
-          key: const Key('input_signup_name'),
-          controller: nameController,
-          decoration: InputDecoration(
-            labelText: LocaleKeys.auth_name_label.tr(),
-            hintText: LocaleKeys.auth_name_hint.tr(),
-            prefixIcon: const Icon(Icons.badge_outlined, size: 20),
+    return AutofillGroup(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextField(
+            key: const Key('input_signup_name'),
+            controller: nameController,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.name],
+            decoration: InputDecoration(
+              labelText: LocaleKeys.auth_name_label.tr(),
+              hintText: LocaleKeys.auth_name_hint.tr(),
+              prefixIcon: const Icon(Icons.badge_outlined, size: 20),
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          key: const Key('input_signup_email'),
-          controller: emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: InputDecoration(
-            labelText: LocaleKeys.auth_email_label.tr(),
-            hintText: LocaleKeys.auth_email_hint.tr(),
-            prefixIcon: const Icon(Icons.email_outlined, size: 20),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('input_signup_email'),
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.email, AutofillHints.newUsername],
+            decoration: InputDecoration(
+              labelText: LocaleKeys.auth_email_label.tr(),
+              hintText: LocaleKeys.auth_email_hint.tr(),
+              prefixIcon: const Icon(Icons.email_outlined, size: 20),
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          key: const Key('input_signup_password'),
-          controller: passwordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: LocaleKeys.auth_password_label.tr(),
-            hintText: LocaleKeys.auth_password_hint.tr(),
-            prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('input_signup_password'),
+            controller: passwordController,
+            obscureText: true,
+            textInputAction: TextInputAction.done,
+            autofillHints: const [AutofillHints.newPassword],
+            onSubmitted: (_) => onSignUp(),
+            decoration: InputDecoration(
+              labelText: LocaleKeys.auth_password_label.tr(),
+              hintText: LocaleKeys.auth_password_hint.tr(),
+              prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
+            ),
           ),
-        ),
         const SizedBox(height: 14),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -158,7 +166,8 @@ class SignUpFormWidget extends StatelessWidget {
           onGoogleSignIn: onGoogleSignIn,
           onAppleSignIn: onAppleSignIn,
         ),
-      ],
+        ],
+      ),
     );
   }
 }

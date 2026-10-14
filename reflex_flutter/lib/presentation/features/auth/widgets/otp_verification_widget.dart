@@ -28,7 +28,8 @@ class OtpVerificationWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Column(
+    return AutofillGroup(
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
@@ -83,6 +84,9 @@ class OtpVerificationWidget extends StatelessWidget {
           key: const Key("input_otp_code"),
           controller: otpController,
           keyboardType: TextInputType.text,
+          textInputAction: TextInputAction.done,
+          autofillHints: const [AutofillHints.oneTimeCode],
+          onSubmitted: (_) => onVerify(),
           textAlign: TextAlign.center,
           maxLength: 8,
           autofocus: true,
@@ -152,6 +156,7 @@ class OtpVerificationWidget extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
+    ),
+  );
+}
 }

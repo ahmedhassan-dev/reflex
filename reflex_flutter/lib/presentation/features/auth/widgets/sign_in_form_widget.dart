@@ -30,83 +30,90 @@ class SignInFormWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        TextField(
-          key: const Key('input_signin_email'),
-          controller: emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: InputDecoration(
-            labelText: LocaleKeys.auth_email_label.tr(),
-            hintText: LocaleKeys.auth_email_hint.tr(),
-            prefixIcon: const Icon(Icons.email_outlined, size: 20),
+    return AutofillGroup(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextField(
+            key: const Key('input_signin_email'),
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.email, AutofillHints.username],
+            decoration: InputDecoration(
+              labelText: LocaleKeys.auth_email_label.tr(),
+              hintText: LocaleKeys.auth_email_hint.tr(),
+              prefixIcon: const Icon(Icons.email_outlined, size: 20),
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          key: const Key('input_signin_password'),
-          controller: passwordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: LocaleKeys.auth_password_label.tr(),
-            hintText: LocaleKeys.auth_password_hint.tr(),
-            prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('input_signin_password'),
+            controller: passwordController,
+            obscureText: true,
+            textInputAction: TextInputAction.done,
+            autofillHints: const [AutofillHints.password],
+            onSubmitted: (_) => onSignIn(),
+            decoration: InputDecoration(
+              labelText: LocaleKeys.auth_password_label.tr(),
+              hintText: LocaleKeys.auth_password_hint.tr(),
+              prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
+            ),
           ),
-        ),
-        if (onForgotPassword != null)
-          Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: TextButton(
-              key: const Key('btn_forgot_password'),
-              onPressed: onForgotPassword,
-              child: Text(
-                LocaleKeys.auth_forgot_password.tr(),
-                style: TextStyle(
-                  color: roleColor,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+          if (onForgotPassword != null)
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: TextButton(
+                key: const Key('btn_forgot_password'),
+                onPressed: onForgotPassword,
+                child: Text(
+                  LocaleKeys.auth_forgot_password.tr(),
+                  style: TextStyle(
+                    color: roleColor,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
-          ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 50,
-          child: ElevatedButton.icon(
-            key: const Key('btn_submit_signin'),
-            icon: isLoading
-                ? const SizedBox.shrink()
-                : const Icon(Icons.login_rounded),
-            label: isLoading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: Colors.white,
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 50,
+            child: ElevatedButton.icon(
+              key: const Key('btn_submit_signin'),
+              icon: isLoading
+                  ? const SizedBox.shrink()
+                  : const Icon(Icons.login_rounded),
+              label: isLoading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      selectedRole == Role.student
+                          ? LocaleKeys.auth_continue_as_student.tr()
+                          : LocaleKeys.auth_continue_as_teacher.tr(),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                     ),
-                  )
-                : Text(
-                    selectedRole == Role.student
-                        ? LocaleKeys.auth_continue_as_student.tr()
-                        : LocaleKeys.auth_continue_as_teacher.tr(),
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: roleColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: roleColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: isLoading ? null : onSignIn,
             ),
-            onPressed: isLoading ? null : onSignIn,
           ),
-        ),
-        const SizedBox(height: 16),
-        OAuthButtonsWidget(
-          onGoogleSignIn: onGoogleSignIn,
-          onAppleSignIn: onAppleSignIn,
-        ),
-      ],
+          const SizedBox(height: 16),
+          OAuthButtonsWidget(
+            onGoogleSignIn: onGoogleSignIn,
+            onAppleSignIn: onAppleSignIn,
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import "dart:async";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:reflex_client/reflex_client.dart";
 import "package:sentry_flutter/sentry_flutter.dart";
 import "../../../../client.dart";
@@ -116,6 +117,7 @@ mixin EmailRegistrationMixin on State<AuthScreen> {
         password: passwordController.text,
       );
       await authSessionManager?.updateSignedInUser(authSuccess);
+      TextInput.finishAutofillContext(shouldSave: true);
       final fullName = nameController.text.trim();
       if (fullName.isNotEmpty) {
         try {

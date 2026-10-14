@@ -13,7 +13,7 @@ dependencies:
   serverpod_auth_core_server: 4.0.4
   serverpod_auth_idp_server: 4.0.4
   serverpod_cloud_storage: 4.0.4
-  sentry: ^9.30.1
+  sentry: ^10.0.0
 
 dev_dependencies:
   lints: '>=3.0.0 <7.0.0'
