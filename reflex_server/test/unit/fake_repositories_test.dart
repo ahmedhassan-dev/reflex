@@ -133,6 +133,67 @@ void main() {
       expect(fetched?.lastServedAt, equals(now));
     });
 
+    test('Fake repositories support deletion and unassignment for account removal', () async {
+      final learnerRepo = FakeLearnerRepository();
+      final courseRepo = FakeCourseRepository();
+      final subRepo = FakeCourseSubscriptionRepository();
+      final attemptRepo = FakeAttemptRepository();
+      final reviewRepo = FakeReviewStateRepository();
+
+      final learner = await learnerRepo.save(Learner(
+        authUserId: UuidValue.fromString('00000000-0000-4000-8000-000000000099'),
+        displayName: 'DeleteMe',
+        role: Role.student,
+      ));
+      final learnerId = learner.id!;
+
+      final course = await courseRepo.save(Course(
+        title: 'Owned Course',
+        subject: 'Math',
+        teacherId: learnerId,
+      ));
+      await subRepo.save(CourseSubscription(
+        courseId: course.id!,
+        studentId: learnerId,
+        status: SubscriptionStatus.accepted,
+        requestedAt: DateTime.utc(2026, 10, 10),
+      ));
+      await attemptRepo.insert(Attempt(
+        learnerId: learnerId,
+        questionId: 1,
+        status: AttemptStatus.valid,
+        responseMs: 1000,
+        usedHelp: false,
+        isFirstAttempt: true,
+        underExpectedTime: true,
+        isClean: true,
+        reflexTier: ReflexTier.greenMastered,
+        createdAt: DateTime.utc(2026, 10, 10),
+      ));
+      await reviewRepo.upsert(ReviewState(
+        learnerId: learnerId,
+        questionId: 1,
+        dueAt: DateTime.utc(2026, 10, 10),
+        intervalDays: 1,
+        lapses: 0,
+        helpUsed: false,
+      ));
+
+      // Execute cleanups
+      await attemptRepo.deleteByLearnerId(learnerId);
+      await reviewRepo.deleteByLearnerId(learnerId);
+      await subRepo.deleteByStudentId(learnerId);
+      await courseRepo.unassignTeacher(learnerId);
+      await learnerRepo.delete(learner);
+
+      expect(await attemptRepo.listAttemptsByLearner(learnerId), isEmpty);
+      expect(await reviewRepo.listByLearner(learnerId), isEmpty);
+      expect(await subRepo.listByStudent(learnerId), isEmpty);
+      final updatedCourse = await courseRepo.findById(course.id!);
+      expect(updatedCourse?.teacherId, isNull);
+      expect(await learnerRepo.findById(learnerId), isNull);
+    });
+
     test('FakeDemoClockRepository sets and retrieves offsetDays', () async {
       final repo = FakeDemoClockRepository();
       expect(await repo.getOffsetDays(), equals(0));

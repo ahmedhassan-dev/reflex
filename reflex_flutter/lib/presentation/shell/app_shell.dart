@@ -86,6 +86,13 @@ class _AppShellState extends State<AppShell> {
     );
   }
 
+  Future<void> _handleDeleteAccount() async {
+    await deleteCurrentUserAccount();
+    if (mounted) {
+      _switchToAuthScreen();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isStudent = _currentRole == Role.student;
@@ -151,6 +158,7 @@ class _AppShellState extends State<AppShell> {
               showTimeMachine: _showTimeMachine,
               onToggleTimeMachine: (val) => setState(() => _showTimeMachine = val),
               onSignOut: _switchToAuthScreen,
+              onDeleteAccount: _handleDeleteAccount,
             )
           : null,
       appBar: AppBar(

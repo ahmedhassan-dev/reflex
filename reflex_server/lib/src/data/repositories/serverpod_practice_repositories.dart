@@ -35,6 +35,11 @@ class ServerpodLearnerRepository implements ILearnerRepository {
   Future<List<Learner>> listAll() async {
     return Learner.db.find(session, transaction: transaction);
   }
+
+  @override
+  Future<void> delete(Learner learner) async {
+    await Learner.db.deleteRow(session, learner, transaction: transaction);
+  }
 }
 
 /// Serverpod ORM implementation of [IAttemptRepository].
@@ -47,6 +52,15 @@ class ServerpodAttemptRepository implements IAttemptRepository {
   @override
   Future<Attempt> insert(Attempt attempt) async {
     return Attempt.db.insertRow(session, attempt, transaction: transaction);
+  }
+
+  @override
+  Future<void> deleteByLearnerId(int learnerId) async {
+    await Attempt.db.deleteWhere(
+      session,
+      where: (t) => t.learnerId.equals(learnerId),
+      transaction: transaction,
+    );
   }
 
   @override
@@ -175,6 +189,15 @@ class ServerpodReviewStateRepository implements IReviewStateRepository {
         transaction: transaction,
       );
     }
+  }
+
+  @override
+  Future<void> deleteByLearnerId(int learnerId) async {
+    await ReviewState.db.deleteWhere(
+      session,
+      where: (t) => t.learnerId.equals(learnerId),
+      transaction: transaction,
+    );
   }
 }
 

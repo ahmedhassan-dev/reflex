@@ -65,6 +65,20 @@ Future<void> signOutDemo() async {
   }
 }
 
+/// Permanently deletes the authenticated user's account and all associated data,
+/// then clears active auth tokens.
+Future<void> deleteCurrentUserAccount() async {
+  if (isUserAuthenticated && !isDemoUserActive) {
+    try {
+      await client.userProfile.deleteAccount();
+    } catch (e) {
+      debugPrint('[UserProfile] Error deleting account: $e');
+      rethrow;
+    }
+  }
+  await signOutDemo();
+}
+
 /// Fetches profile information (full name and public image URL) for the active authenticated user.
 Future<({String? name, String? imageUrl})> fetchCurrentUserProfile() async {
   if (isDemoUserActive || !isUserAuthenticated) {

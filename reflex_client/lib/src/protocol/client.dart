@@ -357,6 +357,13 @@ class EndpointUserProfile extends _iacc.EndpointUserProfileEditBase {
   @override
   String get name => 'userProfile';
 
+  /// Permanently deletes the authenticated user's account and associated data.
+  _ida.Future<bool> deleteAccount() => caller.callServerEndpoint<bool>(
+    'userProfile',
+    'deleteAccount',
+    {},
+  );
+
   /// Removes the user's uploaded image, setting it to null.
   ///
   /// The client should handle displaying a placeholder for users without images.

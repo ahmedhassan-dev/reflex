@@ -7,6 +7,7 @@ abstract interface class ILearnerRepository {
   Future<Learner?> findById(int id);
   Future<Learner?> findByAuthUserId(UuidValue authUserId);
   Future<Learner> save(Learner learner);
+  Future<void> delete(Learner learner);
   Future<List<Learner>> listAll();
 }
 
@@ -16,6 +17,7 @@ abstract interface class ICourseRepository {
   Future<List<Course>> listAll();
   Future<List<Course>> listByTeacher(int teacherId);
   Future<Course> save(Course course);
+  Future<void> unassignTeacher(int teacherId);
 }
 
 /// Repository interface for CourseSubscription entities.
@@ -25,6 +27,7 @@ abstract interface class ICourseSubscriptionRepository {
   Future<List<CourseSubscription>> listByStudent(int studentId);
   Future<CourseSubscription?> findById(int id);
   Future<CourseSubscription> save(CourseSubscription subscription);
+  Future<void> deleteByStudentId(int studentId);
 }
 
 /// Repository interface for Question entities and atomic counter operations.
@@ -58,6 +61,7 @@ abstract interface class IAttemptRepository {
   Future<bool> hasLearnerSolvedQuestion(int learnerId, int questionId);
   Future<List<Attempt>> listAttemptsByLearner(int learnerId);
   Future<List<Attempt>> listAttemptsForCourse(int courseId);
+  Future<void> deleteByLearnerId(int learnerId);
 }
 
 /// Repository interface for spaced repetition ReviewState entities.
@@ -71,6 +75,7 @@ abstract interface class IReviewStateRepository {
   });
   Future<List<ReviewState>> listByLearner(int learnerId);
   Future<void> markServed(int learnerId, int questionId, DateTime servedAt);
+  Future<void> deleteByLearnerId(int learnerId);
 }
 
 /// Repository interface for persisting DemoClock offset days.

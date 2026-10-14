@@ -416,6 +416,17 @@ class Endpoints extends _is.EndpointDispatch {
       name: 'userProfile',
       endpoint: endpoints['userProfile']!,
       methodConnectors: {
+        'deleteAccount': _is.MethodConnector(
+          name: 'deleteAccount',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
+                      .deleteAccount(session),
+        ),
         'removeUserImage': _is.MethodConnector(
           name: 'removeUserImage',
           params: {},

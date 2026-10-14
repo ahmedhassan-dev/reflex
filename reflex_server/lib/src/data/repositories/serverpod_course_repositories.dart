@@ -64,6 +64,19 @@ class ServerpodCourseRepository implements ICourseRepository {
     }
     return Course.db.insertRow(session, course, transaction: transaction);
   }
+
+  @override
+  Future<void> unassignTeacher(int teacherId) async {
+    final courses = await Course.db.find(
+      session,
+      where: (t) => t.teacherId.equals(teacherId),
+      transaction: transaction,
+    );
+    for (final course in courses) {
+      course.teacherId = null;
+      await Course.db.updateRow(session, course, transaction: transaction);
+    }
+  }
 }
 
 /// Serverpod ORM implementation of [ICourseSubscriptionRepository].
@@ -117,5 +130,14 @@ class ServerpodCourseSubscriptionRepository
     }
     return CourseSubscription.db
           .insertRow(session, subscription, transaction: transaction);
+  }
+
+  @override
+  Future<void> deleteByStudentId(int studentId) async {
+    await CourseSubscription.db.deleteWhere(
+      session,
+      where: (t) => t.studentId.equals(studentId),
+      transaction: transaction,
+    );
   }
 }

@@ -247,6 +247,45 @@ class CodegenLoader extends AssetLoader{
     "google_unconfigured": "Google Sign-In is not configured for this domain.",
     "google_signin_failed": "Google Sign-In failed to authenticate.",
     "registration_failed": "Registration failed. Please check your details and try again."
+  },
+  "drawer": {
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service",
+    "delete_account": "Delete Account",
+    "delete_account_dialog_title": "Delete Account?",
+    "delete_account_dialog_desc": "Are you sure you want to permanently delete your Reflex account? This action cannot be undone. All your progress, flashcards, attempts, reviews, and profile data will be permanently erased.",
+    "delete_account_confirm": "Delete My Account",
+    "delete_account_cancelling": "Deleting...",
+    "delete_account_success": "Your account and data have been permanently deleted.",
+    "delete_account_error": "Failed to delete account. Please try again later.",
+    "cancel": "Cancel",
+    "app_version": "Reflex v1.0.0",
+    "production_ready": "Production Build",
+    "about_title": "About Reflex",
+    "copyright": "© 2026 Reflex Platform. All rights reserved."
+  },
+  "legal": {
+    "privacy_policy_title": "Privacy Policy",
+    "terms_title": "Terms of Service",
+    "close": "Close",
+    "last_updated": "Last updated: October 2026",
+    "privacy_intro": "Reflex is committed to safeguarding your privacy and ensuring transparency regarding how your data is handled.",
+    "privacy_section1_title": "1. Information We Collect",
+    "privacy_section1_body": "We collect information you provide directly, including your name, email address, profile picture (if uploaded), and study preferences. When practicing flashcards, we record your response latency, answers, and spaced repetition intervals to adaptively schedule reviews.",
+    "privacy_section2_title": "2. Authentication & Third Parties",
+    "privacy_section2_body": "If you sign in using Google or Apple, we receive your verified identifier and email address in accordance with their privacy policies. We never share your learning history or personal credentials with advertisers.",
+    "privacy_section3_title": "3. Data Retention & Deletion",
+    "privacy_section3_body": "You have full ownership of your data. You may permanently delete your account and all associated attempts, review schedules, and profile images at any time directly within the app under Settings > Delete Account.",
+    "privacy_section4_title": "4. Security & Compliance",
+    "privacy_section4_body": "All network communication is encrypted using TLS/HTTPS. Passwords and session tokens are hashed and secured in compliance with standard mobile data safety standards (Google Play & Apple App Store guidelines).",
+    "terms_section1_title": "1. Acceptance of Terms",
+    "terms_section1_body": "By accessing or using Reflex, you agree to be bound by these Terms of Service and all applicable laws and regulations.",
+    "terms_section2_title": "2. Learning Content & Fair Use",
+    "terms_section2_body": "All educational flashcards, concepts, and teacher notes provided on Reflex are for individual learning or approved classroom study. Automated scraping or reverse engineering is prohibited.",
+    "terms_section3_title": "3. User Conduct",
+    "terms_section3_body": "Users must not upload abusive content, attempt unauthorized server access, or compromise the learning platform for other students.",
+    "terms_section4_title": "4. Termination",
+    "terms_section4_body": "You may terminate your account at any time. We reserve the right to suspend accounts that violate educational integrity or community guidelines."
   }
 };
 static const Map<String,dynamic> _ar = {
@@ -482,6 +521,45 @@ static const Map<String,dynamic> _ar = {
     "google_unconfigured": "تسجيل الدخول عبر Google غير مهيأ لهذا النطاق.",
     "google_signin_failed": "تعذر تسجيل الدخول عبر Google.",
     "registration_failed": "فشل إنشاء الحساب. تحقق من البيانات وحاول مجدداً."
+  },
+  "drawer": {
+    "privacy_policy": "سياسة الخصوصية",
+    "terms_of_service": "شروط الخدمة",
+    "delete_account": "حذف الحساب",
+    "delete_account_dialog_title": "حذف الحساب نهائياً؟",
+    "delete_account_dialog_desc": "هل أنت متأكد من رغبتك في حذف حسابك على ريفلكس نهائياً؟ هذا الإجراء لا يمكن التراجع عنه، وسيتم مسح جميع بياناتك وتقدمك التعليمي ومحاولاتك وصورك الشخصية بشكل دائم.",
+    "delete_account_confirm": "حذف حسابي نهائياً",
+    "delete_account_cancelling": "جارٍ الحذف...",
+    "delete_account_success": "تم حذف حسابك وجميع بياناتك بنجاح.",
+    "delete_account_error": "فشل حذف الحساب. يرجى المحاولة مرة أخرى لاحقاً.",
+    "cancel": "إلغاء",
+    "app_version": "ريفلكس v1.0.0",
+    "production_ready": "إصدار الإنتاج الرسمي",
+    "about_title": "عن ريفلكس",
+    "copyright": "© 2026 منصة ريفلكس. جميع الحقوق محفوظة."
+  },
+  "legal": {
+    "privacy_policy_title": "سياسة الخصوصية",
+    "terms_title": "شروط الخدمة",
+    "close": "إغلاق",
+    "last_updated": "آخر تحديث: أكتوبر 2026",
+    "privacy_intro": "تلتزم منصة ريفلكس بحماية خصوصيتك وضمان الشفافية الكاملة بشأن كيفية التعامل مع بياناتك التعليمية.",
+    "privacy_section1_title": "1. البيانات التي نجمعها",
+    "privacy_section1_body": "نجمع المعلومات التي تقدمها مباشرة عند التسجيل (مثل الاسم، البريد الإلكتروني، وصورة الملف الشخصي إن وجدت). وأثناء المذاكرة، نسجل زمن استجابتك ودقة إجاباتك وفترات التكرار المتباعد لجدولة المراجعة بدقة.",
+    "privacy_section2_title": "2. تسجيل الدخول والجهات الخارجية",
+    "privacy_section2_body": "عند تسجيل الدخول عبر Google أو Apple، نتلقى معرّفك وبريدك المعتمد وفقاً لسياسات الخصوصية الخاصة بهم. نحن لا نشارك سجل تعلمك أو بياناتك مع أي معلنين أو أطراف خارجية.",
+    "privacy_section3_title": "3. الاحتفاظ بالبيانات وحذفها",
+    "privacy_section3_body": "أنت المالك الوحيد لبياناتك. يحق لك في أي وقت حذف حسابك ومسح كافة محاولاتك وجداول مراجعاتك وصورك نهائياً وفورياً من داخل التطبيق عبر خيار (حذف الحساب).",
+    "privacy_section4_title": "4. الأمان والامتثال",
+    "privacy_section4_body": "جميع الاتصالات مشفرة ببروتوكول TLS/HTTPS. وكلمات المرور والرموز مشفرة ومحمية وفق أعلى معايير أمان البيانات المعتمدة في متجري Google Play و Apple App Store.",
+    "terms_section1_title": "1. قبول الشروط",
+    "terms_section1_body": "باستخدامك لمنصة ريفلكس، فإنك توافق على الالتزام بشروط الخدمة هذه وجميع القوانين والأنظمة المعمول بها.",
+    "terms_section2_title": "2. المحتوى التعليمي وحقوق الاستخدام",
+    "terms_section2_body": "جميع البطاقات التعليمية والمفاهيم وشروحات المعلمين على ريفلكس مخصصة للتعلم الفردي أو الفصول المعتمدة. يُحظر الاستخراج الآلي أو التعدي البرمجي.",
+    "terms_section3_title": "3. سلوك المستخدم",
+    "terms_section3_body": "يجب على المستخدمين عدم رفع أي محتوى مسيء، أو محاولة الوصول غير المصرح به للخوادم، أو تعطيل تجربة التعلم لزملائهم.",
+    "terms_section4_title": "4. إنهاء الحساب",
+    "terms_section4_body": "يمكنك إنهاء وحذف حسابك في أي وقت. ونحتفظ بحق تعليق أي حساب يخالف النزاهة التعليمية أو سياسات المنصة."
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": _en, "ar": _ar};
