@@ -166,6 +166,10 @@ void main() {
       await tester.enterText(find.byKey(const Key("input_signup_password")), "securePassword123");
       await tester.pumpAndSettle();
 
+      // Accept privacy policy
+      await tester.tap(find.byKey(const Key("checkbox_privacy_policy")));
+      await tester.pumpAndSettle();
+
       // Tap submit sign up
       await tester.ensureVisible(submitBtn);
       await tester.tap(submitBtn);

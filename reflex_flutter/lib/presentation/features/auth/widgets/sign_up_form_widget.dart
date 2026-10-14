@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../../shell/widgets/legal_doc_dialog.dart';
 import 'oauth_buttons_widget.dart';
 
 class SignUpFormWidget extends StatelessWidget {
@@ -11,6 +13,8 @@ class SignUpFormWidget extends StatelessWidget {
   final Role selectedRole;
   final Color roleColor;
   final bool isLoading;
+  final bool acceptedPrivacyPolicy;
+  final ValueChanged<bool?> onPrivacyPolicyChanged;
   final VoidCallback onSignUp;
   final VoidCallback onGoogleSignIn;
   final VoidCallback onAppleSignIn;
@@ -23,6 +27,8 @@ class SignUpFormWidget extends StatelessWidget {
     required this.selectedRole,
     required this.roleColor,
     this.isLoading = false,
+    this.acceptedPrivacyPolicy = false,
+    required this.onPrivacyPolicyChanged,
     required this.onSignUp,
     required this.onGoogleSignIn,
     required this.onAppleSignIn,
@@ -64,7 +70,61 @@ class SignUpFormWidget extends StatelessWidget {
             prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
           ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 14),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 24,
+              width: 24,
+              child: Checkbox(
+                key: const Key('checkbox_privacy_policy'),
+                value: acceptedPrivacyPolicy,
+                activeColor: roleColor,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                onChanged: isLoading ? null : onPrivacyPolicyChanged,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text.rich(
+                TextSpan(
+                  text: LocaleKeys.auth_agree_to_terms_prefix.tr(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                  ),
+                  children: [
+                    TextSpan(
+                      text: LocaleKeys.auth_terms_of_service_link.tr(),
+                      style: TextStyle(
+                        color: roleColor,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () => LegalDocDialog.show(context, LegalDocType.termsOfService),
+                    ),
+                    TextSpan(
+                      text: LocaleKeys.auth_and_conjunction.tr(),
+                    ),
+                    TextSpan(
+                      text: LocaleKeys.auth_privacy_policy_link.tr(),
+                      style: TextStyle(
+                        color: roleColor,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () => LegalDocDialog.show(context, LegalDocType.privacyPolicy),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
         SizedBox(
           height: 50,
           child: ElevatedButton.icon(

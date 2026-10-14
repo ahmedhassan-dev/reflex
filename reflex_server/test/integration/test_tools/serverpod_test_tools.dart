@@ -780,6 +780,37 @@ class _UserProfileEndpoint {
 
   final _is.SerializationManager _serializationManager;
 
+  _ida.Future<bool> updateFcmToken(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required String fcmToken,
+  }) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'userProfile',
+            method: 'updateFcmToken',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'userProfile',
+          methodName: 'updateFcmToken',
+          parameters: _ist.testObjectToJson({'fcmToken': fcmToken}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _ida.Future<bool> deleteAccount(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {

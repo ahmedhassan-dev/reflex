@@ -355,6 +355,14 @@ class EndpointUserProfile extends _iacc.EndpointUserProfileEditBase {
   @override
   String get name => 'userProfile';
 
+  /// Updates the FCM device token for the authenticated user.
+  _ida.Future<bool> updateFcmToken({required String fcmToken}) =>
+      caller.callServerEndpoint<bool>(
+        'userProfile',
+        'updateFcmToken',
+        {'fcmToken': fcmToken},
+      );
+
   /// Permanently deletes the authenticated user's account and associated data.
   _ida.Future<bool> deleteAccount() => caller.callServerEndpoint<bool>(
     'userProfile',

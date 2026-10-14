@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart';
+import 'package:reflex_server/src/core/di/app_container.dart';
 import 'package:reflex_server/src/core/errors/exceptions.dart';
 import 'package:reflex_server/src/data/repositories/serverpod_course_repositories.dart';
 import 'package:reflex_server/src/data/repositories/serverpod_practice_repositories.dart';
@@ -13,6 +14,24 @@ class UserProfileEndpoint extends UserProfileEditBaseEndpoint {
 
   UserProfileEndpoint({AccountDeletionService? accountDeletionService})
       : _accountDeletionService = accountDeletionService;
+
+  /// Updates the FCM device token for the authenticated user.
+  Future<bool> updateFcmToken(Session session, {required String fcmToken}) async {
+    final authInfo = session.authenticated;
+    if (authInfo == null) {
+      throw const UnauthorizedException('Authentication required.');
+    }
+    final authUserId = UuidValue.fromString(authInfo.userIdentifier);
+    final repo = ServerpodLearnerRepository(session);
+    var learner = await repo.findByAuthUserId(authUserId);
+    if (learner == null) {
+      final container = AppContainer(session);
+      learner = await container.resolveCurrentLearner();
+    }
+    learner.fcmToken = fcmToken;
+    await repo.save(learner);
+    return true;
+  }
 
   /// Permanently deletes the authenticated user's account and associated data.
   Future<bool> deleteAccount(Session session) async {

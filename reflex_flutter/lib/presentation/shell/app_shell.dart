@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:reflex_client/reflex_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import '../../client.dart';
+import '../../core/services/firebase_messaging_service.dart';
 import '../../generated/locale_keys.g.dart';
 import '../core/theme/app_colors.dart';
 import '../core/widgets/reflex_logo.dart';
@@ -59,6 +60,9 @@ class _AppShellState extends State<AppShell> {
         if (profile.name != null) _userName = profile.name;
         if (profile.imageUrl != null) _userImageUrl = profile.imageUrl;
       });
+    }
+    if (client.auth.isAuthenticated && !isDemoUserActive) {
+      unawaited(FirebaseMessagingService.syncWithServer());
     }
   }
 

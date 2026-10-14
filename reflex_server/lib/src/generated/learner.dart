@@ -20,6 +20,7 @@ abstract class Learner
     required this.authUserId,
     required this.displayName,
     required this.role,
+    this.fcmToken,
   });
 
   factory Learner({
@@ -27,6 +28,7 @@ abstract class Learner
     required _is.UuidValue authUserId,
     required String displayName,
     required _iu4tij3a.Role role,
+    String? fcmToken,
   }) = _LearnerImpl;
 
   factory Learner.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -37,6 +39,7 @@ abstract class Learner
       ),
       displayName: jsonSerialization['displayName'] as String,
       role: _iu4tij3a.Role.fromJson((jsonSerialization['role'] as String)),
+      fcmToken: jsonSerialization['fcmToken'] as String?,
     );
   }
 
@@ -53,6 +56,8 @@ abstract class Learner
 
   _iu4tij3a.Role role;
 
+  String? fcmToken;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -64,6 +69,7 @@ abstract class Learner
     _is.UuidValue? authUserId,
     String? displayName,
     _iu4tij3a.Role? role,
+    String? fcmToken,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -73,6 +79,7 @@ abstract class Learner
       'authUserId': authUserId.toJson(),
       'displayName': displayName,
       'role': role.toJson(),
+      if (fcmToken != null) 'fcmToken': fcmToken,
     };
   }
 
@@ -84,6 +91,7 @@ abstract class Learner
       'authUserId': authUserId.toJson(),
       'displayName': displayName,
       'role': role.toJson(),
+      if (fcmToken != null) 'fcmToken': fcmToken,
     };
   }
 
@@ -123,11 +131,13 @@ class _LearnerImpl extends Learner {
     required _is.UuidValue authUserId,
     required String displayName,
     required _iu4tij3a.Role role,
+    String? fcmToken,
   }) : super._(
          id: id,
          authUserId: authUserId,
          displayName: displayName,
          role: role,
+         fcmToken: fcmToken,
        );
 
   /// Returns a shallow copy of this [Learner]
@@ -139,12 +149,14 @@ class _LearnerImpl extends Learner {
     _is.UuidValue? authUserId,
     String? displayName,
     _iu4tij3a.Role? role,
+    Object? fcmToken = _Undefined,
   }) {
     return Learner(
       id: id is int? ? id : this.id,
       authUserId: authUserId ?? this.authUserId,
       displayName: displayName ?? this.displayName,
       role: role ?? this.role,
+      fcmToken: fcmToken is String? ? fcmToken : this.fcmToken,
     );
   }
 }
@@ -169,6 +181,11 @@ class LearnerUpdateTable extends _is.UpdateTable<LearnerTable> {
         table.role,
         value,
       );
+
+  _is.ColumnValue<String, String> fcmToken(String? value) => _is.ColumnValue(
+    table.fcmToken,
+    value,
+  );
 }
 
 class LearnerTable extends _is.Table<int?> {
@@ -187,6 +204,10 @@ class LearnerTable extends _is.Table<int?> {
       this,
       _is.EnumSerialization.byName,
     );
+    fcmToken = _is.ColumnString(
+      'fcmToken',
+      this,
+    );
   }
 
   late final LearnerUpdateTable updateTable;
@@ -197,12 +218,15 @@ class LearnerTable extends _is.Table<int?> {
 
   late final _is.ColumnEnum<_iu4tij3a.Role> role;
 
+  late final _is.ColumnString fcmToken;
+
   @override
   List<_is.Column> get columns => [
     id,
     authUserId,
     displayName,
     role,
+    fcmToken,
   ];
 }
 

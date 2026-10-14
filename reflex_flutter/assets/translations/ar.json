@@ -256,7 +256,12 @@
     "passwords_do_not_match": "كلمتا المرور غير متطابقتين.",
     "submit_password_reset": "إعادة التعيين والدخول",
     "password_reset_success": "تم تغيير كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.",
-    "back_to_signin": "العودة لتسجيل الدخول"
+    "back_to_signin": "العودة لتسجيل الدخول",
+    "agree_to_terms_prefix": "أوافق على ",
+    "terms_of_service_link": "شروط الخدمة",
+    "and_conjunction": " و ",
+    "privacy_policy_link": "سياسة الخصوصية",
+    "must_accept_privacy_policy": "يرجى الموافقة على شروط الخدمة وسياسة الخصوصية للمتابعة."
   },
   "drawer": {
     "privacy_policy": "سياسة الخصوصية",

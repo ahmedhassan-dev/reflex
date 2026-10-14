@@ -435,6 +435,26 @@ class Endpoints extends _is.EndpointDispatch {
       name: 'userProfile',
       endpoint: endpoints['userProfile']!,
       methodConnectors: {
+        'updateFcmToken': _is.MethodConnector(
+          name: 'updateFcmToken',
+          params: {
+            'fcmToken': _is.ParameterDescription(
+              name: 'fcmToken',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['userProfile'] as _ixcbvcae.UserProfileEndpoint)
+                      .updateFcmToken(
+                        session,
+                        fcmToken: params['fcmToken'],
+                      ),
+        ),
         'deleteAccount': _is.MethodConnector(
           name: 'deleteAccount',
           params: {},

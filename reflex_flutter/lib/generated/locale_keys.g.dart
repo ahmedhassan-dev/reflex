@@ -252,6 +252,11 @@ abstract class  LocaleKeys {
   static const auth_submit_password_reset = 'auth.submit_password_reset';
   static const auth_password_reset_success = 'auth.password_reset_success';
   static const auth_back_to_signin = 'auth.back_to_signin';
+  static const auth_agree_to_terms_prefix = 'auth.agree_to_terms_prefix';
+  static const auth_terms_of_service_link = 'auth.terms_of_service_link';
+  static const auth_and_conjunction = 'auth.and_conjunction';
+  static const auth_privacy_policy_link = 'auth.privacy_policy_link';
+  static const auth_must_accept_privacy_policy = 'auth.must_accept_privacy_policy';
   static const auth = 'auth';
   static const drawer_privacy_policy = 'drawer.privacy_policy';
   static const drawer_terms_of_service = 'drawer.terms_of_service';

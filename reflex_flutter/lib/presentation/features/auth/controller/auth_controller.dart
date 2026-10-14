@@ -4,6 +4,7 @@ import "package:flutter/material.dart";
 import "package:reflex_client/reflex_client.dart";
 import "package:sentry_flutter/sentry_flutter.dart";
 import "../../../../client.dart";
+import "../../../../core/services/firebase_messaging_service.dart";
 import "../../../../core/storage/role_preferences.dart";
 import "../../../../generated/locale_keys.g.dart";
 import "../../../shell/app_shell.dart";
@@ -31,6 +32,8 @@ abstract class AuthController extends State<AuthScreen>
   bool isLoading = false;
   @override
   String? errorMessage;
+  @override
+  bool acceptedPrivacyPolicy = false;
 
   @override
   AuthViewMode authViewMode = AuthViewMode.tabs;
@@ -40,6 +43,14 @@ abstract class AuthController extends State<AuthScreen>
   UuidValue? passwordResetRequestId;
   @override
   bool isResetCodeSent = false;
+
+  Future<void> signUpWithGoogle() async {
+    if (!acceptedPrivacyPolicy) {
+      setState(() => errorMessage = LocaleKeys.auth_must_accept_privacy_policy.tr());
+      return;
+    }
+    await signInWithGoogle();
+  }
 
   @override
   final emailController = TextEditingController();
@@ -157,6 +168,7 @@ abstract class AuthController extends State<AuthScreen>
   void _navigateToAppShell({required Role role, String? userName}) {
     if (!mounted) return;
     RolePreferences.saveRole(role);
+    unawaited(FirebaseMessagingService.syncWithServer());
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => AppShell(initialRole: role, userName: userName),

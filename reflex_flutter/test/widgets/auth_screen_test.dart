@@ -219,5 +219,49 @@ void main() {
       expect(find.text('تسجيل الدخول عبر Apple'), findsNothing);
       expect(find.text('تبديل الدور'), findsWidgets);
     });
+
+    testWidgets('switching to Sign Up tab shows privacy checkbox and blocks signup without acceptance', (tester) async {
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: const AuthScreen(initialRole: Role.student),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Switch to Sign Up tab
+      final signUpTab = find.text(LocaleKeys.auth_tab_signup.tr());
+      await tester.ensureVisible(signUpTab);
+      await tester.tap(signUpTab);
+      await tester.pumpAndSettle();
+
+      // Privacy policy checkbox is visible and unchecked
+      final checkboxFinder = find.byKey(const Key('checkbox_privacy_policy'));
+      expect(checkboxFinder, findsOneWidget);
+      final checkbox = tester.widget<Checkbox>(checkboxFinder);
+      expect(checkbox.value, isFalse);
+
+      // Enter email and password
+      await tester.enterText(find.byKey(const Key('input_signup_email')), 'newuser@example.com');
+      await tester.enterText(find.byKey(const Key('input_signup_password')), 'password123');
+      await tester.pumpAndSettle();
+
+      // Attempt to submit signup without checking
+      await tester.tap(find.byKey(const Key('btn_submit_signup')));
+      await tester.pumpAndSettle();
+
+      // Error banner shows acceptance warning
+      expect(find.text(LocaleKeys.auth_must_accept_privacy_policy.tr()), findsOneWidget);
+
+      // Tapping Google sign in on Sign Up tab also blocked without acceptance
+      await tester.tap(find.byKey(const Key('btn_google_signin')));
+      await tester.pumpAndSettle();
+      expect(find.text(LocaleKeys.auth_must_accept_privacy_policy.tr()), findsOneWidget);
+
+      // Tapping checkbox checks it
+      await tester.tap(checkboxFinder);
+      await tester.pumpAndSettle();
+      final updatedCheckbox = tester.widget<Checkbox>(checkboxFinder);
+      expect(updatedCheckbox.value, isTrue);
+    });
   });
 }

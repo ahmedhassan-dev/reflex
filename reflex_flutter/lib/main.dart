@@ -2,8 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'client.dart';
+import 'core/services/firebase_messaging_service.dart';
 import 'core/storage/role_preferences.dart';
+import 'firebase_options.dart';
 import 'generated/codegen_loader.g.dart';
 import 'generated/locale_keys.g.dart';
 import 'package:reflex_client/reflex_client.dart';
@@ -24,6 +27,14 @@ Future<void> main() async {
     appRunner: () async {
       WidgetsFlutterBinding.ensureInitialized();
       await EasyLocalization.ensureInitialized();
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        await FirebaseMessagingService.init();
+      } catch (e) {
+        debugPrint('[Firebase] Init skipped or failed: $e');
+      }
       await initializeClient();
       final savedRole = await RolePreferences.getSavedRole();
 

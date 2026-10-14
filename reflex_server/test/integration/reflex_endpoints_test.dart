@@ -32,5 +32,15 @@ void main() {
       );
       expect(exists, isFalse);
     });
+
+    test('when updating fcm token unauthenticated then throws exception', () async {
+      expect(
+        () => endpoints.userProfile.updateFcmToken(
+          sessionBuilder,
+          fcmToken: 'test-fcm-token-12345',
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
   });
 }

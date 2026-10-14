@@ -4,6 +4,7 @@ fields:
   authUserId: UuidValue
   displayName: String
   role: Role
+  fcmToken: String?
 indexes:
   learner_auth_idx:
     fields: authUserId

@@ -18,6 +18,7 @@ googleIdp:
 jwtRefresh:
   - refreshAccessToken:
 userProfile:
+  - updateFcmToken:
   - deleteAccount:
   - removeUserImage:
   - setUserImage:

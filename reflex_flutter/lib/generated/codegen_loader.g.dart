@@ -272,7 +272,12 @@ class CodegenLoader extends AssetLoader{
     "passwords_do_not_match": "Passwords do not match.",
     "submit_password_reset": "Reset Password & Sign In",
     "password_reset_success": "Password reset successfully! You can now sign in.",
-    "back_to_signin": "Back to Sign In"
+    "back_to_signin": "Back to Sign In",
+    "agree_to_terms_prefix": "I agree to the ",
+    "terms_of_service_link": "Terms of Service",
+    "and_conjunction": " and ",
+    "privacy_policy_link": "Privacy Policy",
+    "must_accept_privacy_policy": "Please accept the Terms of Service and Privacy Policy to continue."
   },
   "drawer": {
     "privacy_policy": "Privacy Policy",
@@ -572,7 +577,12 @@ static const Map<String,dynamic> _ar = {
     "passwords_do_not_match": "كلمتا المرور غير متطابقتين.",
     "submit_password_reset": "إعادة التعيين والدخول",
     "password_reset_success": "تم تغيير كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.",
-    "back_to_signin": "العودة لتسجيل الدخول"
+    "back_to_signin": "العودة لتسجيل الدخول",
+    "agree_to_terms_prefix": "أوافق على ",
+    "terms_of_service_link": "شروط الخدمة",
+    "and_conjunction": " و ",
+    "privacy_policy_link": "سياسة الخصوصية",
+    "must_accept_privacy_policy": "يرجى الموافقة على شروط الخدمة وسياسة الخصوصية للمتابعة."
   },
   "drawer": {
     "privacy_policy": "سياسة الخصوصية",

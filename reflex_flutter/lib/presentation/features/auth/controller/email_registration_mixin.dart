@@ -24,6 +24,7 @@ mixin EmailRegistrationMixin on State<AuthScreen> {
   TextEditingController get nameController;
   TextEditingController get otpController;
   Role get selectedRole;
+  bool get acceptedPrivacyPolicy;
 
   void navigateToAppShell({
     required Role role,
@@ -39,6 +40,10 @@ mixin EmailRegistrationMixin on State<AuthScreen> {
     }
     if (password.length < 8) {
       setState(() => errorMessage = LocaleKeys.auth_password_too_short.tr());
+      return;
+    }
+    if (!acceptedPrivacyPolicy) {
+      setState(() => errorMessage = LocaleKeys.auth_must_accept_privacy_policy.tr());
       return;
     }
 

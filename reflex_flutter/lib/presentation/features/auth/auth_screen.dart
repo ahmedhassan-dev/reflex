@@ -233,8 +233,11 @@ class _AuthScreenState extends AuthController {
                               selectedRole: selectedRole,
                               roleColor: roleColor,
                               isLoading: isLoading,
+                              acceptedPrivacyPolicy: acceptedPrivacyPolicy,
+                              onPrivacyPolicyChanged: (val) =>
+                                  setState(() => acceptedPrivacyPolicy = val ?? false),
                               onSignUp: signUpWithEmail,
-                              onGoogleSignIn: signInWithGoogle,
+                              onGoogleSignIn: signUpWithGoogle,
                               onAppleSignIn: signInWithApple,
                             ),
                             QuickDemoSectionWidget(
