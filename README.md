@@ -41,7 +41,7 @@ Reflex is designed mobile-first with high-fidelity dark aesthetics, micro-animat
 | 4. Courses Dashboard | 5. MCQ Flashcard Drill | 6. Option Selection |
 | :---: | :---: | :---: |
 | <img src="docs/screenshots/04_student_courses.png" width="220" alt="Student Courses" /> | <img src="docs/screenshots/06_practice_mcq.png" width="220" alt="Practice MCQ" /> | <img src="docs/screenshots/07_option_selected.png" width="220" alt="Option Selected" /> |
-| Enrolled courses & active tags | 30s countdown & hint trigger | Real-time option highlight |
+| Enrolled courses & active tags | Response timer vs teacher target | Real-time option highlight |
 
 | 7. 🟢 Chromatic Feedback (Mastered) | 8. Text-Input Question Drill | 9. Student Progress & Streaks |
 | :---: | :---: | :---: |
@@ -50,10 +50,10 @@ Reflex is designed mobile-first with high-fidelity dark aesthetics, micro-animat
 
 ### 👩‍🏫 Teacher Analytics & Management Portal
 
-| 10. Topic Mastery Breakdown | 11. Question Insights (Atomic Counters) |
-| :---: | :---: |
-| <img src="docs/screenshots/10_teacher_topic_mastery.png" width="260" alt="Teacher Topic Mastery" /> | <img src="docs/screenshots/11_teacher_question_insights.png" width="260" alt="Teacher Question Insights" /> |
-| Live student counts, progress bars, and clean solve metrics | Atomic solve counters, 1st try rate, and horizontal scroll |
+| 10. Topic Mastery Breakdown | 11. Question Insights (Atomic Counters) | 12. Question Admin & Target Time |
+| :---: | :---: | :---: |
+| <img src="docs/screenshots/10_teacher_topic_mastery.png" width="220" alt="Teacher Topic Mastery" /> | <img src="docs/screenshots/11_teacher_question_insights.png" width="220" alt="Teacher Question Insights" /> | <img src="docs/screenshots/12_teacher_question_admin.png" width="220" alt="Teacher Question Admin" /> |
+| Live student counts, progress bars, and clean solve metrics | Atomic solve counters, 1st try rate, and horizontal scroll | Curriculum editor, concept notes & teacher target time (15s) |
 
 ---
 
@@ -67,12 +67,12 @@ While completing my Master's in Software Engineering at **Quantic** (a global co
 
 Reflex transforms studying into a fast-paced active reflex:
 
-1. **Answer a Short Question (Active Micro-Recall):** Students solve quick 30-second scenario cards (multiple-choice or text-input) designed to trigger active recall without textbook burnout.
+1. **Answer a Short Question (Active Micro-Recall):** Students solve rapid scenario cards (multiple-choice or text-input) timed against the teacher's estimated target solve time (e.g., 10s-30s) to trigger active recall without textbook burnout.
 2. **Get Immediate Feedback (Chromatic Visual Aura):** Instant visual feedback (🟢 Green for mastered, 🟡 Yellow for developing, 🔴 Red for needs work) plus compulsory concept explanations and option rationales.
-3. **Track Accuracy & Response Time (Hesitation Detection):** Reflex doesn't only check if an answer is right; it measures millisecond reaction latency to detect true mastery versus lucky guesses or hesitation.
+3. **Track Accuracy & Response Time (Hesitation Detection):** Reflex doesn't only check if an answer is right; it measures millisecond reaction latency against the teacher's target estimation to detect true mastery versus lucky guesses or hesitation.
 4. **Review Again at the Right Time (Spaced Repetition Engine):** The Serverpod spaced repetition queue schedules cards at scientifically optimal intervals right before memory decays.
 
-Teachers create courses and questions, approve student subscriptions to private courses, and see live cohort analytics. **Each teacher only sees and manages their own content.**
+Teachers create courses and questions, set per-question target solve times (`expectedSeconds`), author guided hints and compulsory explanation notes, approve student subscriptions to private courses, and monitor live cohort analytics. **Each teacher only sees and manages their own content.**
 
 ## 🧠 Why Serverpod?
 
@@ -84,7 +84,7 @@ After years of building with Firebase, concurrency was the wall: many users writ
 
 - **Spaced-Repetition Review Queue:** Dynamically selects overdue flashcards or prioritizes new unattempted questions based on forgetting curve intervals.
 - **Chromatic Feedback Aura:** Instant feedback reflecting the student's mastery level:
-  - 🟢 **Green (Mastered):** Clean first-try solve answered under the target response time.
+  - 🟢 **Green (Mastered):** Clean first-try solve answered under the teacher's estimated target response time.
   - 🟡 **Yellow (Developing):** Correct answer, but slow response time or hint was requested.
   - 🔴 **Red (Needs Work):** Incorrect answer, scheduling the card for review in +1 day.
 - **Compulsory Explanation Note Gate:** When answering, students must view and absorb the teacher's concept explanation note before proceeding to the next card.
