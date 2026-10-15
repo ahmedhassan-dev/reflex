@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1280px;
+    height: 720px;
+    background-color: #FAF8F5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 18px 36px 14px 36px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .title {
+    font-size: 29px;
+    font-weight: 800;
+    color: #1E293B;
+    text-align: center;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .swimlane-headers {
+    position: relative;
+    width: 1208px;
+    height: 26px;
+    margin: 0 auto 4px auto;
+  }
+  .header-col {
+    position: absolute;
+    text-align: center;
+    font-size: 14.5px;
+    font-weight: 700;
+  }
+  .col-user { left: 28px; width: 154px; color: #0284C7; }
+  .col-flutter { left: 260px; width: 180px; color: #0284C7; }
+  .col-serverpod { left: 535px; width: 180px; color: #EA580C; }
+  .col-spaced { left: 780px; width: 232px; color: #059669; }
+  .col-postgres { left: 1060px; width: 135px; color: #4338CA; }
+
+  .canvas {
+    width: 1208px;
+    height: 560px;
+    position: relative;
+    margin: 0 auto;
+  }
+
+  .guideline {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    border-left: 1px dashed rgba(148, 163, 184, 0.35);
+    z-index: 1;
+  }
+  .guide-1 { left: 105px; }
+  .guide-2 { left: 350px; }
+  .guide-3 { left: 625px; }
+  .guide-4 { left: 896px; }
+  .guide-5 { left: 1127px; }
+
+  .phase-band {
+    position: absolute;
+    width: 100%;
+    border-radius: 12px;
+    z-index: 2;
+  }
+  .phase-header {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 3px 0;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  /* Phase 1 */
+  .phase-1 {
+    top: 0px;
+    height: 165px;
+    background: rgba(224, 242, 254, 0.45);
+    border: 1px solid rgba(186, 230, 253, 0.8);
+  }
+  .phase-1 .phase-header {
+    background: #BAE6FD;
+    color: #0369A1;
+  }
+
+  /* Phase 2 */
+  .phase-2 {
+    top: 177px;
+    height: 172px;
+    background: rgba(254, 243, 199, 0.45);
+    border: 1px solid rgba(253, 230, 138, 0.8);
+  }
+  .phase-2 .phase-header {
+    background: #FDE68A;
+    color: #B45309;
+  }
+
+  /* Phase 3 */
+  .phase-3 {
+    top: 361px;
+    height: 194px;
+    background: rgba(209, 250, 229, 0.45);
+    border: 1px solid rgba(167, 243, 208, 0.8);
+  }
+  .phase-3 .phase-header {
+    background: #A7F3D0;
+    color: #047857;
+  }
+
+  /* Nodes */
+  .node {
+    position: absolute;
+    border-radius: 10px;
+    padding: 6px 8px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .node-title {
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 1.25;
+    margin-bottom: 2px;
+    white-space: nowrap;
+  }
+  .node-sub {
+    font-size: 9.2px;
+    line-height: 1.25;
+    opacity: 0.92;
+  }
+
+  .node-blue-outline {
+    background: #ffffff;
+    border: 1.5px solid #0284C7;
+    color: #0369A1;
+  }
+  .node-green-outline {
+    background: #ffffff;
+    border: 1.5px solid #059669;
+    color: #047857;
+  }
+  .node-blue { background: #38BDF8; color: #ffffff; }
+  .node-orange { background: #FB923C; color: #ffffff; }
+  .node-emerald { background: #34D399; color: #ffffff; }
+  .node-indigo { background: #818CF8; color: #ffffff; }
+
+  .flow-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 4;
+  }
+  .flow-label {
+    font-size: 9px;
+    font-weight: 600;
+    fill: #475569;
+    text-anchor: middle;
+  }
+</style>
+</head>
+<body>
+
+  <h1 class="title">The Reflex Learning Loop: How Active Speed-Recall Actually Works</h1>
+
+  <div class="swimlane-headers">
+    <div class="header-col col-user">Student</div>
+    <div class="header-col col-flutter">Flutter App</div>
+    <div class="header-col col-serverpod">Serverpod</div>
+    <div class="header-col col-spaced">Spaced Repetition</div>
+    <div class="header-col col-postgres">PostgreSQL</div>
+  </div>
+
+  <div class="canvas">
+    <div class="guideline guide-1"></div>
+    <div class="guideline guide-2"></div>
+    <div class="guideline guide-3"></div>
+    <div class="guideline guide-4"></div>
+    <div class="guideline guide-5"></div>
+
+    <div class="phase-band phase-1">
+      <div class="phase-header">Phase 1: Card Request & Active Recall Drill</div>
+    </div>
+
+    <div class="phase-band phase-2">
+      <div class="phase-header">Phase 2: Timed Hesitation Detection & Submission</div>
+    </div>
+
+    <div class="phase-band phase-3">
+      <div class="phase-header">Phase 3: Chromatic Feedback Aura & Compulsory Note Gate</div>
+    </div>
+
+    <svg class="flow-svg">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#475569" />
+        </marker>
+        <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669" />
+        </marker>
+      </defs>
+
+      <!-- PHASE 1 ARROWS -->
+      <line x1="182" y1="61" x2="260" y2="61" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="221" y="53" class="flow-label">taps practice</text>
+
+      <line x1="440" y1="61" x2="535" y2="61" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="487" y="53" class="flow-label">getNextCard()</text>
+
+      <line x1="715" y1="61" x2="780" y2="61" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="747" y="53" class="flow-label">selectCard</text>
+
+      <line x1="1012" y1="61" x2="1060" y2="61" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="1036" y="53" class="flow-label">query</text>
+
+      <path d="M 1060 124 L 440 124" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" fill="none" />
+      <text x="742" y="116" class="flow-label">return QuestionView (Zero-Leakage Security Contract: answer & rationales stripped)</text>
+
+      <!-- PHASE 2 ARROWS -->
+      <line x1="182" y1="238" x2="260" y2="238" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="221" y="230" class="flow-label">taps answer</text>
+
+      <line x1="440" y1="238" x2="535" y2="238" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="487" y="230" class="flow-label">submitAttempt()</text>
+
+      <line x1="715" y1="238" x2="780" y2="238" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="747" y="230" class="flow-label">evaluate</text>
+
+      <path d="M 896 263 L 896 305 L 715 305" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" fill="none" />
+      <text x="805" y="297" class="flow-label">ReflexTier assigned</text>
+
+      <!-- PHASE 3 ARROWS -->
+      <line x1="535" y1="421" x2="440" y2="421" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="487" y="413" class="flow-label">SubmitResult</text>
+
+      <line x1="260" y1="421" x2="182" y2="421" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="221" y="413" class="flow-label">chromatic aura</text>
+
+      <line x1="182" y1="496" x2="260" y2="496" stroke="#059669" stroke-width="1.6" marker-end="url(#arrow-green)" />
+      <text x="221" y="488" class="flow-label" fill="#059669">reads note</text>
+
+      <line x1="440" y1="496" x2="535" y2="496" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="487" y="488" class="flow-label">acknowledgeNote()</text>
+
+      <line x1="715" y1="496" x2="1060" y2="496" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="887" y="488" class="flow-label">atomic SQL: session.db.unsafeExecute (increments & intervals)</text>
+    </svg>
+
+    <!-- PHASE 1 NODES -->
+    <div class="node node-blue-outline" style="top: 36px; left: 28px; width: 154px; height: 50px;">
+      <div class="node-title">Starts Practice</div>
+      <div class="node-sub">Selects Physics Deck</div>
+    </div>
+
+    <div class="node node-blue" style="top: 36px; left: 260px; width: 180px; height: 50px;">
+      <div class="node-title">getNextCard(courseId)</div>
+      <div class="node-sub">PracticeStateController</div>
+    </div>
+
+    <div class="node node-orange" style="top: 36px; left: 535px; width: 180px; height: 50px;">
+      <div class="node-title">CardSelector.selectNext()</div>
+      <div class="node-sub">Prioritize Overdue Cards</div>
+    </div>
+
+    <div class="node node-emerald" style="top: 36px; left: 780px; width: 232px; height: 50px;">
+      <div class="node-title">Spaced Repetition Queue</div>
+      <div class="node-sub">Intervals: 1d, 3d, 7d, 14d</div>
+    </div>
+
+    <div class="node node-indigo" style="top: 36px; left: 1060px; width: 135px; height: 50px;">
+      <div class="node-title">review_state</div>
+      <div class="node-sub">Filter by dueAt &lt;= now</div>
+    </div>
+
+    <div class="node node-blue" style="top: 99px; left: 260px; width: 180px; height: 50px;">
+      <div class="node-title">Speed Timer Starts</div>
+      <div class="node-sub">Counts down vs 6s target</div>
+    </div>
+
+    <!-- PHASE 2 NODES -->
+    <div class="node node-blue-outline" style="top: 213px; left: 28px; width: 154px; height: 50px;">
+      <div class="node-title">Selects Option A</div>
+      <div class="node-sub">Taps before timeout</div>
+    </div>
+
+    <div class="node node-blue" style="top: 213px; left: 260px; width: 180px; height: 50px;">
+      <div class="node-title">Measure Hesitation</div>
+      <div class="node-sub">Elapsed: 4.8s (Target: 6s)</div>
+    </div>
+
+    <div class="node node-orange" style="top: 213px; left: 535px; width: 180px; height: 50px;">
+      <div class="node-title">submitAttempt()</div>
+      <div class="node-sub">questionId, optionId, latency</div>
+    </div>
+
+    <div class="node node-emerald" style="top: 213px; left: 780px; width: 232px; height: 50px;">
+      <div class="node-title">AttemptOutcomeCalculator</div>
+      <div class="node-sub" style="font-size: 8.5px; letter-spacing: -0.2px;">🟢 Mastered &nbsp;•&nbsp; 🟡 Developing &nbsp;•&nbsp; 🔴 Needs Work</div>
+    </div>
+
+    <div class="node node-orange" style="top: 280px; left: 535px; width: 180px; height: 50px;">
+      <div class="node-title">SubmitResult DTO</div>
+      <div class="node-sub">tier, option rationales, topic note</div>
+    </div>
+
+    <!-- PHASE 3 NODES -->
+    <div class="node node-blue-outline" style="top: 396px; left: 28px; width: 154px; height: 50px;">
+      <div class="node-title">Sees Chromatic Aura</div>
+      <div class="node-sub">🟡 Amber: Correct but slow</div>
+    </div>
+
+    <div class="node node-blue" style="top: 396px; left: 260px; width: 180px; height: 50px;">
+      <div class="node-title">Dynamic Glow & Rationales</div>
+      <div class="node-sub">Explains correct & distractor options</div>
+    </div>
+
+    <div class="node node-orange" style="top: 396px; left: 535px; width: 180px; height: 50px;">
+      <div class="node-title">Compulsory Note Lock</div>
+      <div class="node-sub">Enforces explanation gate</div>
+    </div>
+
+    <div class="node node-green-outline" style="top: 471px; left: 28px; width: 154px; height: 50px;">
+      <div class="node-title">Compulsory Gate</div>
+      <div class="node-sub">Student reads concept note</div>
+    </div>
+
+    <div class="node node-blue" style="top: 471px; left: 260px; width: 180px; height: 50px;">
+      <div class="node-title">acknowledgeNote()</div>
+      <div class="node-sub">Unlocks "Continue to Next Card"</div>
+    </div>
+
+    <div class="node node-orange" style="top: 471px; left: 535px; width: 180px; height: 50px;">
+      <div class="node-title">Atomic Transaction</div>
+      <div class="node-sub">Increments counters & streak</div>
+    </div>
+
+    <div class="node node-indigo" style="top: 471px; left: 1060px; width: 135px; height: 50px;">
+      <div class="node-title">PostgreSQL Update</div>
+      <div class="node-sub">Atomic unsafeExecute update</div>
+    </div>
+  </div>
+
+</body>
+</html>

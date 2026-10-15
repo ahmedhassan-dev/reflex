@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1280px;
+    height: 720px;
+    background-color: #FAF8F5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 30px 18px 30px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .title {
+    font-size: 34px;
+    font-weight: 800;
+    color: #1E293B;
+    letter-spacing: -0.5px;
+  }
+
+  .diagram-container {
+    width: 1220px;
+    height: 580px;
+    position: relative;
+  }
+
+  .arrows-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1220px;
+    height: 580px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .card {
+    position: absolute;
+    border-radius: 16px;
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Flutter Card */
+  .card-flutter {
+    top: 0px;
+    left: 360px;
+    width: 500px;
+    height: 126px;
+    background: #38BDF8;
+    padding: 12px 24px;
+  }
+  .card-flutter h2 {
+    font-size: 23px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .card-flutter p {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.95);
+    font-weight: 500;
+  }
+
+  /* Serverpod Card */
+  .card-serverpod {
+    top: 180px;
+    left: 230px;
+    width: 760px;
+    height: 160px;
+    background: #F97316;
+    padding: 14px 24px;
+  }
+  .card-serverpod h2 {
+    font-size: 23px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .serverpod-grid {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .serverpod-col {
+    flex: 1;
+    padding: 0 12px;
+  }
+  .serverpod-col h3 {
+    font-size: 13.5px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255,255,255,0.35);
+    padding-bottom: 2px;
+  }
+  .serverpod-col p {
+    font-size: 11px;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.92);
+  }
+  .serverpod-footer {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.92);
+    font-weight: 500;
+    border-top: 1px solid rgba(255,255,255,0.25);
+    padding-top: 6px;
+    width: 100%;
+  }
+
+  /* Bottom Tier Cards */
+  .card-bottom {
+    top: 400px;
+    width: 285px;
+    height: 152px;
+    padding: 14px 18px;
+  }
+  .card-sentry {
+    left: 5px;
+    background: #F43F5E;
+  }
+  .card-chromatic {
+    left: 315px;
+    background: #8B5CF6;
+  }
+  .card-cloud {
+    left: 625px;
+    background: #10B981;
+  }
+  .card-postgres {
+    left: 935px;
+    background: #3B82F6;
+  }
+
+  .card-bottom h3 {
+    font-size: 16.5px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-bottom p {
+    font-size: 11px;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.92);
+  }
+
+  /* Arrow Labels */
+  .arrow-label {
+    font-size: 11px;
+    font-weight: 600;
+    fill: #475569;
+    text-anchor: middle;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+  }
+  .footer-tagline {
+    font-size: 14.5px;
+    color: #475569;
+    font-style: italic;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .footer-sub {
+    font-size: 12px;
+    color: #94A3B8;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+  <h1 class="title">Reflex Architecture</h1>
+
+  <div class="diagram-container">
+    <!-- SVG Connections -->
+    <svg class="arrows-layer">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#64748B" />
+        </marker>
+      </defs>
+
+      <!-- Flutter to Serverpod -->
+      <line x1="610" y1="126" x2="610" y2="176" stroke="#64748B" stroke-width="1.8" marker-end="url(#arrow)" />
+      <text x="610" y="154" class="arrow-label">Type-safe API calls via reflex_client</text>
+
+      <!-- Serverpod to Sentry -->
+      <path d="M 370 340 L 175 396" stroke="#64748B" stroke-width="1.8" marker-end="url(#arrow)" fill="none" />
+      <text x="250" y="360" class="arrow-label" transform="rotate(-15 250 360)">Capture error telemetry</text>
+
+      <!-- Serverpod to Chromatic -->
+      <path d="M 520 340 L 460 396" stroke="#64748B" stroke-width="1.8" marker-end="url(#arrow)" fill="none" />
+      <text x="475" y="370" class="arrow-label">Evaluate latency & aura</text>
+
+      <!-- Serverpod to Cloud -->
+      <path d="M 700 340 L 760 396" stroke="#64748B" stroke-width="1.8" marker-end="url(#arrow)" fill="none" />
+      <text x="745" y="370" class="arrow-label">Live API & Insights</text>
+
+      <!-- Serverpod to Postgres -->
+      <path d="M 850 340 L 1050 396" stroke="#64748B" stroke-width="1.8" marker-end="url(#arrow)" fill="none" />
+      <text x="965" y="360" class="arrow-label" transform="rotate(15 965 360)">Persist state & counters</text>
+    </svg>
+
+    <!-- 1. Flutter App Card -->
+    <div class="card card-flutter">
+      <h2>Flutter App</h2>
+      <p>CoursesScreen • PracticeScreen • QuestionAdminScreen • AnalyticsDashboard<br>
+      PracticeStateController (MVVM) • SentryTelemetry • easy_localization (EN/AR RTL)<br>
+      Live Circular Speed Timer • Web, iOS & Android</p>
+    </div>
+
+    <!-- 2. Serverpod Card -->
+    <div class="card card-serverpod">
+      <h2>Serverpod Backend</h2>
+      <div class="serverpod-grid">
+        <div class="serverpod-col">
+          <h3>Endpoints</h3>
+          <p>practice • questions<br>analytics • auth<br>demoClock</p>
+        </div>
+        <div class="serverpod-col">
+          <h3>Core Logic</h3>
+          <p>AttemptOutcomeCalculator<br>Spaced Repetition (CardSelector)<br>CohortStatsService</p>
+        </div>
+        <div class="serverpod-col">
+          <h3>Integrations & Data</h3>
+          <p>Atomic SQL Counter Increments<br>Zero-Leakage Security Contract<br>Teacher Content Scopes</p>
+        </div>
+      </div>
+      <div class="serverpod-footer">
+        All Dart • Auto-generated client • PostgreSQL ORM with migrations
+      </div>
+    </div>
+
+    <!-- 3. Bottom Cards -->
+    <div class="card card-bottom card-sentry">
+      <h3>🛡️ Sentry Cloud</h3>
+      <p>Distributed error telemetry<br>
+      Automatic PII & answer scrubbing<br>
+      Exception breadcrumbs & tracing<br>
+      → Health alerts & crash tracking</p>
+    </div>
+
+    <div class="card card-bottom card-chromatic">
+      <h3>🎨 Chromatic Engine</h3>
+      <p>🟢 Mastered (Fast, clean 1st try)<br>
+      🟡 Developing (Slow / hint note gate)<br>
+      🔴 Needs Work (+1d review queue)<br>
+      Compulsory concept explanation lock</p>
+    </div>
+
+    <div class="card card-bottom card-cloud">
+      <h3>☁️ Serverpod Cloud</h3>
+      <p>Live API: reflex.api.serverpod.space<br>
+      Live Web: reflex.serverpod.space<br>
+      Serverpod Insights dashboard<br>
+      Docker containerized cluster</p>
+    </div>
+
+    <div class="card card-bottom card-postgres">
+      <h3>💾 PostgreSQL</h3>
+      <p>Neon Tech serverless / local Postgres<br>
+      Atomic increments (unsafeExecute)<br>
+      Zero counter drift under load<br>
+      Courses, Questions, Options, Attempts</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-tagline">All type-safe, all Dart, end to end</div>
+    <div class="footer-sub">Built with Flutter + Serverpod 4.0.4</div>
+  </div>
+
+</body>
+</html>

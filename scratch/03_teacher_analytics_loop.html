@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1280px;
+    height: 720px;
+    background-color: #FAF8F5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 18px 36px 14px 36px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .title {
+    font-size: 29px;
+    font-weight: 800;
+    color: #1E293B;
+    text-align: center;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .swimlane-headers {
+    position: relative;
+    width: 1208px;
+    height: 26px;
+    margin: 0 auto 4px auto;
+  }
+  .header-col {
+    position: absolute;
+    text-align: center;
+    font-size: 14.5px;
+    font-weight: 700;
+  }
+  .col-teacher { left: 28px; width: 154px; color: #8B5CF6; }
+  .col-flutter { left: 260px; width: 180px; color: #0284C7; }
+  .col-serverpod { left: 535px; width: 180px; color: #EA580C; }
+  .col-analytics { left: 790px; width: 200px; color: #059669; }
+  .col-postgres { left: 1060px; width: 135px; color: #4338CA; }
+
+  .canvas {
+    width: 1208px;
+    height: 524px;
+    position: relative;
+    margin: 0 auto;
+  }
+
+  .guideline {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    border-left: 1px dashed rgba(148, 163, 184, 0.35);
+    z-index: 1;
+  }
+  .guide-1 { left: 105px; }
+  .guide-2 { left: 350px; }
+  .guide-3 { left: 625px; }
+  .guide-4 { left: 890px; }
+  .guide-5 { left: 1127px; }
+
+  .phase-band {
+    position: absolute;
+    width: 100%;
+    border-radius: 12px;
+    z-index: 2;
+  }
+  .phase-header {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 3px 0;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  /* Phase 1: Authoring */
+  .phase-1 {
+    top: 0px;
+    height: 156px;
+    background: rgba(243, 232, 255, 0.45);
+    border: 1px solid rgba(221, 214, 254, 0.8);
+  }
+  .phase-1 .phase-header {
+    background: #DDD6FE;
+    color: #6D28D9;
+  }
+
+  /* Phase 2: Subscriptions */
+  .phase-2 {
+    top: 168px;
+    height: 156px;
+    background: rgba(255, 237, 213, 0.45);
+    border: 1px solid rgba(254, 215, 170, 0.8);
+  }
+  .phase-2 .phase-header {
+    background: #FED7AA;
+    color: #C2410C;
+  }
+
+  /* Phase 3: Analytics */
+  .phase-3 {
+    top: 336px;
+    height: 178px;
+    background: rgba(224, 242, 254, 0.45);
+    border: 1px solid rgba(186, 230, 253, 0.8);
+  }
+  .phase-3 .phase-header {
+    background: #BAE6FD;
+    color: #0369A1;
+  }
+
+  /* Nodes */
+  .node {
+    position: absolute;
+    border-radius: 10px;
+    padding: 6px 8px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .node-title {
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 1.25;
+    margin-bottom: 2px;
+    white-space: nowrap;
+  }
+  .node-sub {
+    font-size: 9.5px;
+    line-height: 1.25;
+    opacity: 0.92;
+  }
+
+  .node-purple-outline {
+    background: #ffffff;
+    border: 1.5px solid #8B5CF6;
+    color: #6D28D9;
+  }
+  .node-blue { background: #38BDF8; color: #ffffff; }
+  .node-orange { background: #FB923C; color: #ffffff; }
+  .node-emerald { background: #34D399; color: #ffffff; }
+  .node-indigo { background: #818CF8; color: #ffffff; }
+
+  .flow-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 4;
+  }
+  .flow-label {
+    font-size: 9px;
+    font-weight: 600;
+    fill: #475569;
+    text-anchor: middle;
+  }
+
+  /* Bottom Callout */
+  .bottom-callout {
+    width: 1208px;
+    margin: 4px auto 0 auto;
+    background: #F5F3FF;
+    border: 1px solid #DDD6FE;
+    border-radius: 10px;
+    padding: 7px 20px;
+    text-align: center;
+    color: #5B21B6;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .bottom-callout strong {
+    font-size: 11.5px;
+    display: block;
+    margin-bottom: 1px;
+  }
+</style>
+</head>
+<body>
+
+  <h1 class="title">Teacher Curriculum & Cohort Analytics: How Mastery Is Managed</h1>
+
+  <div class="swimlane-headers">
+    <div class="header-col col-teacher">Teacher</div>
+    <div class="header-col col-flutter">Flutter Admin</div>
+    <div class="header-col col-serverpod">Serverpod Backend</div>
+    <div class="header-col col-analytics">Cohort Analytics</div>
+    <div class="header-col col-postgres">PostgreSQL</div>
+  </div>
+
+  <div class="canvas">
+    <div class="guideline guide-1"></div>
+    <div class="guideline guide-2"></div>
+    <div class="guideline guide-3"></div>
+    <div class="guideline guide-4"></div>
+    <div class="guideline guide-5"></div>
+
+    <div class="phase-band phase-1">
+      <div class="phase-header">Phase 1: Course & Question Authoring</div>
+    </div>
+
+    <div class="phase-band phase-2">
+      <div class="phase-header">Phase 2: Private Course Subscription Management</div>
+    </div>
+
+    <div class="phase-band phase-3">
+      <div class="phase-header">Phase 3: Real-Time Cohort Analytics & Question Insights</div>
+    </div>
+
+    <svg class="flow-svg">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#475569" />
+        </marker>
+      </defs>
+
+      <!-- PHASE 1 ARROWS -->
+      <line x1="182" y1="61" x2="260" y2="61" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="221" y="53" class="flow-label">creates question</text>
+
+      <line x1="440" y1="61" x2="535" y2="61" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="487" y="53" class="flow-label">createQuestion()</text>
+
+      <line x1="715" y1="61" x2="1060" y2="61" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="887" y="53" class="flow-label">atomic insert into question & question_option</text>
+
+      <path d="M 1060 116 L 260 116" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" fill="none" />
+      <text x="652" y="108" class="flow-label">deck updated: sets expectedSeconds (6s), hints & concept notes</text>
+
+      <!-- PHASE 2 ARROWS -->
+      <line x1="182" y1="229" x2="260" y2="229" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="221" y="221" class="flow-label">taps [Approve]</text>
+
+      <line x1="440" y1="229" x2="535" y2="229" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="487" y="221" class="flow-label">updateStatus()</text>
+
+      <line x1="715" y1="229" x2="1060" y2="229" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="887" y="221" class="flow-label">update learner_subscription (status = active)</text>
+
+      <path d="M 1060 284 L 440 284" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" fill="none" />
+      <text x="742" y="276" class="flow-label">student instantly granted practice deck access</text>
+
+      <!-- PHASE 3 ARROWS -->
+      <line x1="182" y1="391" x2="260" y2="391" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="221" y="383" class="flow-label">opens analytics</text>
+
+      <line x1="440" y1="391" x2="535" y2="391" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="487" y="383" class="flow-label">getDashboard()</text>
+
+      <line x1="715" y1="391" x2="790" y2="391" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="752" y="383" class="flow-label">aggregate</text>
+
+      <line x1="990" y1="391" x2="1060" y2="391" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="1025" y="383" class="flow-label">atomic SQL</text>
+
+      <path d="M 890 416 L 890 466 L 440 466" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" fill="none" />
+      <text x="665" y="458" class="flow-label">returns topic mastery breakdown & question difficulty indices</text>
+
+      <line x1="260" y1="466" x2="182" y2="466" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" />
+      <text x="221" y="458" class="flow-label">renders charts</text>
+    </svg>
+
+    <!-- Phase 1 Nodes -->
+    <div class="node node-purple-outline" style="top: 36px; left: 28px; width: 154px; height: 50px;">
+      <div class="node-title">Authors Curriculum</div>
+      <div class="node-sub">Physics: Forces & Motion</div>
+    </div>
+
+    <div class="node node-blue" style="top: 36px; left: 260px; width: 180px; height: 50px;">
+      <div class="node-title">Add Question Modal</div>
+      <div class="node-sub">MCQ options, points, 6s target</div>
+    </div>
+
+    <div class="node node-orange" style="top: 36px; left: 535px; width: 180px; height: 50px;">
+      <div class="node-title">QuestionEndpoint</div>
+      <div class="node-sub">Verify teacher ownership</div>
+    </div>
+
+    <div class="node node-indigo" style="top: 36px; left: 1060px; width: 135px; height: 50px;">
+      <div class="node-title">PostgreSQL DB</div>
+      <div class="node-sub">question + options</div>
+    </div>
+
+    <!-- Phase 2 Nodes -->
+    <div class="node node-purple-outline" style="top: 204px; left: 28px; width: 154px; height: 50px;">
+      <div class="node-title">Reviews Pending</div>
+      <div class="node-sub">Student enrollment list</div>
+    </div>
+
+    <div class="node node-blue" style="top: 204px; left: 260px; width: 180px; height: 50px;">
+      <div class="node-title">Subscriptions Sheet</div>
+      <div class="node-sub">Taps approve on student</div>
+    </div>
+
+    <div class="node node-orange" style="top: 204px; left: 535px; width: 180px; height: 50px;">
+      <div class="node-title">CourseAdminService</div>
+      <div class="node-sub">Activate enrollment scope</div>
+    </div>
+
+    <div class="node node-indigo" style="top: 204px; left: 1060px; width: 135px; height: 50px;">
+      <div class="node-title">learner_subscription</div>
+      <div class="node-sub">Active status saved</div>
+    </div>
+
+    <!-- Phase 3 Nodes -->
+    <div class="node node-purple-outline" style="top: 366px; left: 28px; width: 154px; height: 50px;">
+      <div class="node-title">Inspects Metrics</div>
+      <div class="node-sub">Topic mastery & latency</div>
+    </div>
+
+    <div class="node node-blue" style="top: 366px; left: 260px; width: 180px; height: 50px;">
+      <div class="node-title">Teacher Dashboard UI</div>
+      <div class="node-sub">Forces (100%), Motion (needs work)</div>
+    </div>
+
+    <div class="node node-orange" style="top: 366px; left: 535px; width: 180px; height: 50px;">
+      <div class="node-title">AnalyticsEndpoint</div>
+      <div class="node-sub">Secure cohort retrieval</div>
+    </div>
+
+    <div class="node node-emerald" style="top: 366px; left: 790px; width: 200px; height: 50px;">
+      <div class="node-title">CohortStatsService</div>
+      <div class="node-sub">1st-try rate, clean solves, speed</div>
+    </div>
+
+    <div class="node node-indigo" style="top: 366px; left: 1060px; width: 135px; height: 50px;">
+      <div class="node-title">Atomic Counters</div>
+      <div class="node-sub">Clean solves, attempts</div>
+    </div>
+
+    <div class="node node-purple-outline" style="top: 441px; left: 28px; width: 154px; height: 50px;">
+      <div class="node-title">Actionable Insight</div>
+      <div class="node-sub">Adjusts target or adds hint</div>
+    </div>
+  </div>
+
+  <div class="bottom-callout">
+    <strong>Why Active Spaced Recall Transforms Learning</strong>
+    Traditional education treats recall as passive recognition. Reflex measures millisecond latency against target times, exposing hidden hesitation and directing teacher intervention where it's needed most.
+  </div>
+
+</body>
+</html>

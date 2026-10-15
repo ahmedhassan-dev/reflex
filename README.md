@@ -68,6 +68,12 @@ Reflex dynamically evaluates both **accuracy** and **reaction latency** against 
 | <img src="docs/screenshots/11_teacher_add_question_sheet.png" width="230" alt="Add Question Sheet" /> | <img src="docs/screenshots/12_teacher_concept_note_and_hints.png" width="230" alt="Concept Note and Hints Editor" /> |
 | Responsive question type, points & target solve time | Foundational concept notes & hint authoring |
 
+#### 🔄 Teacher Curriculum & Cohort Analytics Workflow
+
+<p align="center">
+  <img src="docs/diagrams/03_teacher_analytics_loop.png" alt="Teacher Curriculum & Cohort Analytics Workflow" width="100%" />
+</p>
+
 ---
 
 ## 💡 Inspiration
@@ -77,6 +83,10 @@ Most educational apps are built for students who already love reading textbooks 
 While completing my Master's in Software Engineering at **Quantic** (a global community of over 17,000 members and alumni), I experienced how active, bite-sized smart cases transform engagement. **Reflex** brings that fast-paced active learning to the high school students who need it most.
 
 ## 🎯 What Reflex Does: The 4-Step Learning Loop
+
+<p align="center">
+  <img src="docs/diagrams/02_reflex_learning_loop.png" alt="The Reflex Learning Loop: How Active Speed-Recall Actually Works" width="100%" />
+</p>
 
 Reflex transforms studying into a fast-paced active reflex:
 
@@ -113,6 +123,12 @@ After years of building with Firebase, concurrency was the wall: many users writ
 ---
 
 ## 🏗️ Monorepo Architecture
+
+Reflex is built end-to-end in pure Dart, featuring a Flutter client (Web, iOS, Android) and a Serverpod 4.0.4 backend powered by PostgreSQL with atomic transactions and Sentry Cloud telemetry:
+
+<p align="center">
+  <img src="docs/diagrams/01_reflex_architecture.png" alt="Reflex Monorepo Architecture" width="100%" />
+</p>
 
 Reflex adopts a **Feature-First (Package-by-Feature / Screaming Architecture)** structure across both backend and frontend:
 
