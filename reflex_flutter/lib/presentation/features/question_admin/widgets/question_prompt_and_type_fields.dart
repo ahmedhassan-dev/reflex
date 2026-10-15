@@ -52,6 +52,39 @@ class QuestionPromptAndTypeFields extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
+        Text(
+          LocaleKeys.questions_admin_question_type_label.tr(),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        DropdownButtonFormField<QuestionType>(
+          key: const Key('dropdown_question_type'),
+          initialValue: selectedType,
+          isExpanded: true,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+          items: [
+            DropdownMenuItem(
+              value: QuestionType.multipleChoice,
+              child: Text(
+                LocaleKeys.questions_admin_type_multiple_choice.tr(),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            DropdownMenuItem(
+              value: QuestionType.textInput,
+              child: Text(
+                LocaleKeys.questions_admin_type_text_input.tr(),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+          onChanged: (val) {
+            if (val != null) onTypeChanged(val);
+          },
+        ),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
@@ -59,51 +92,14 @@ class QuestionPromptAndTypeFields extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    LocaleKeys.questions_admin_question_type_label.tr(),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 12),
-                  ),
-                  const SizedBox(height: 4),
-                  DropdownButtonFormField<QuestionType>(
-                    key: const Key('dropdown_question_type'),
-                    initialValue: selectedType,
-                    decoration: const InputDecoration(
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    items: [
-                      DropdownMenuItem(
-                        value: QuestionType.multipleChoice,
-                        child: Text(LocaleKeys
-                            .questions_admin_type_multiple_choice
-                            .tr()),
-                      ),
-                      DropdownMenuItem(
-                        value: QuestionType.textInput,
-                        child: Text(
-                            LocaleKeys.questions_admin_type_text_input.tr()),
-                      ),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) onTypeChanged(val);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            SizedBox(
-              width: 80,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
                     LocaleKeys.questions_admin_points_label.tr(),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 12),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   TextField(
+                    key: const Key('input_question_points'),
                     controller: pointsCtrl,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
@@ -115,18 +111,19 @@ class QuestionPromptAndTypeFields extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            SizedBox(
-              width: 90,
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     LocaleKeys.questions_admin_expected_seconds_label.tr(),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 12),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   TextField(
+                    key: const Key('input_question_time'),
                     controller: timeCtrl,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(

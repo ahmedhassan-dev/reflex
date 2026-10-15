@@ -31,29 +31,42 @@ Use these pre-configured accounts to explore the live app directly against the p
 
 Reflex is designed mobile-first with high-fidelity dark aesthetics, micro-animations, and instant chromatic feedback.
 
-### 🎓 Student Experience & Speed-Recall Practice
+### 🎓 1. Onboarding & Authentication
 
-| 1. Role Selection | 2. Authentication | 3. Quick Demo Personas |
+| Role Selection | Authentication (with Show Password) | Quick Demo Personas |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/01_role_selection.png" width="220" alt="Role Selection" /> | <img src="docs/screenshots/02_auth_signin.png" width="220" alt="Sign In" /> | <img src="docs/screenshots/03_quick_demo_personas.png" width="220" alt="Quick Demo" /> |
-| Choose Student or Teacher | Sign in with email or OAuth | One-tap judge & demo logins |
+| <img src="docs/screenshots/01_role_selection.png" width="220" alt="Role Selection" /> | <img src="docs/screenshots/02_auth_signin.png" width="220" alt="Sign In iOS" /> | <img src="docs/screenshots/03_quick_demo_personas.png" width="220" alt="Quick Demo" /> |
+| Student or Teacher persona switch | Email/password with visibility toggle | One-tap judge & demo logins |
 
-| 4. Courses Dashboard | 5. MCQ Flashcard Drill | 6. Option Selection |
+### 📚 2. Student Discovery, Speed Drills & Milestones
+
+| High School Courses Dashboard | MCQ Speed Drill (Target: 6s) | Student Progress & Streaks |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/04_student_courses.png" width="220" alt="Student Courses" /> | <img src="docs/screenshots/06_practice_mcq.png" width="220" alt="Practice MCQ" /> | <img src="docs/screenshots/07_option_selected.png" width="220" alt="Option Selected" /> |
-| Enrolled courses & active tags | Response timer vs teacher target | Real-time option highlight |
+| <img src="docs/screenshots/04_student_courses.png" width="220" alt="High School Courses" /> | <img src="docs/screenshots/06_practice_mcq.png" width="220" alt="Physics MCQ" /> | <img src="docs/screenshots/05_student_progress.png" width="220" alt="Student Progress" /> |
+| Physics, Chemistry & topic chips | Dynamic response timer vs teacher target | Mastery milestones & study streaks |
 
-| 7. 🟢 Chromatic Feedback (Mastered) | 8. Text-Input Question Drill | 9. Student Progress & Streaks |
-| :---: | :---: | :---: |
-| <img src="docs/screenshots/08_chromatic_feedback_mastered.png" width="220" alt="Chromatic Feedback" /> | <img src="docs/screenshots/09_practice_text_input.png" width="220" alt="Text Input" /> | <img src="docs/screenshots/05_student_progress.png" width="220" alt="Student Progress" /> |
-| Emerald green aura + rationales | Text answer with auto-grading | Mastery milestones & streaks |
+### 🎨 3. Chromatic Feedback Engine & Pedagogical Tiers
 
-### 👩‍🏫 Teacher Analytics & Management Portal
+Reflex dynamically evaluates both **accuracy** and **reaction latency** against the teacher's target time to assign distinct chromatic tiers:
 
-| 10. Topic Mastery Breakdown | 11. Question Insights (Atomic Counters) | 12. Question Admin & Target Time |
-| :---: | :---: | :---: |
-| <img src="docs/screenshots/10_teacher_topic_mastery.png" width="220" alt="Teacher Topic Mastery" /> | <img src="docs/screenshots/11_teacher_question_insights.png" width="220" alt="Teacher Question Insights" /> | <img src="docs/screenshots/12_teacher_question_admin.png" width="220" alt="Teacher Question Admin" /> |
-| Live student counts, progress bars, and clean solve metrics | Atomic solve counters, 1st try rate, and horizontal scroll | Curriculum editor, concept notes & teacher target time (15s) |
+| 🟡 Yellow (Developing Tier) | 🔴 Red (Needs Work Tier) |
+| :---: | :---: |
+| <img src="docs/screenshots/07_chromatic_feedback_developing.png" width="230" alt="Yellow Developing" /> | <img src="docs/screenshots/08_chromatic_feedback_needs_work.png" width="230" alt="Red Needs Work" /> |
+| **Correct, but slow or hint requested**<br>Compulsory concept note gate & full option rationales | **Inaccurate attempt**<br>Concept reinforcement & scheduled for next-day review queue |
+
+### 📊 4. Teacher Analytics Dashboard & Question Admin
+
+| Teacher Analytics Dashboard | Curriculum & Question Admin |
+| :---: | :---: |
+| <img src="docs/screenshots/09_teacher_topic_mastery.png" width="230" alt="Teacher Topic Mastery" /> | <img src="docs/screenshots/10_teacher_question_admin.png" width="230" alt="Teacher Question Admin" /> |
+| Topic mastery, clean solve counts & solve rates | Topic chips, target times & question metrics |
+
+### ✏️ 5. Teacher Question Creator & Pedagogical Authoring
+
+| Add Question Bottom Sheet | Concept Notes & Guided Hints Editor |
+| :---: | :---: |
+| <img src="docs/screenshots/11_teacher_add_question_sheet.png" width="230" alt="Add Question Sheet" /> | <img src="docs/screenshots/12_teacher_concept_note_and_hints.png" width="230" alt="Concept Note and Hints Editor" /> |
+| Responsive question type, points & target solve time | Foundational concept notes & hint authoring |
 
 ---
 

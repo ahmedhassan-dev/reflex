@@ -18,7 +18,10 @@ import 'presentation/shell/app_shell.dart';
 Future<void> main() async {
   await SentryFlutter.init(
     (options) {
-      options.dsn = const String.fromEnvironment('SENTRY_DSN', defaultValue: '');
+      options.dsn = const String.fromEnvironment(
+        'SENTRY_DSN',
+        defaultValue: '',
+      );
       options.tracesSampleRate = 1.0;
       options.beforeSend = (event, hint) {
         return event;
@@ -62,6 +65,7 @@ class ReflexApp extends StatelessWidget {
     return MaterialApp(
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
+      debugShowCheckedModeBanner: false,
       locale: context.locale,
       title: LocaleKeys.app_title.tr(),
       theme: ReflexTheme.light,
@@ -70,8 +74,8 @@ class ReflexApp extends StatelessWidget {
       home: isUserAuthenticated
           ? AppShell(initialRole: effectiveRole)
           : (initialRole != null
-              ? AuthScreen(initialRole: initialRole)
-              : const RoleSelectionScreen()),
+                ? AuthScreen(initialRole: initialRole)
+                : const RoleSelectionScreen()),
     );
   }
 }
