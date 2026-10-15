@@ -2,6 +2,30 @@
 
 > **Reflex** is a high-performance, adaptive spaced-repetition learning platform built with **Serverpod** (PostgreSQL) and **Flutter**. It combines rapid-recall card drills, chromatic performance feedback, live peer statistics, and teacher-authored concept mastery explanations.
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=Uv20QjTRHCo" target="_blank">
+    <img src="https://img.shields.io/badge/YouTube-Watch_Video_Walkthrough-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Video Walkthrough" />
+  </a>
+  <a href="https://reflex.serverpod.space/" target="_blank">
+    <img src="https://img.shields.io/badge/Live_App-reflex.serverpod.space-0284C7?style=for-the-badge&logo=flutter&logoColor=white" alt="Live Demo" />
+  </a>
+  <a href="https://reflex.api.serverpod.space/" target="_blank">
+    <img src="https://img.shields.io/badge/Serverpod_Backend-4.0.4-EA580C?style=for-the-badge&logo=dart&logoColor=white" alt="Serverpod Backend" />
+  </a>
+</p>
+
+---
+
+## 🎥 Video Walkthrough & Demo
+
+> **▶️ [Watch the Full Reflex Demo on YouTube](https://www.youtube.com/watch?v=Uv20QjTRHCo)** *(Answer Fast, Receive Instant Feedback, Track Speed & Accuracy)*
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=Uv20QjTRHCo" target="_blank">
+    <img src="https://img.youtube.com/vi/Uv20QjTRHCo/maxresdefault.jpg" alt="Reflex Demo Video Walkthrough" width="90%" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
+  </a>
+</p>
+
 ---
 
 ## ☁️ Live Demo & Deployment
@@ -10,6 +34,7 @@ Reflex is deployed and running live on **Serverpod Cloud**:
 
 | Service | Public URL | Description |
 | :--- | :--- | :--- |
+| 🎥 **Demo Video** | [https://www.youtube.com/watch?v=Uv20QjTRHCo](https://www.youtube.com/watch?v=Uv20QjTRHCo) | Complete product & architecture walkthrough |
 | 🌐 **Live Web App** | [https://reflex.serverpod.space/](https://reflex.serverpod.space/) | Deployed Flutter Web client |
 | ⚡ **API Server** | [https://reflex.api.serverpod.space/](https://reflex.api.serverpod.space/) | Live Serverpod backend API |
 | 📊 **Serverpod Insights** | [https://reflex.insights.serverpod.space/](https://reflex.insights.serverpod.space/) | Serverpod Insights dashboard |
