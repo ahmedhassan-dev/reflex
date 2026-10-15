@@ -169,7 +169,8 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                     hintText: LocaleKeys.auth_new_password_hint.tr(),
                     prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
                     suffixIcon: IconButton(
-                      icon: Icon(_obscureNewPassword ? Icons.visibility_off : Icons.visibility, size: 20),
+                      key: const Key('btn_toggle_new_password'),
+                      icon: Icon(_obscureNewPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20),
                       onPressed: () => setState(() => _obscureNewPassword = !_obscureNewPassword),
                     ),
                   ),
@@ -187,7 +188,8 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                     hintText: LocaleKeys.auth_confirm_password_hint.tr(),
                     prefixIcon: const Icon(Icons.lock_reset_rounded, size: 20),
                     suffixIcon: IconButton(
-                      icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility, size: 20),
+                      key: const Key('btn_toggle_confirm_password'),
+                      icon: Icon(_obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20),
                       onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                     ),
                   ),

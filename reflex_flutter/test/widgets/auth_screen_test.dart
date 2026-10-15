@@ -253,6 +253,7 @@ void main() {
       expect(find.text(LocaleKeys.auth_must_accept_privacy_policy.tr()), findsOneWidget);
 
       // Tapping Google sign in on Sign Up tab also blocked without acceptance
+      await tester.ensureVisible(find.byKey(const Key('btn_google_signin')));
       await tester.tap(find.byKey(const Key('btn_google_signin')));
       await tester.pumpAndSettle();
       expect(find.text(LocaleKeys.auth_must_accept_privacy_policy.tr()), findsOneWidget);
@@ -262,6 +263,64 @@ void main() {
       await tester.pumpAndSettle();
       final updatedCheckbox = tester.widget<Checkbox>(checkboxFinder);
       expect(updatedCheckbox.value, isTrue);
+    });
+
+    testWidgets('toggles password visibility on Sign In form', (tester) async {
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: const AuthScreen(initialRole: Role.student),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final passInputFinder = find.byKey(const Key('input_signin_password'));
+      expect(passInputFinder, findsOneWidget);
+      expect(tester.widget<TextField>(passInputFinder).obscureText, isTrue);
+
+      final toggleBtnFinder = find.byKey(const Key('btn_toggle_signin_password'));
+      expect(toggleBtnFinder, findsOneWidget);
+
+      // Tap toggle to show password
+      await tester.tap(toggleBtnFinder);
+      await tester.pumpAndSettle();
+      expect(tester.widget<TextField>(passInputFinder).obscureText, isFalse);
+
+      // Tap toggle again to hide password
+      await tester.tap(toggleBtnFinder);
+      await tester.pumpAndSettle();
+      expect(tester.widget<TextField>(passInputFinder).obscureText, isTrue);
+    });
+
+    testWidgets('toggles password visibility on Sign Up form', (tester) async {
+      await tester.pumpWidget(
+        createLocalizedTestWidget(
+          child: const AuthScreen(initialRole: Role.student),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Switch to Sign Up tab
+      final signUpTab = find.text(LocaleKeys.auth_tab_signup.tr());
+      await tester.ensureVisible(signUpTab);
+      await tester.tap(signUpTab);
+      await tester.pumpAndSettle();
+
+      final passInputFinder = find.byKey(const Key('input_signup_password'));
+      expect(passInputFinder, findsOneWidget);
+      expect(tester.widget<TextField>(passInputFinder).obscureText, isTrue);
+
+      final toggleBtnFinder = find.byKey(const Key('btn_toggle_signup_password'));
+      expect(toggleBtnFinder, findsOneWidget);
+
+      // Tap toggle to show password
+      await tester.tap(toggleBtnFinder);
+      await tester.pumpAndSettle();
+      expect(tester.widget<TextField>(passInputFinder).obscureText, isFalse);
+
+      // Tap toggle again to hide password
+      await tester.tap(toggleBtnFinder);
+      await tester.pumpAndSettle();
+      expect(tester.widget<TextField>(passInputFinder).obscureText, isTrue);
     });
   });
 }
