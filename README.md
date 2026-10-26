@@ -181,6 +181,32 @@ reflex/
 
 ---
 
+## 🧪 Built by Vibe Coding: An Idea-Validation Prototype
+
+Reflex was **vibe coded** with AI pair programming: the goal was to get a working product in front of real users fast and **validate the idea first** (does timed active recall, chromatic feedback, and teacher analytics actually engage students?) before investing in a hardened production build.
+
+Because speed-to-validation was the priority, the codebase is deliberately **split by feature** so any part can be refactored, replaced, or rebuilt later without touching the rest:
+
+| Feature Module | Isolated Responsibility | Safe to Rebuild Independently? |
+| :--- | :--- | :---: |
+| `auth` | Sign-in, registration, role selection (Student / Teacher) | ✅ |
+| `practice` | Card selection, speed timer, submission, chromatic tiers | ✅ |
+| `questions` | Course, topic, question & option authoring (teacher admin) | ✅ |
+| `analytics` | Cohort stats, topic mastery, question difficulty | ✅ |
+| `demo_clock` | Time-travel clock for spaced-repetition demos | ✅ |
+
+**How the structure keeps rebuilds cheap:**
+
+- **Thin endpoints → services → repositories:** business rules (`Grader`, `AttemptOutcomeCalculator`, `CardSelector`, `CohortStatsService`) are pure Dart with no database access, so they can be unit-tested and reused as-is in a future rewrite.
+- **Persistence is isolated:** only repositories touch PostgreSQL, so the storage layer can change without affecting domain logic.
+- **Typed contract:** the generated `reflex_client` and `.spy.yaml` models act as a stable API boundary between Flutter and the server.
+- **MVVM on the client:** views hold no business logic, so screens can be redesigned or ported independently of state and data code.
+- **Automated safety net:** `bash tool/check.sh` runs analysis plus server and Flutter tests, so refactors can be verified quickly.
+
+> ⚠️ **Prototype status:** Treat this as a validated proof of concept. Expect rough edges, and plan a deliberate hardening pass (security review, load testing, accessibility, and expanded test coverage) before scaling to production.
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -292,3 +318,5 @@ bash tool/check.sh
 ## 📄 License & Vision
 
 Reflex is developed for the Serverpod Hackathon 2026 and serves as the seed for an upcoming EdTech startup transforming active speed-recall learning.
+
+It was vibe coded as a fast prototype to validate the idea first. Its feature-split architecture is intentionally designed so individual modules can be refactored or rebuilt into a production-grade version as the product evolves.
